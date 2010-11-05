@@ -25,3 +25,8 @@ ADD_PROCESSOR(MS_Barcode_Decide)
 ADD_PROCESSOR(CvFindChessboardCorners)
 ADD_PROCESSOR(CvSolvePnP)
 ADD_PROCESSOR(CvUndistort)
+
+ADD_PROCESSOR(ProcKasia)
+ADD_PROCESSOR(ImageBlurer)
+
+ADD_PROCESSOR(KW_Palm_LUT)

@@ -20,7 +20,6 @@ class ScopeLogger
 {
 public:
 	ScopeLogger(Logger & p, const char * f, int l, Severity s) : parent(p), file(f), line(l), sev(s) {
-
 	}
 
 	~ScopeLogger() {

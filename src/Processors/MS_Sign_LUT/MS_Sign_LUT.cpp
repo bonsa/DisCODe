@@ -90,8 +90,12 @@ void MS_Sign_LUT::onNewImage()
 			// when the arrays are continuous,
 			// the outer loop is executed only once
 			// if not - it's executed for each row
+
+			// get pointer to beggining of i-th row of input hsv image
 			const uchar* hsv_p = hsv_img.ptr <uchar> (i);
+			// get pointer to beggining of i-th row of output hue image
 			uchar* seg_p = segments.ptr <uchar> (i);
+			// get pointer to beggining of i-th row of output segments
 			uchar* hue_p = hue_img.ptr <uchar> (i);
 
 			int j, k = 0;

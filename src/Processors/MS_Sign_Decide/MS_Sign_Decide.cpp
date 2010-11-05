@@ -68,7 +68,7 @@ bool MS_Sign_Decide::onStep()
 		int i;
 		IplImage h = IplImage(hue_img);
 		Types::Blobs::Blob *currentBlob;
-		Types::DrawableContainer signs;
+		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
 
 		// iterate through all found blobs
 		for (i = 0; i < blobs.GetNumBlobs(); i++ )

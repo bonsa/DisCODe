@@ -27,6 +27,7 @@ Movie_Source::~Movie_Source() {
 
 bool Movie_Source::onInit() {
 	LOG(TRACE) << "Movie_Source::initialize()\n";
+	std::cout << "Movie::onInit()\n";
 	newImage = registerEvent("newImage");
 
 	registerStream("out_img", &out_img);

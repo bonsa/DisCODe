@@ -3,6 +3,9 @@ FILE(GLOB files Component/Example/*)
 install(FILES ${files}
   DESTINATION Component/Example
   COMPONENT sdk)
+
+
+
   
 if (WIN32)
     install(PROGRAMS Component/create.bat
