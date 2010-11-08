@@ -15,20 +15,24 @@ namespace Sources {
 namespace Movie {
 
 Movie_Source::Movie_Source(const std::string & name) : Base::Component(name) {
-	LOG(TRACE) << "Movie_Source::Movie_Source()\n";
+	LOG(LTRACE) << "Movie_Source::Movie_Source()\n";
 
 //	cap = NULL;
 	trig = true;
 }
 
 Movie_Source::~Movie_Source() {
-	LOG(TRACE) << "Movie_Source::~Movie_Source()\n";
+	LOG(LTRACE) << "Movie_Source::~Movie_Source()\n";
 }
 
 bool Movie_Source::onInit() {
-	LOG(TRACE) << "Movie_Source::initialize()\n";
-	std::cout << "Movie::onInit()\n";
-	newImage = registerEvent("newImage");
+//<<<<<<< HEAD
+/* LOG(TRACE) << "Movie_Source::initialize()\n";*/
+//	std::cout << "Movie::onInit()\n";
+//=======
+//	LOG(LTRACE) << "Movie_Source::initialize()\n";
+//>>>>>> 00da083b01dd199755366baf70102d84c6dce4b1
+//	newImage = registerEvent("newImage");
 
 	registerStream("out_img", &out_img);
 
@@ -36,16 +40,16 @@ bool Movie_Source::onInit() {
 	registerHandler("onTrigger", &h_onTrigger);
 
 	if (!boost::filesystem::exists(props.filename)) {
-		LOG(ERROR) << "File " << props.filename << " doesn't exist.";
-		LOG(NOTICE) << "Check config file or override movie filename thorugh -S switch.";
+		LOG(LERROR) << "File " << props.filename << " doesn't exist.";
+		LOG(LNOTICE) << "Check config file or override movie filename thorugh -S switch.";
 		return false;
 	}
 
 	cap.open(props.filename);
 
 	if (!cap.isOpened()) {
-		LOG(ERROR) << "Couldn't open movie " << props.filename;
-		LOG(NOTICE) << "Check if you have proper codecs installed.";
+		LOG(LERROR) << "Couldn't open movie " << props.filename;
+		LOG(LNOTICE) << "Check if you have proper codecs installed.";
 		return false;
 	}
 
@@ -53,7 +57,7 @@ bool Movie_Source::onInit() {
 }
 
 bool Movie_Source::onFinish() {
-	LOG(TRACE) << "Movie_Source::finish()\n";
+	LOG(LTRACE) << "Movie_Source::finish()\n";
 	cap.release();
 
 	return true;
@@ -65,7 +69,7 @@ bool Movie_Source::onStep() {
 
 	trig = false;
 
-	LOG(TRACE) << "Movie_Source::step() start\n";
+	LOG(LTRACE) << "Movie_Source::step() start\n";
 	cap >> frame;
 	if (frame.empty()) {
 		return false;
@@ -76,7 +80,7 @@ bool Movie_Source::onStep() {
 
 	newImage->raise();
 
-	LOG(TRACE) << "Movie_Source::step() end\n";
+	LOG(LTRACE) << "Movie_Source::step() end\n";
 	return true;
 }
 
