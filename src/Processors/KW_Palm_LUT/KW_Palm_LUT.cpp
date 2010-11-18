@@ -76,10 +76,9 @@ void KW_Palm_LUT::onNewImage()
 		cv::Mat hsv_img = in_img.read();	//czytam obrazu w wejścia
 
 		cv::Size size = hsv_img.size();		//rozmiar obrazka
-;
-		hue_img.create(size, CV_8UC1);	//8bitów, 0-255, 1 kanał
-		saturation_img.create(size, CV_8UC1);
-		value_img.create(size, CV_8UC1);
+
+		palm_img.create(size, CV_8UC1);		//8bitów, 0-255, 1 kanał
+		m.create(2, CV_8UC1);
 		segments_img.create(size, CV_8UC1);
 
 		
@@ -115,7 +114,6 @@ void KW_Palm_LUT::onNewImage()
 			{
 				hue_p[k] = hsv_p[j];
 				sat_p[k] = hsv_p[j + 1];
-				val_p[k] = hsv_p[j + 2];
 				//seg_p[k] = hsv_p[j + 2];
 
 				seg_p[k] = 0;

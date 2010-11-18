@@ -14,8 +14,12 @@
 #include "DataStream.hpp"
 #include "Props.hpp"
 
+#include <Types/stream_OpenCV.hpp>
+
 #include <cv.h>
 #include <highgui.h>
+
+#include <sstream>
 
 namespace Processors {
 namespace KW_Palm {
@@ -27,11 +31,24 @@ using namespace cv;
  */
 struct Props: public Base::Props
 {
+	int lambda;
+	int features;
+	cv::Mat mean;
+	cv::Mat cov;
+
+
 	/*!
 	 * \copydoc Base::Props::load
 	 */
 	void load(const ptree & pt)
 	{
+		lambda = pt.get("lambda", 3);
+
+		features = pt.get("features", 2);
+
+
+		cov = str2mat(cv::Size(2, 2), pt.get("cov", ""), 1.0);
+	//	mean = str2mat(cv::Size(features, 1), pt.get("mean", ""), 1.0);
 	}
 
 	/*!
@@ -110,25 +127,14 @@ protected:
 	Base::Event * newImage;
 
 	/// Output data stream - hue part with continous red
-	Base::DataStreamOut <Mat> out_hue;
-
-	/// Output data stream - saturation
-	Base::DataStreamOut <Mat> out_saturation;
-
-	/// Output data stream - value
-	Base::DataStreamOut <Mat> out_value;	
-
-	/// Output data stream - segments
-	Base::DataStreamOut <Mat> out_segments;
+	Base::DataStreamOut <Mat> out_palm;
 
 	/// Properties
 	Props props;
 
 private:
-	cv::Mat hue_img;
-	cv::Mat saturation_img;
-	cv::Mat value_img;
-	cv::Mat segments_img;
+	cv::Mat palm_img;
+
 };
 
 }//: namespace KW_Palm
