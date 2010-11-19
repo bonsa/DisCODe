@@ -33,6 +33,7 @@ struct Props: public Base::Props
 {
 	int lambda;
 	int features;
+	int value;
 	cv::Mat mean;
 	cv::Mat cov;
 
@@ -43,12 +44,13 @@ struct Props: public Base::Props
 	void load(const ptree & pt)
 	{
 		lambda = pt.get("lambda", 3);
-
+		value = pt.get("value", 0);
 		features = pt.get("features", 2);
 
 
-		cov = str2mat(cv::Size(2, 2), pt.get("cov", ""), 1.0);
-	//	mean = str2mat(cv::Size(features, 1), pt.get("mean", ""), 1.0);
+		cov = str2mat(cv::Size(features, features), pt.get("cov", ""), 1.0);
+		mean = str2mat(cv::Size(features, 1), pt.get("mean", ""), 1.0);
+
 	}
 
 	/*!
@@ -56,6 +58,25 @@ struct Props: public Base::Props
 	 */
 	void save(ptree & pt)
 	{
+	}
+
+protected:
+	cv::Mat str2mat(cv::Size size, std::string s, double norm) {
+		std::stringstream ss;
+		cv::Mat mat = cv::Mat::eye(size, CV_32F);
+		double val;
+
+		ss << s;
+
+		for (int i = 0; i < size.height; ++i) {
+			for (int j = 0; j < size.width; ++j) {
+				ss >> val;
+				val /= norm;
+				mat.at<float>(i,j) = val;
+			}
+		}
+
+		return mat;
 	}
 };
 
@@ -123,17 +144,21 @@ protected:
 	/// Input image
 	Base::DataStreamIn <Mat> in_img;
 
+
 	/// Event raised, when image is processed
 	Base::Event * newImage;
 
-	/// Output data stream - hue part with continous red
-	Base::DataStreamOut <Mat> out_palm;
+	/// Output data stream - skin part
+	Base::DataStreamOut <Mat> out_img;
+
 
 	/// Properties
 	Props props;
 
 private:
-	cv::Mat palm_img;
+	cv::Mat skin_img;
+
+
 
 };
 

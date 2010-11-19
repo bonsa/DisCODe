@@ -4,7 +4,7 @@
 	<Components>
 
 		<Seq1 type="Sequence" thread="Exec1" group="s1">
-			<directory>/home/kasia/Pulpit/fotoINZ/DaneUczace/</directory> 
+			<directory>/home/kasia/Pulpit/fotoINZ/sort_4/Dane_testowe/</directory> 
 			<pattern>.*\.jpg</pattern>
 		</Seq1>
 		
@@ -12,7 +12,15 @@
 			<type>BGR2HSV</type>
 		</ColorConv>
 		
-		<SkinArray type="KW_Skin" thread="Exec1" group="s1">
+		<SkinArray type="KW_Palm_LUT" thread="Exec1" group="s1">
+			<cov>
+				0.0208683 0.0205496
+				0.0205496 0.0207089
+			</cov>
+			<mean>
+				0.367551
+				0.393607		
+			</mean>
 		</SkinArray>
 
 		<Wnd1 type="CvWindow" thread="Exec2" group="s1">
@@ -59,12 +67,12 @@
 		
 		<SkinArray>
 				<in_img  type="in" group="Con2"/>
-				<out_hue type="out" group="Con3"/>
-				<out_saturation type="out" group="Con3"/>
+				<out_img type="out" group="Con3"/>
 		</SkinArray>
 		
 		<Wnd1>
 			<in_img  type="in" group="Con3"/>
+		
 		</Wnd1>
 		
 	</DataStreams>

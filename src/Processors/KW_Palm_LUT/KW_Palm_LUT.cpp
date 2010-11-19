@@ -38,10 +38,8 @@ bool KW_Palm_LUT::onInit()
 
 	newImage = registerEvent("newImage");
 
-	registerStream("out_hue", &out_hue);
-	registerStream("out_saturation", &out_saturation);
-	registerStream("out_value", &out_value);
-	registerStream("out_segments", &out_segments);
+	registerStream("out_img", &out_img);
+
 
 	return true;
 }
@@ -77,47 +75,72 @@ void KW_Palm_LUT::onNewImage()
 
 		cv::Size size = hsv_img.size();		//rozmiar obrazka
 
-		palm_img.create(size, CV_8UC1);		//8bitów, 0-255, 1 kanał
-		m.create(2, CV_8UC1);
-		segments_img.create(size, CV_8UC1);
+		skin_img.create(size, CV_8UC1);		//8bitów, 0-255, 1 kanał
 
-		
+		double lambda;
+		float value;
+		cv::Mat inv_cov(2, 2, CV_32FC1);	//odwrotna macierz kowariancji
+		cv::Mat pixel(2, 1, CV_32FC1);
 
 		// Check the arrays for continuity and, if this is the case,
 		// treat the arrays as 1D vectors
-		if (hsv_img.isContinuous() && segments_img.isContinuous() && value_img.isContinuous() && hue_img.isContinuous() && saturation_img.isContinuous()) {
+		if (hsv_img.isContinuous())  {
 			size.width *= size.height;
 			size.height = 1;
 		}
 		size.width *= 3;
 
+
 		for (int i = 0; i < size.height; i++) {
+
 			// when the arrays are continuous,
 			// the outer loop is executed only once
 			// if not - it's executed for each row
 
-			// get pointer to beggining of i-th row of input hsv image
-			const uchar* hsv_p = hsv_img.ptr <uchar> (i);
+			// get pointer to beggining of i-th row of input image
+			const uchar* c_p = hsv_img.ptr <uchar> (i);
 			// get pointer to beggining of i-th row of output hue image
-			uchar* hue_p = hue_img.ptr <uchar> (i);
-			// get pointer to beggining of i-th row of output saturation image
-			uchar* sat_p = saturation_img.ptr <uchar> (i);
-			// get pointer to beggining of i-th row of output value image
-			uchar* val_p = value_img.ptr <uchar> (i);
-			// get pointer to beggining of i-th row of output vsegment image
-			uchar* seg_p = segments_img.ptr <uchar> (i);
+			uchar* skin_p = skin_img.ptr <uchar> (i);
 
-			
 
-			int j, k = 0;
-			for (j = 0; j < size.width; j += 3)
-			{
-				hue_p[k] = hsv_p[j];
-				sat_p[k] = hsv_p[j + 1];
+			int j = 0;
+			for (j = 0; j < size.width; j += 3) {
+
+
+				pixel.at<float>(0, 0) = c_p[j];
+				pixel.at<float>(1, 0) = c_p[j+1];
+
+
+				LOG(LERROR) << "KW_Palm_LUT:*******************przedinvert\n";
+				cv::invert(props.cov, inv_cov, CV_LU);
+				LOG(LERROR) << "KW_Palm_LUT:*******************poinvert\n";
+
+
+				for (int i = 0; i < props.mean.size().height; ++i)
+					LOG(LERROR) << "Mean[" << i << "] = " << props.mean.at<double>(i, 0);
+
+				for (int i = 0; i < props.cov.size().height; ++i)
+					for (int j = 0; j < props.cov.size().width; ++j)
+						LOG(LERROR) << "Covar[" << i << "," << j << "] = " << props.cov.at<double>(i, j);
+
+				LOG(LERROR) << "KW_Palm_LUT:*******************poPrzedMaha\n";
+				lambda = cv::Mahalanobis(pixel, props.mean, props.cov);
+				LOG(LERROR) << "KW_Palm_LUT:*******************poOdlMaha\n";
+				value = c_p[j+2];
+
+				if ((lambda <= props.lambda) && (value >= props.value)) {
+					skin_p[j] = 255;
+				}
+				else {
+					skin_p[j] = 0;
+				}
+
+//				hue_p[k] = hsv_p[j];
+	//			sat_p[k] = hsv_p[j + 1];
 				//seg_p[k] = hsv_p[j + 2];
 
-				seg_p[k] = 0;
-				if ((hue_p[k] > H(0)) && (hue_p[k] < H(50)))
+//				seg_p[k] = 0;
+/*				if ((hue_p[k] > H(0)) && (hue_p[k] < H(50)))
 				{
 					if((sat_p[k] > 23) && (sat_p[k] < 68))
 					{
@@ -126,13 +149,12 @@ void KW_Palm_LUT::onNewImage()
 				}
 
 				++k;
-			}
+	*/		}
 		}
 
-		out_hue.write(hue_img);
-		out_saturation.write(saturation_img);
-		out_value.write(value_img);
-		out_segments.write(segments_img);
+		LOG(LERROR) << "KW_Palm_LUT:*******************888****8\n";
+		out_img.write(skin_img);
+
 
 		newImage->raise();
 
