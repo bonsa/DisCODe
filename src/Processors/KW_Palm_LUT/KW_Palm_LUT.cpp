@@ -80,7 +80,7 @@ void KW_Palm_LUT::onNewImage()
 		double lambda;
 		float value;
 		cv::Mat inv_cov(2, 2, CV_32FC1);	//odwrotna macierz kowariancji
-		cv::Mat pixel(2, 1, CV_32FC1);
+		cv::Mat pixel(1, 2, CV_32FC1);
 
 		// Check the arrays for continuity and, if this is the case,
 		// treat the arrays as 1D vectors
@@ -108,24 +108,26 @@ void KW_Palm_LUT::onNewImage()
 
 
 				pixel.at<float>(0, 0) = c_p[j];
-				pixel.at<float>(1, 0) = c_p[j+1];
+				pixel.at<float>(0, 1) = c_p[j+1];
 
 
-				LOG(LERROR) << "KW_Palm_LUT:*******************przedinvert\n";
+
 				cv::invert(props.cov, inv_cov, CV_LU);
-				LOG(LERROR) << "KW_Palm_LUT:*******************poinvert\n";
 
 
-				for (int i = 0; i < props.mean.size().height; ++i)
-					LOG(LERROR) << "Mean[" << i << "] = " << props.mean.at<double>(i, 0);
+
+			/*	for (int i = 0; i < props.mean.size().width; ++i) {
+					LOG(LERROR) << "Jestem w petli for do wyświetlania mean";
+					LOG(LERROR) << "Mean[" << i << "] = " << props.mean.at<double>(0, i);
+				}
 
 				for (int i = 0; i < props.cov.size().height; ++i)
 					for (int j = 0; j < props.cov.size().width; ++j)
 						LOG(LERROR) << "Covar[" << i << "," << j << "] = " << props.cov.at<double>(i, j);
-
-				LOG(LERROR) << "KW_Palm_LUT:*******************poPrzedMaha\n";
+*/
+	//			LOG(LERROR) << "KW_Palm_LUT:*******************PrzedMaha\n";
 				lambda = cv::Mahalanobis(pixel, props.mean, props.cov);
-				LOG(LERROR) << "KW_Palm_LUT:*******************poOdlMaha\n";
+		//		LOG(LERROR) << "KW_Palm_LUT:*******************poOdlMaha\n";
 				value = c_p[j+2];
 
 				if ((lambda <= props.lambda) && (value >= props.value)) {

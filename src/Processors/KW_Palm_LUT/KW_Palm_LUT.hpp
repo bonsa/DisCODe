@@ -51,6 +51,16 @@ struct Props: public Base::Props
 		cov = str2mat(cv::Size(features, features), pt.get("cov", ""), 1.0);
 		mean = str2mat(cv::Size(features, 1), pt.get("mean", ""), 1.0);
 
+		for (int i = 0; i <mean.size().width; ++i) {
+				LOG(LERROR) << "LOAD";
+				LOG(LERROR) << "Mean[" << i << "] = " << mean.at<double>(0, i);
+			}
+
+			for (int i = 0; i < cov.size().height; ++i)
+				for (int j = 0; j < cov.size().width; ++j) {
+					LOG(LERROR) << "LOAD";
+					LOG(LERROR) << "Covar[" << i << "," << j << "] = " << cov.at<double>(i, j);
+			}
 	}
 
 	/*!
