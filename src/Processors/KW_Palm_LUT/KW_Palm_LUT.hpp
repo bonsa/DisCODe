@@ -43,8 +43,8 @@ struct Props: public Base::Props
 	 */
 	void load(const ptree & pt)
 	{
-		lambda = pt.get("lambda", 3);
-		value = pt.get("value", 0);
+		lambda = pt.get("lambda", 1);
+		value = pt.get("value", 50);
 		features = pt.get("features", 2);
 
 
@@ -53,13 +53,13 @@ struct Props: public Base::Props
 
 		for (int i = 0; i <mean.size().width; ++i) {
 				LOG(LERROR) << "LOAD";
-				LOG(LERROR) << "Mean[" << i << "] = " << mean.at<double>(0, i);
+				LOG(LERROR) << "Mean[" << i << "] = " << mean.at<float>(0, i);
 			}
 
 			for (int i = 0; i < cov.size().height; ++i)
 				for (int j = 0; j < cov.size().width; ++j) {
 					LOG(LERROR) << "LOAD";
-					LOG(LERROR) << "Covar[" << i << "," << j << "] = " << cov.at<double>(i, j);
+					LOG(LERROR) << "Covar[" << i << "," << j << "] = " << cov.at<float>(i, j);
 			}
 	}
 

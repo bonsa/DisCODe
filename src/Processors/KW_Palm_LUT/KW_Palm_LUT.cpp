@@ -77,6 +77,7 @@ void KW_Palm_LUT::onNewImage()
 
 		skin_img.create(size, CV_8UC1);		//8bitów, 0-255, 1 kanał
 
+
 		double lambda;
 		float value;
 		cv::Mat inv_cov(2, 2, CV_32FC1);	//odwrotna macierz kowariancji
@@ -84,12 +85,11 @@ void KW_Palm_LUT::onNewImage()
 
 		// Check the arrays for continuity and, if this is the case,
 		// treat the arrays as 1D vectors
-		if (hsv_img.isContinuous())  {
+		if (hsv_img.isContinuous() && skin_img.isContinuous())  {
 			size.width *= size.height;
 			size.height = 1;
 		}
 		size.width *= 3;
-
 
 		for (int i = 0; i < size.height; i++) {
 
@@ -103,38 +103,37 @@ void KW_Palm_LUT::onNewImage()
 			uchar* skin_p = skin_img.ptr <uchar> (i);
 
 
-			int j = 0;
+			int j,k = 0;
 			for (j = 0; j < size.width; j += 3) {
 
 
-				pixel.at<float>(0, 0) = c_p[j];
-				pixel.at<float>(0, 1) = c_p[j+1];
+				pixel.at<float>(0, 0) = c_p[j]/255.0;
+				pixel.at<float>(0, 1) = c_p[j+1]/255.0;
 
+		//		pixel.at<float>(0, 0) = pixel.at<float>(0, 0)/255.0;
+		//		pixel.at<float>(0, 1) = pixel.at<float>(0, 1)/255.0;
 
-
+	//			LOG(LERROR) << "KW_Palm_LUT::pixel: "<<c_p[j]<<", "<< c_p[j+1]<<"\n";
+	//			LOG(LERROR) << "KW_Palm_LUT::pixel: "<<pixel.at<float>(0, 0)<<", "<< pixel.at<float>(0, 1)<<"\n";
+	//			LOG(LERROR)  << size.width<<"\n";
+	//			LOG(LERROR)  << hsv_img.size().width<<"\n";
+	//			LOG(LERROR)  << hsv_img.size().height<<"\n";
+	//			LOG(LERROR)  << "*********************************************************";
 				cv::invert(props.cov, inv_cov, CV_LU);
 
+				lambda = cv::Mahalanobis(pixel, props.mean, inv_cov);
 
+		//		LOG(LERROR) << "KW_Palm_LUT::lambda: "<<lambda<<"\n";
 
-			/*	for (int i = 0; i < props.mean.size().width; ++i) {
-					LOG(LERROR) << "Jestem w petli for do wyświetlania mean";
-					LOG(LERROR) << "Mean[" << i << "] = " << props.mean.at<double>(0, i);
-				}
-
-				for (int i = 0; i < props.cov.size().height; ++i)
-					for (int j = 0; j < props.cov.size().width; ++j)
-						LOG(LERROR) << "Covar[" << i << "," << j << "] = " << props.cov.at<double>(i, j);
-*/
-	//			LOG(LERROR) << "KW_Palm_LUT:*******************PrzedMaha\n";
-				lambda = cv::Mahalanobis(pixel, props.mean, props.cov);
-		//		LOG(LERROR) << "KW_Palm_LUT:*******************poOdlMaha\n";
 				value = c_p[j+2];
 
 				if ((lambda <= props.lambda) && (value >= props.value)) {
-					skin_p[j] = 255;
+					skin_p[k] = 255;
+		//			LOG(LERROR) << "KW_Palm_LUT::mahalanobis:1\n";
 				}
 				else {
-					skin_p[j] = 0;
+					skin_p[k] = 0;
+		//			LOG(LERROR) << "KW_Palm_LUT::mahalanobis:0\n";
 				}
 
 //				hue_p[k] = hsv_p[j];
@@ -149,9 +148,9 @@ void KW_Palm_LUT::onNewImage()
 						seg_p[k] = 255;
 					}
 				}
-
+*/
 				++k;
-	*/		}
+			}
 		}
 
 		LOG(LERROR) << "KW_Palm_LUT:*******************888****8\n";

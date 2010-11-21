@@ -4,8 +4,11 @@
 	<Components>
 
 		<Seq1 type="Sequence" thread="Exec1" group="s1">
-			<directory>/home/kasia/Pulpit/fotoINZ/sort_4/Dane_uczace/</directory>
-			<pattern>.*\.jpg</pattern>
+	<!--	<directory>/home/kasia/Pulpit/fotoINZ/sort_4/Dane_uczące/</directory>
+		-->
+		<directory>/home/kasia/Pulpit/daneut/2/dane_uczące</directory>
+		<pattern>.*\.jpg</pattern>
+		
 		</Seq1>
 
 		<Cov1 type="KW_Cov" thread="Exec1" group="s1">
