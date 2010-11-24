@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- List of components -->
+	<Components>
+
+		
+		<Movie type="Movie" thread="Exec1" group="s1">
+			<filename>/home/kasia/Pulpit/inz21.11/dlon2.AVI</filename>
+		</Movie>
+		
+		<ColorConv type="CvColorConv" thread="Exec1" group="s1">
+			<type>BGR2HSV</type>
+		</ColorConv>
+		
+		<SkinArray type="KW_Skin_Detection" thread="Exec1" group="s1">
+		
+		</SkinArray>
+	<!--	
+		<MorphOpen type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_OPEN</type>
+			<iterations>3</iterations>
+		</MorphOpen>
+
+-->
+
+		<Wnd1 type="CvWindow" thread="Exec1" group="s1">
+		</Wnd1>
+					
+
+	</Components>
+
+	<!-- Threads of execution -->
+	<Executors>
+
+		  
+	<Exec1 type="continuous">
+			<main_component>Movie</main_component>
+			<iterations>200</iterations>
+		</Exec1>
+        
+        
+        
+        
+	</Executors>
+
+	<!-- Event connections -->
+	<Events>
+
+		<Event source="Movie.newImage" destination="ColorConv.onNewImage"/>
+		<Event source="ColorConv.newImage" destination="SkinArray.onNewImage"/>
+		<Event source="SkinArray.newImage" destination="Wnd1.onNewImage"/>
+	
+	</Events>
+
+	<!-- Data stream assignments -->
+	<DataStreams>
+		<Movie>
+			<out_img type="out" group="Con1"/>
+		</Movie>
+		
+		<ColorConv>
+				<in_img  type="in" group="Con1"/>
+				<out_img type="out" group="Con2"/>
+		</ColorConv>
+		
+		<SkinArray>
+				<in_img  type="in" group="Con2"/>
+				<out_img type="out" group="Con3"/>
+		</SkinArray> 
+
+		
+		<Wnd1>
+			<in_img  type="in" group="Con3"/>	
+		</Wnd1>
+		
+		
+		
+		
+	</DataStreams>
+
+</Task>
