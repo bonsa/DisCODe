@@ -5,7 +5,7 @@
 
 		
 		<Movie type="Movie" thread="Exec1" group="s1">
-			<filename>/home/kasia/Pulpit/inz21.11/lab_1is.avi</filename>
+			<filename>/home/kasia/Pulpit/inz21.11/lab_1.avi</filename>
 		</Movie>
 		
 		<ColorConv type="CvColorConv" thread="Exec1" group="s1">
