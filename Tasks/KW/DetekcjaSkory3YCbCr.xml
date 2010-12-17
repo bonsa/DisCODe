@@ -5,14 +5,14 @@
 
 		
 		<Movie type="Movie" thread="Exec1" group="s1">
-			<filename>/home/kasia/Pulpit/inz21.11/lab_1is.avi</filename>
+			<filename>/home/kasia/Pulpit/inz21.11/lab_1.avi</filename>
 		</Movie>
 		
 		<ColorConv type="CvColorConv" thread="Exec1" group="s1">
-			<type>BGR2HSV</type>
+			<type>RGB2YCrCb</type>
 		</ColorConv>
 		
-		<SkinArray type="KW_Skin_Detection" thread="Exec1" group="s1">
+		<SkinArray type="KW_Skin_DetectionYCbCr" thread="Exec1" group="s1">
 		
 		</SkinArray>
 		
@@ -20,8 +20,10 @@
 			<type>MORPH_OPEN</type>
 			<iterations>5</iterations>
 		</MorphOpen>
-		
-	
+
+
+
+
 		<Wnd1 type="CvWindow" thread="Exec1" group="s1">
 		</Wnd1>
 					
@@ -48,6 +50,7 @@
 		<Event source="ColorConv.newImage" destination="SkinArray.onNewImage"/>
 		<Event source="SkinArray.newImage" destination="MorphOpen.onNewImage"/>
 		<Event source="MorphOpen.newImage" destination="Wnd1.onNewImage"/>
+
 	
 	</Events>
 
@@ -74,7 +77,7 @@
 		
 		
 		<Wnd1>
-			<in_img  type="in" group="Con4"/>	
+			<in_img  type="in" group="Con3"/>	
 		</Wnd1>
 		
 		

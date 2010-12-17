@@ -1,37 +1,37 @@
 /*!
- * \file KW_Skin_Detection.cpp
+ * \file KW_Skin_DetectionCbCrY.cpp
  * \brief
  * \author kwasak
- * \date 2010-11-21
+ * \date 2010-11-25
  */
 
 #include <memory>
 #include <string>
 
-#include "KW_Skin_Detection.hpp"
+#include "KW_Skin_DetectionYCbCr.hpp"
 #include "Logger.hpp"
 
 namespace Processors {
-namespace KW_Skin {
+namespace KW_SkinYCbCr{
 
 // OpenCV writes hue in range 0..180 instead of 0..360
 #define H(x) (x>>1)
 
-KW_Skin_Detection::KW_Skin_Detection(const std::string & name) : Base::Component(name)
+KW_Skin_DetectionYCbCr::KW_Skin_DetectionYCbCr(const std::string & name) : Base::Component(name)
 {
-	LOG(LTRACE) << "Hello KW_Skin_Detection\n";
+	LOG(LTRACE) << "Hello KW_Skin_DetectionYCbCr\n";
 }
 
-KW_Skin_Detection::~KW_Skin_Detection()
+KW_Skin_DetectionYCbCr::~KW_Skin_DetectionYCbCr()
 {
-	LOG(LTRACE) << "Good bye KW_Skin_Detection\n";
+	LOG(LTRACE) << "Good bye KW_Skin_DetectionYCbCr\n";
 }
 
-bool KW_Skin_Detection::onInit()
+bool KW_Skin_DetectionYCbCr::onInit()
 {
-	LOG(LTRACE) << "KW_Skin_Detection::initialize\n";
+	LOG(LTRACE) << "KW_Skin_DetectionYCbCr::initialize\n";
 
-	h_onNewImage.setup(this, &KW_Skin_Detection::onNewImage);
+	h_onNewImage.setup(this, &KW_Skin_DetectionYCbCr::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
 
 	registerStream("in_img", &in_img);
@@ -44,36 +44,36 @@ bool KW_Skin_Detection::onInit()
 	return true;
 }
 
-bool KW_Skin_Detection::onFinish()
+bool KW_Skin_DetectionYCbCr::onFinish()
 {
-	LOG(LTRACE) << "KW_Skin_Detection::finish\n";
+	LOG(LTRACE) << "KW_Skin_DetectionYCbCr::finish\n";
 
 	return true;
 }
 
-bool KW_Skin_Detection::onStep()
+bool KW_Skin_DetectionYCbCr::onStep()
 {
-	LOG(LTRACE) << "KW_Skin_Detection::step\n";
+	LOG(LTRACE) << "KW_Skin_DetectionYCbCr::step\n";
 	return true;
 }
 
-bool KW_Skin_Detection::onStop()
-{
-	return true;
-}
-
-bool KW_Skin_Detection::onStart()
+bool KW_Skin_DetectionYCbCr::onStop()
 {
 	return true;
 }
 
-void KW_Skin_Detection::onNewImage()
+bool KW_Skin_DetectionYCbCr::onStart()
 {
-	LOG(LTRACE) << "KW_Skin_Detection::onNewImage\n";
+	return true;
+}
+
+void KW_Skin_DetectionYCbCr::onNewImage()
+{
+	LOG(LTRACE) << "KW_Skin_DetectionYCbCr::onNewImage\n";
 	try {
-		cv::Mat hsv_img = in_img.read();	//czytam obrazu w wejścia
+		cv::Mat CbCrY_img = in_img.read();	//czytam obrazu w wejścia
 
-		cv::Size size = hsv_img.size();		//rozmiar obrazka
+		cv::Size size = CbCrY_img.size();		//rozmiar obrazka
 
 		skin_img.create(size, CV_8UC1);		//8bitów, 0-255, 1 kanał
 
@@ -82,7 +82,7 @@ void KW_Skin_Detection::onNewImage()
 
 		// Check the arrays for continuity and, if this is the case,
 		// treat the arrays as 1D vectors
-		if (hsv_img.isContinuous() && skin_img.isContinuous())  {
+		if (CbCrY_img.isContinuous() && skin_img.isContinuous())  {
 			size.width *= size.height;
 			size.height = 1;
 		}
@@ -95,7 +95,7 @@ void KW_Skin_Detection::onNewImage()
 			// if not - it's executed for each row
 
 			// get pointer to beggining of i-th row of input image
-			const uchar* c_p = hsv_img.ptr <uchar> (i);
+			const uchar* c_p = CbCrY_img.ptr <uchar> (i);
 			// get pointer to beggining of i-th row of output hue image
 			uchar* skin_p = skin_img.ptr <uchar> (i);
 
@@ -103,14 +103,15 @@ void KW_Skin_Detection::onNewImage()
 			int j,k = 0;
 			for (j = 0; j < size.width; j += 3) {
 
-				if ((c_p[j] >= H(0)) && (c_p[j] <= H(50)))
+				if ((c_p[j+1] > 85) && (c_p[j+1] < 135))
 				{
-					if((c_p[j+1]*100.0/255.0 >= 50.0/*23.0*/) && (c_p[j+1]*100.0/255.0 <= 75/*68.0*/))
+					if((c_p[j+2] > 135) && (c_p[j+2] < 180))
 					{
-						if(c_p[j+2] > 50)
+						if(c_p[j] >= 80)
 						{
 							skin_p[k] = 255;
 						}
+				
 					}
 				}
 				else {
@@ -122,7 +123,7 @@ void KW_Skin_Detection::onNewImage()
 			}
 		}
 
-		LOG(LERROR) << "KW_Palm_LUT:*******************888****8\n";
+		LOG(LERROR) << "KW_Skin_DetectionYCbCr:*******************888****8\n";
 		out_img.write(skin_img);
 
 
@@ -139,9 +140,9 @@ void KW_Skin_Detection::onNewImage()
 		LOG(LERROR) << ex;
 	}
 	catch (...) {
-		LOG(LERROR) << "KW_Skin_Detection::onNewImage failed\n";
+		LOG(LERROR) << "KW_Skin_DetectionYCbCr::onNewImage failed\n";
 	}
 }
 
-}//: namespace KW_Skin
+}//: namespace KW_Skin_YCbCr
 }//: namespace Processors

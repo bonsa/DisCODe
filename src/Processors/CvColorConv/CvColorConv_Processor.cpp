@@ -16,7 +16,7 @@ namespace CvColorConv {
 
 CvColorConv_Processor::CvColorConv_Processor(const std::string & name) : Base::Component(name)
 {
-	LOG(LTRACE) << "Hello CvThreshold_Processor\n";
+	LOG(LTRACE) << "Hello CvColorConv\n";
 }
 
 CvColorConv_Processor::~CvColorConv_Processor()

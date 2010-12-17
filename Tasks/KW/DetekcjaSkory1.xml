@@ -5,8 +5,8 @@
 
 		<Seq1 type="Sequence" thread="Exec1" group="s1">
 			<!-- <directory>/home/kasia/Pulpit/fotoINZ/sort_4/Dane_testowe/</directory>  -->
-			<directory>/home/kasia/Pulpit/daneut/2/dane_testujące_500px</directory>
-			<!-- <directory>/home/kasia/Pulpit/inz21.11/1/</directory>-->
+			<!--<directory>/home/kasia/Pulpit/daneut/2/dane_testujące_500px</directory> -->
+			<directory>/home/kasia/Pulpit/inz21.11/lab_1.avi</directory>
 			<pattern>.*\.JPG</pattern>
 			<!--<pattern>u.*\.JPG</pattern>-->
 		</Seq1>
