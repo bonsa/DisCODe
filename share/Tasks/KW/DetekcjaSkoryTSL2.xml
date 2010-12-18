@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- List of components -->
+	<Components>
+
+		<Movie type="Movie" thread="Exec1" group="s1">
+			<filename>/home/kasia/Pulpit/inz21.11/lab_1.avi</filename>
+		</Movie>
+
+		<ConColor type="KW_RGB_TSL" thread="Exec1" group="s1">
+				
+		</ConColor> 
+	
+		<Split type="CvSplit" thread="Exec1" group="s1">
+			<channels>3</channels>
+		</Split>
+
+		<Wnd1 type="CvWindow" thread="Exec1" group="s1">
+			<title>Preview</title>	
+			<count>3</count>
+		</Wnd1>
+				
+	</Components>
+
+	<!-- Threads of execution -->
+	<Executors>
+		  
+		<Exec1 type="continuous">
+			<main_component>Movie</main_component>
+		</Exec1>
+        
+        
+        
+        
+	</Executors>
+
+	<!-- Event connections -->
+	<Events>
+
+		<Event source="Movie.newImage" destination="ConColor.onNewImage"/>
+		<Event source="ConColor.newImage" destination="Split.onNewImage"/>
+		<Event source="Split.newImage" destination="Wnd1.onNewImage0"/>
+		<Event source="Split.newImage" destination="Wnd1.onNewImage1"/>
+		<Event source="Split.newImage" destination="Wnd1.onNewImage2"/>
+	</Events>
+
+	<!-- Data stream assignments -->
+	<DataStreams>
+		<Movie>
+			<out_img type="out" group="Con1"/>
+		</Movie>
+		
+
+				
+		<ConColor>
+				<in_img  type="in" group="Con1"/>
+				<out_img type="out" group="Con2"/>
+		</ConColor> 
+		
+		<Split>
+			<in_img type="in" group="Con2"/>
+			<out_img_0 type="out" group="Con00"/>
+			<out_img_1 type="out" group="Con01"/>
+			<out_img_2 type="out" group="Con02"/>
+		</Split>
+		
+		<Wnd1>
+			<in_img0 type="in" group="Con00"/>
+			<in_img1 type="in" group="Con01"/>
+			<in_img2 type="in" group="Con02"/>
+		</Wnd1>
+		
+		
+		
+	</DataStreams>
+
+</Task>

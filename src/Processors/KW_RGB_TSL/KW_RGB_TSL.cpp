@@ -41,6 +41,7 @@ bool KW_RGB_TSL::onInit()
 	newImage = registerEvent("newImage");
 
 	registerStream("out_img", &out_img);
+	registerStream("out_img2", &out_img2);
 
 
 
@@ -101,12 +102,12 @@ void KW_RGB_TSL::onNewImage()
 
 
 
-			uchar R, G, B, r_, g_, T,S,L;
+			float R, G, B, r_, g_, T,S,L;
 
 			//MaxT
 			MinMax.maxT = 0;
 			//MinS
-			MinMax.minS = 10000000000;
+			MinMax.minS = 100000;
 			//MaxS
 			MinMax.maxT = 0;
 
@@ -114,12 +115,12 @@ void KW_RGB_TSL::onNewImage()
 			int j;
 			for (j = 0; j < size.width; j += 3)
 			{
-				R = RGB_p[j];
+				B = RGB_p[j];
 				G = RGB_p[j + 1];
-				B = RGB_p[j + 2];
+				R = RGB_p[j + 2];
 
-				r_ = R/(R+G+B)-1/3;
-				g_ = G/(R+G+B)-1/3;
+				r_ = 1.0*R/(R+G+B+1)-1./3;
+				g_ = 1.0*G/(R+G+B+1)-1./3;
 
 				if (g_!=0)
 				{
@@ -129,12 +130,12 @@ void KW_RGB_TSL::onNewImage()
 				{
 					T = 0;
 				}
-				S = sqrt(9.0/(5.0*(r_*r_+g_*g_)));
+				S = sqrt(9.0/5.0*(r_*r_+g_*g_));
 				L = 0.299*R + 0.587*G + 0.114*B;
 
 				
-				TSL_img_p[j] = T;
-				TSL_img_p[j + 1] = S;
+				TSL_img_p[j] = T*255;
+				TSL_img_p[j + 1] = S*255;
 				TSL_img_p[j + 2] = L;
 				
 				if (MinMax.maxT < T)

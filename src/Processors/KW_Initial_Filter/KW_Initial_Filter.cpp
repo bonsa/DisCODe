@@ -104,9 +104,9 @@ void KW_Initial_Filter::onNewImage()
 			int j;
 			for (j = 0; j < size.width; j += 3)
 			{
-				R = RGB_p[j];
+				B = RGB_p[j];
 				G = RGB_p[j + 1];
-				B = RGB_p[j + 2];
+				R = RGB_p[j + 2];
 
 				if((B > 160 && R < 180 && G < 180) || // too much blue
 					(G > 160 && R < 180 && B < 180) || // too much green

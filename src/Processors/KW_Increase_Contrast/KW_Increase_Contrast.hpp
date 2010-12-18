@@ -42,11 +42,18 @@ struct Props: public Base::Props
 	}
 };
 
+
+struct min_max {
+        float maxT;
+        float minS;
+        float maxS;
+};
+
 /*!
  * \class KW_Increase_Contrast
  * \brief Example processor class.
  */
-class KW_Increase_Contrastr: public Base::Component
+class KW_Increase_Contrast: public Base::Component
 {
 public:
 	/*!

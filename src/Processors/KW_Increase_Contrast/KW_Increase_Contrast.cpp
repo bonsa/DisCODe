@@ -20,7 +20,7 @@ namespace KW_Contrast {
 KW_Increase_Contrast::KW_Increase_Contrast(const std::string & name) : Base::Component(name)
 {
 	LOG(LTRACE) << "Hello KW_Increase_Contrast\n";
-	k = 0;
+
 }
 
 KW_Increase_Contrast::~KW_Increase_Contrast()
@@ -74,7 +74,7 @@ void KW_Increase_Contrast::onNewImage()
 	LOG(LTRACE) << "KW_Increase_Contrast::onNewImage\n";
 	try {
 		cv::Mat TSL_img = in_img.read();	//czytam obrazem w zejścia
-		Processors::KW_TSL::min_max MinMax = in_img2.read();
+		min_max MinMax = in_img2.read();
 		
 		cv::Size size = TSL_img.size();		//rozmiar obrazka
 				
