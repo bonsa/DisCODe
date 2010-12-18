@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- List of components -->
+	<Components>
+
+		<Seq1 type="Sequence" thread="Exec1" group="s1">
+			<!--<directory>/home/kasia/Pulpit/fotoINZ/sort_4/Dane_testowe/</directory> -->
+			<directory>/home/kasia/Pulpit/daneut/2/dane_testujące_500px</directory>
+			<pattern>.*\.JPG</pattern>
+		</Seq1>
+		
+		<ColorConv type="CvColorConv" thread="Exec1" group="s1">
+			<type>BGR2HSV</type>
+		</ColorConv>
+		
+		<SkinArray type="KW_Palm_LUT" thread="Exec1" group="s1">
+		<!-- <cov>
+				0.0208683 0.0205496
+				0.0205496 0.0207089
+			</cov>
+			<mean>
+				0.367551 0.393607		
+			</mean>
+			-->
+			<cov>
+				0.00617084 0.00669169
+				0.00669169 0.0083114
+			</cov>
+			<mean>
+				0.432718 0.541849		
+			</mean>
+		</SkinArray>
+	<!--	
+		<MorphOpen type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_OPEN</type>
+			<iterations>3</iterations>
+		</MorphOpen>
+
+-->
+
+		<Wnd1 type="CvWindow" thread="Exec2" group="s1">
+		</Wnd1>
+					
+
+	</Components>
+
+	<!-- Threads of execution -->
+	<Executors>
+		<Exec1 type="periodic">
+			<main_component>Seq1</main_component>
+			 <interval>1.0</interval>
+		</Exec1>
+		  
+        <Exec2 type="periodic">
+            <main_component>Wnd1</main_component>
+            <interval>0.2</interval>
+        </Exec2>
+        
+        
+        
+        
+	</Executors>
+
+	<!-- Event connections -->
+	<Events>
+	<!--	<Event source="Seq1.newImage" destination="ColorConv.onNewImage"/>
+		<Event source="ColorConv.newImage" destination="SkinArray.onNewImage"/>
+		<Event source="SkinArray.newImage" destination="MorphOpen.onNewImage"/>
+		<Event source="MorphOpen.newImage" destination="Wnd1.onNewImage"/>
+	-->
+		<Event source="Seq1.newImage" destination="ColorConv.onNewImage"/>
+		<Event source="ColorConv.newImage" destination="SkinArray.onNewImage"/>
+		<Event source="SkinArray.newImage" destination="Wnd1.onNewImage"/>
+	
+	</Events>
+
+	<!-- Data stream assignments -->
+	<DataStreams>
+		<Seq1>
+			<out_img type="out" group="Con1"/>
+		</Seq1>
+		
+		<ColorConv>
+				<in_img  type="in" group="Con1"/>
+				<out_img type="out" group="Con2"/>
+		</ColorConv>
+		
+		<SkinArray>
+				<in_img  type="in" group="Con2"/>
+				<out_img type="out" group="Con3"/>
+		</SkinArray> 
+	<!--	
+		<MorphOpen>
+			<in_img  type="in"  group="Con3"/>
+			<out_img type="out" group="Con4"/>
+		</MorphOpen>	
+		
+		-->
+		
+		<Wnd1>
+			<in_img  type="in" group="Con3"/>	
+		</Wnd1>
+		
+		
+		
+		
+	</DataStreams>
+
+</Task>
