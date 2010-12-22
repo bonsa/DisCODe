@@ -109,13 +109,13 @@ void KW_Initial_Filter::onNewImage()
 				R = RGB_p[j + 2];
 
 				if((B > 160 && R < 180 && G < 180) || // too much blue
-					(G > 160 && R < 180 && B < 180) || // too much green
-					(B < 100 && R < 100 && G < 100) || // too dark
+					(G > 160 && R < 180 && B < 180)|| // too much green
+					(B < 90 && R < 90 && G < 90) || // too dark
 					(G > 200) || //Green
 					(R+G > 400) || // too much red and green (yellow like color)
 					(G > 150 && B < 90)|| // too Yellow like also
-					(B/(R+G+B) > 0.4)|| // too much blue in contrast to others
-					(G/(R+G+B) > 0.4)|| // too much green in contrast to others
+					(1.0*B/(R+G+B) > 0.4)|| // too much blue in contrast to others
+					(1.0*G/(R+G+B) > 0.4)|| // too much green in contrast to others
 					(R < 102 && G > 100 && B > 110 && G < 140 && B <160))
 					{
 						Filtered_img_p[j] = 255;
