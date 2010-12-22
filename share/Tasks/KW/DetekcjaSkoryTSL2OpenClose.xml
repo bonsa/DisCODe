@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- List of components -->
+	<Components>
+
+		<Movie type="Movie" thread="Exec1" group="s1">
+			<filename>/home/kasia/Pulpit/inz21.11/lab_1.avi</filename>
+		</Movie>
+		
+		
+		<Filtr type="KW_Initial_Filter" thread="Exec1" group="s1">
+				
+		</Filtr> 
+
+		<ConColor type="KW_RGB_TSL" thread="Exec1" group="s1">
+				
+		</ConColor> 
+		
+		<DecSkin type= "KW_Skin_Detection_TSL" thread="Exec1" group="s1">
+				
+			</DecSkin>
+			
+		<Blur type= "CvGaussianBlur"  thread="Exec1" group="s1">
+			<kernel>21 21</kernel>	
+		</Blur>
+		
+		<MorphOpen1 type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_OPEN</type>
+			<iterations>1</iterations>
+		</MorphOpen1>
+		
+		<MorphClose type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_CLOSE</type>
+			<iterations>2</iterations>
+		</MorphClose>	
+		
+		<MorphOpen2 type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_OPEN</type>
+			<iterations>1</iterations>
+		</MorphOpen2>
+				
+
+		
+			
+
+		<Wnd1 type="CvWindow" thread="Exec1" group="s1">
+		</Wnd1>
+					
+	<!--	<Writer type="CvVideoWriter" thread="Exec1" group="s1">
+			<filename>output.avi</filename>
+			<fourcc>XVID</fourcc>
+		</Writer>
+	-->
+	</Components>
+
+	<!-- Threads of execution -->
+	<Executors>
+		  
+		<Exec1 type="continuous">
+			<main_component>Movie</main_component>
+		</Exec1>
+        
+        
+        
+        
+	</Executors>
+
+	<!-- Event connections -->
+	<Events>
+
+		<Event source="Movie.newImage" destination="Filtr.onNewImage"/>
+		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
+		<Event source="ConColor.newImage" destination="DecSkin.onNewImage"/>
+	<!--	<Event source="DecSkin.newImage" destination="Wnd1.onNewImage"/> -->
+		<Event source="DecSkin.newImage" destination="Blur.onNewImage"/>
+		<Event source="Blur.newImage" destination="MorphOpen1.onNewImage"/>
+		<Event source="MorphOpen1.newImage" destination="MorphClose.onNewImage"/>
+		<Event source="MorphClose.newImage" destination="MorphOpen2.onNewImage"/>
+		<Event source="MorphOpen2.newImage" destination="Wnd1.onNewImage"/>
+	
+			<!--<Event source="ConColor.newImage" destination="Writer.onNewImage"/-->
+	
+	</Events>
+
+	<!-- Data stream assignments -->
+	<DataStreams>
+		<Movie>
+			<out_img type="out" group="Con1"/>
+		</Movie>
+		
+		
+		<Filtr>
+				<in_img  type="in" group="Con1"/>
+				<out_img type="out" group="Con2"/>
+		</Filtr> 
+
+				
+		<ConColor>
+				<in_img  type="in" group="Con2"/>
+				<out_img type="out" group="Con3"/>
+		</ConColor> 
+
+		<DecSkin>
+			<in_img  type="in" group="Con3"/>	
+			<out_img type="out" group="Con4"/>
+		</DecSkin>
+		
+		
+		<Blur>
+			<in_img  type="in" group="Con4"/>	
+			<out_img type="out" group="Con5"/>
+		</Blur>
+		
+		<MorphOpen1>
+			<in_img  type="in" group="Con5"/>	
+			<out_img type="out" group="Con6"/>
+		</MorphOpen1>
+		
+		<MorphClose>
+			<in_img  type="in" group="Con6"/>	
+			<out_img type="out" group="Con7"/>
+		</MorphClose>
+		
+		<MorphOpen2>
+			<in_img  type="in" group="Con7"/>	
+			<out_img type="out" group="Con8"/>
+		</MorphOpen2>
+
+		<Wnd1>
+			<in_img  type="in" group="Con8"/>	
+		</Wnd1>
+		
+	<!--	<Writer>
+			<in_img  type="in" group="Con3"/>	
+		</Writer>
+		-->
+		
+	</DataStreams>
+
+</Task>
