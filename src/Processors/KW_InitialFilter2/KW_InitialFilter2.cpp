@@ -19,20 +19,24 @@ namespace KW_Filter2 {
 
 KW_InitialFilter2::KW_InitialFilter2(const std::string & name) : Base::Component(name),
 
-		blue_B("down_blue_B", 160, "range"),
-		blue_R("up_blue_R", 180, "range"),
-		blue_G("up_blue_G", 180, "range"),
+		blue_B("grupa1:down_blue_B", 160, "range"),
+		blue_R("grupa1:up_blue_R", 180, "range"),
+		blue_G("grupa1:up_blue_G", 180, "range"),
 
-		green_G("down_green_G", 160, "range"),
-		green_R("up_green_R", 180, "range"),
-		green_B("up_green_B", 180, "range"),
+		green_G("grupa2:down_green_G", 160, "range"),
+		green_R("grupa2:up_green_R", 180, "range"),
+		green_B("grupa2:up_green_B", 180, "range"),
 
-		dark_R("up_dark_R", 40, "range"),
-		dark_G("up_dark_G", 40, "range"),
-		dark_B("up_dark_B", 40, "range"),
+		green("grupa3:down_green", 200, "range"),
+		red_green("grupa3: down_red_green", 400, "range"),
 
-		Yellow_G("down_Yellow_G", 150, "range"),
-		Yellow_B("up_Yellow_B", 90, "range")
+		Yellow_G("grupa4:down_Yellow_G", 150, "range"),
+		Yellow_B("grupa4:up_Yellow_B", 90, "range"),
+
+		dark_R("grupa5:up_dark_R", 40, "range"),
+		dark_G("grupa5:up_dark_G", 40, "range"),
+		dark_B("grupa5:up_dark_B", 40, "range")
+
 
 {
 	LOG(LTRACE) << "Hello KW_InitialFilter2\n";
@@ -50,6 +54,28 @@ KW_InitialFilter2::KW_InitialFilter2(const std::string & name) : Base::Component
 	registerProperty(blue_R);
 	registerProperty(blue_G);
 	registerProperty(blue_B);
+
+	green_R.addConstraint("0");
+	green_R.addConstraint("255");
+
+	green_G.addConstraint("0");
+	green_G.addConstraint("255");
+
+	green_B.addConstraint("0");
+	green_B.addConstraint("255");
+
+	registerProperty(green_R);
+	registerProperty(green_G);
+	registerProperty(green_B);
+
+	green.addConstraint("0");
+	green.addConstraint("255");
+
+	red_green.addConstraint("0");
+	red_green.addConstraint("255");
+
+	registerProperty(green);
+	registerProperty(red_green);
 
 
 	dark_R.addConstraint("0");

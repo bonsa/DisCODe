@@ -127,6 +127,9 @@ private:
 	Base::Property<int> green_G;
 	Base::Property<int> green_B;
 
+	Base::Property<int> green;
+	Base::Property<int> red_green;
+
 	Base::Property<int> dark_R;
 	Base::Property<int> dark_G;
 	Base::Property<int> dark_B;
