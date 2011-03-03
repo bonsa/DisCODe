@@ -119,9 +119,21 @@ protected:
 	Props props;
 
 private:
+	Base::Property<int> blue_R;
+	Base::Property<int> blue_G;
+	Base::Property<int> blue_B;
+
+	Base::Property<int> green_R;
+	Base::Property<int> green_G;
+	Base::Property<int> green_B;
+
 	Base::Property<int> dark_R;
 	Base::Property<int> dark_G;
 	Base::Property<int> dark_B;
+
+	Base::Property<int> Yellow_G;
+	Base::Property<int> Yellow_B;
+
 	cv::Mat RGB_img;
 	cv::Mat Filtered_img;
 

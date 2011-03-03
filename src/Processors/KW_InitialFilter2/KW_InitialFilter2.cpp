@@ -19,12 +19,38 @@ namespace KW_Filter2 {
 
 KW_InitialFilter2::KW_InitialFilter2(const std::string & name) : Base::Component(name),
 
-		dark_R("R", 40, "range"),
-		dark_G("G", 40, "range"),
-		dark_B("B", 40, "range")
+		blue_B("down_blue_B", 160, "range"),
+		blue_R("up_blue_R", 180, "range"),
+		blue_G("up_blue_G", 180, "range"),
+
+		green_G("down_green_G", 160, "range"),
+		green_R("up_green_R", 180, "range"),
+		green_B("up_green_B", 180, "range"),
+
+		dark_R("up_dark_R", 40, "range"),
+		dark_G("up_dark_G", 40, "range"),
+		dark_B("up_dark_B", 40, "range"),
+
+		Yellow_G("down_Yellow_G", 150, "range"),
+		Yellow_B("up_Yellow_B", 90, "range")
+
 {
 	LOG(LTRACE) << "Hello KW_InitialFilter2\n";
 	k = 0;
+
+	blue_R.addConstraint("0");
+	blue_R.addConstraint("255");
+
+	blue_G.addConstraint("0");
+	blue_G.addConstraint("255");
+
+	blue_B.addConstraint("0");
+	blue_B.addConstraint("255");
+
+	registerProperty(blue_R);
+	registerProperty(blue_G);
+	registerProperty(blue_B);
+
 
 	dark_R.addConstraint("0");
 	dark_R.addConstraint("255");
@@ -38,6 +64,15 @@ KW_InitialFilter2::KW_InitialFilter2(const std::string & name) : Base::Component
 	registerProperty(dark_R);
 	registerProperty(dark_G);
 	registerProperty(dark_B);
+
+	Yellow_G.addConstraint("0");
+	Yellow_G.addConstraint("255");
+
+	Yellow_B.addConstraint("0");
+	Yellow_B.addConstraint("255");
+
+	registerProperty(Yellow_G);
+	registerProperty(Yellow_B);
 }
 
 KW_InitialFilter2::~KW_InitialFilter2()
@@ -125,15 +160,16 @@ void KW_InitialFilter2::onNewImage()
 				G = RGB_p[j + 1];
 				R = RGB_p[j + 2];
 
-				if((B > 160 && R < 180 && G < 180) || // too much blue
-					(G > 160 && R < 180 && B < 180)|| // too much green
+				if((B > blue_B && R < blue_R && G < blue_G) || // too much blue
+					(G > green_G && R < green_R && B < green_B)|| // too much green
 					(B < dark_B && R < dark_R && G < dark_G) || // too dark
 					(G > 200) || //Green
 					(R+G > 400) || // too much red and green (yellow like color)
-					(G > 150 && B < 90)|| // too Yellow like also
+					(G > Yellow_G && B < Yellow_B)|| // too Yellow like also
 					(1.0*B/(R+G+B) > 0.4)|| // too much blue in contrast to others
-					(1.0*G/(R+G+B) > 0.4)|| // too much green in contrast to others
-					(R < 102 && G > 100 && B > 110 && G < 140 && B <160))
+					(1.0*G/(R+G+B) > 0.4)//|| // too much green in contrast to others
+				//	(R < 102 && G > 100 && B > 110 && G < 140 && B <160)
+					)
 					{
 						Filtered_img_p[j] = 255;
 						Filtered_img_p[j + 1] = 255;
