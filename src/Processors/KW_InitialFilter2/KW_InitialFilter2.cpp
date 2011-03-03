@@ -19,23 +19,27 @@ namespace KW_Filter2 {
 
 KW_InitialFilter2::KW_InitialFilter2(const std::string & name) : Base::Component(name),
 
-		blue_B("grupa1:down_blue_B", 160, "range"),
-		blue_R("grupa1:up_blue_R", 180, "range"),
-		blue_G("grupa1:up_blue_G", 180, "range"),
+		blue_B("grupa1|  down_blue_B", 160, "range"),
+		blue_R("grupa1|  up_blue_R", 180, "range"),
+		blue_G("grupa1|  up_blue_G", 180, "range"),
 
-		green_G("grupa2:down_green_G", 160, "range"),
-		green_R("grupa2:up_green_R", 180, "range"),
-		green_B("grupa2:up_green_B", 180, "range"),
+		green_G("grupa2|  down_green_G", 160, "range"),
+		green_R("grupa2|  up_green_R", 180, "range"),
+		green_B("grupa2|  up_green_B", 180, "range"),
 
-		green("grupa3:down_green", 200, "range"),
-		red_green("grupa3: down_red_green", 400, "range"),
+		dark_R("grupa3|  up_dark_R", 40, "range"),
+		dark_G("grupa3|  up_dark_G", 40, "range"),
+		dark_B("grupa3|  up_dark_B", 40, "range"),
 
-		Yellow_G("grupa4:down_Yellow_G", 150, "range"),
-		Yellow_B("grupa4:up_Yellow_B", 90, "range"),
+		green("grupa4|  down_green", 200, "range"),
+		red_green("grupa4|  down_red_green", 400, "range"),
 
-		dark_R("grupa5:up_dark_R", 40, "range"),
-		dark_G("grupa5:up_dark_G", 40, "range"),
-		dark_B("grupa5:up_dark_B", 40, "range")
+		yellow_G("grupa5|  down_yellow_G", 150, "range"),
+		yellow_B("grupa5|  up_yellow_B", 90, "range"),
+
+		blue_in_contast("grupa6|  down_blue_in_contast", 40, "range"),
+		green_in_contast("grupa6|  down_green_in_contast", 40, "range")
+
 
 
 {
@@ -91,14 +95,23 @@ KW_InitialFilter2::KW_InitialFilter2(const std::string & name) : Base::Component
 	registerProperty(dark_G);
 	registerProperty(dark_B);
 
-	Yellow_G.addConstraint("0");
-	Yellow_G.addConstraint("255");
+	yellow_G.addConstraint("0");
+	yellow_G.addConstraint("255");
 
-	Yellow_B.addConstraint("0");
-	Yellow_B.addConstraint("255");
+	yellow_B.addConstraint("0");
+	yellow_B.addConstraint("255");
 
-	registerProperty(Yellow_G);
-	registerProperty(Yellow_B);
+	registerProperty(yellow_G);
+	registerProperty(yellow_B);
+
+	blue_in_contast.addConstraint("0");
+	blue_in_contast.addConstraint("100");
+
+	green_in_contast.addConstraint("0");
+	green_in_contast.addConstraint("100");
+
+	registerProperty(blue_in_contast);
+	registerProperty(green_in_contast);
 }
 
 KW_InitialFilter2::~KW_InitialFilter2()
@@ -189,11 +202,11 @@ void KW_InitialFilter2::onNewImage()
 				if((B > blue_B && R < blue_R && G < blue_G) || // too much blue
 					(G > green_G && R < green_R && B < green_B)|| // too much green
 					(B < dark_B && R < dark_R && G < dark_G) || // too dark
-					(G > 200) || //Green
-					(R+G > 400) || // too much red and green (yellow like color)
-					(G > Yellow_G && B < Yellow_B)|| // too Yellow like also
-					(1.0*B/(R+G+B) > 0.4)|| // too much blue in contrast to others
-					(1.0*G/(R+G+B) > 0.4)//|| // too much green in contrast to others
+					(G > green) || //Green
+					(R+G > red_green) || // too much red and green (yellow like color)
+					(G > yellow_G && B < yellow_B)|| // too Yellow like also
+					(1.0*B/(R+G+B) > 0.01 * blue_in_contast)|| // too much blue in contrast to others
+					(1.0*G/(R+G+B) > 0.01 * green_in_contast)//|| // too much green in contrast to others
 				//	(R < 102 && G > 100 && B > 110 && G < 140 && B <160)
 					)
 					{

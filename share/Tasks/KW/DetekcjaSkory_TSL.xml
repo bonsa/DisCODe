@@ -3,14 +3,16 @@
 	<!-- List of components, data: 01.03.10 -->
 	<Components>
 
-		<Movie type="Movie" thread="Exec1" group="s1">
+		<Movie type="CameraOpenCV" thread="Exec1" group="s1">
 			<filename>/home/kasia/Filmy/slon.avi</filename>
 		</Movie>
 		
 
-		
 		<Wnd1 type="CvWindow" thread="Exec1" group="s1">
 		</Wnd1>
+		
+		<Wnd2 type="CvWindow" thread="Exec1" group="s1">
+		</Wnd2>
 		
 		<Filtr type="KW_InitialFilter2" thread="Exec1" group="s1">
 				
@@ -33,6 +35,7 @@
 		<Exec1 type="continuous">
 			<main_component>Movie</main_component>
 		</Exec1>
+		
         
 	</Executors>
 
@@ -40,6 +43,7 @@
 	<Events>
 
 		<Event source="Movie.newImage" destination="Filtr.onNewImage"/>
+		<Event source="Filtr.newImage" destination="Wnd2.onNewImage"/>
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
 		<Event source="ConColor.newImage" destination="DecSkin.onNewImage"/>
 		<Event source="DecSkin.newImage" destination="Wnd1.onNewImage"/>
@@ -74,6 +78,10 @@
 		<Wnd1>
 			<in_img  type="in" group="Con4"/>	
 		</Wnd1>
+		
+		<Wnd2>
+			<in_img  type="in" group="Con2"/>	
+		</Wnd2>
 		
 
 		

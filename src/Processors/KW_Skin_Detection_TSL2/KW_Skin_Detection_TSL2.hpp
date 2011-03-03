@@ -13,6 +13,7 @@
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Props.hpp"
+#include "Property.hpp"
 
 #include <Types/stream_OpenCV.hpp>
 
@@ -128,6 +129,15 @@ protected:
 
 private:
 	cv::Mat skin_img;
+
+	Base::Property<int> MIN_T;
+	Base::Property<int> MAX_T;
+
+	Base::Property<int> MIN_S;
+	Base::Property<int> MAX_S;
+
+	Base::Property<int> MIN_L;
+	Base::Property<int> MAX_L;
 
 
 

@@ -1,5 +1,5 @@
 /*!
- * \file KW_Skin_Detection2.cpp
+ * \file KW_Skin_Detection_TSL2.cpp
  * \brief Detekcja skory w przestrzni barw TSL
  * \author kwasak
  * \date 2010-03-01
@@ -17,9 +17,44 @@ namespace KW_Skin_TSL2 {
 // OpenCV writes hue in range 0..180 instead of 0..360
 #define H(x) (x>>1)
 
-KW_Skin_Detection_TSL2::KW_Skin_Detection_TSL2(const std::string & name) : Base::Component(name)
+KW_Skin_Detection_TSL2::KW_Skin_Detection_TSL2(const std::string & name) : Base::Component(name),
+
+	MIN_T("grupa1|  MIN_T", 0, "range"),
+	MAX_T("grupa1|  MAX_T", 255, "range"),
+
+	MIN_S("grupa2|  MIN_S", 0, "range"),
+	MAX_S("grupa2|  MAX_S", 255, "range"),
+
+	MIN_L("grupa3|  MIN_L", 0, "range"),
+	MAX_L("grupa3|  MAX_L", 255, "range")
+
 {
 	LOG(LTRACE) << "Hello KW_Skin_Detection_TSL2\n";
+
+	MIN_T.addConstraint("0");
+	MIN_T.addConstraint("255");
+	MAX_T.addConstraint("0");
+	MAX_T.addConstraint("255");
+
+	MIN_S.addConstraint("0");
+	MIN_S.addConstraint("255");
+	MAX_S.addConstraint("0");
+	MAX_S.addConstraint("255");
+
+	MIN_L.addConstraint("0");
+	MIN_L.addConstraint("255");
+	MAX_L.addConstraint("0");
+	MAX_L.addConstraint("255");
+
+	registerProperty(MIN_T);
+	registerProperty(MAX_T);
+
+	registerProperty(MIN_S);
+	registerProperty(MAX_S);
+
+	registerProperty(MIN_L);
+	registerProperty(MAX_L);
+
 }
 
 KW_Skin_Detection_TSL2::~KW_Skin_Detection_TSL2()
@@ -103,17 +138,15 @@ void KW_Skin_Detection_TSL2::onNewImage()
 			int j,k = 0;
 			for (j = 0; j < size.width; j += 3) {
 
-				if (c_p[j] < c_p[j+1] - 10)
+				if ((c_p[j] >= MIN_T) && (c_p[j] <=MAX_T) &&
+					(c_p[j+1] >= MIN_S) && (c_p[j+1] <= MAX_S)&&
+					(c_p[j+1] >= MIN_L) && (c_p[j+1] <= MAX_L))
 				{
-						skin_p[j] = 255;
-						skin_p[j+1] = 255;
-						skin_p[j+2] = 255;
-
+							skin_p[k] = 255;
 				}
-				else{
-					skin_p[j] = c_p[j];
-					skin_p[j+1] = c_p[j+1];
-					skin_p[j+2] = c_p[j+2];
+				else
+				{
+					skin_p[k] = 0;
 				}
 
 				++k;

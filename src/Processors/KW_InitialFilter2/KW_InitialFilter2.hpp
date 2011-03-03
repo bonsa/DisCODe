@@ -134,8 +134,11 @@ private:
 	Base::Property<int> dark_G;
 	Base::Property<int> dark_B;
 
-	Base::Property<int> Yellow_G;
-	Base::Property<int> Yellow_B;
+	Base::Property<int> yellow_G;
+	Base::Property<int> yellow_B;
+
+	Base::Property<int> blue_in_contast;
+	Base::Property<int> green_in_contast;
 
 	cv::Mat RGB_img;
 	cv::Mat Filtered_img;
