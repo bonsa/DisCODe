@@ -16,14 +16,16 @@
 #include "Drawable.hpp"
 #include "Timer.hpp"
 
+#include "Property.hpp"
+
 
 /**
  * \defgroup CvFindChessboardCorners CvFindChessboardCorners
  * \ingroup Processors
  *
- * Locates chessboard on the image.
+ * \brief Locates chessboard on the image.
  *
-  * \par Data streams:
+ * \par Data streams:
  *
  * \streamin{in_img,cv::Mat}
  * Input image.
@@ -46,15 +48,15 @@
  * New image arrived
  *
  * \par Properties:
- * \prop{width,int,}
+ * \prop{width,int,""}
  * Chessboard width.
  * This is number of corners, not the number of fields. Number of corners = number of fields - 1.
  *
- * \prop{height,int,}
+ * \prop{height,int,""}
  * Chessboard height.
  * This is number of corners, not the number of fields. Number of corners = number of fields - 1.
  *
- * \prop{squareSize,int,}
+ * \prop{squareSize,int,""}
  * Square size in meters.
  *
  * \see http://opencv.willowgarage.com/documentation/cpp/camera_calibration_and_3d_reconstruction.html#cv-findchessboardcorners
@@ -133,6 +135,8 @@ protected:
 private:
 	void onNewImage();
 
+	void initChessboard();
+
 	/** New image event handler. */
 	Base::EventHandler <CvFindChessboardCorners_Processor> h_onNewImage;
 	/** Image stream. */
@@ -154,6 +158,17 @@ private:
 	CvFindChessboardCornersProps props;
 
 	boost::shared_ptr<Types::Objects3D::Chessboard> chessboard;
+
+	cv::Mat sub_img;
+
+	Base::Property<bool> prop_subpix;
+	Base::Property<int> prop_subpix_window;
+	Base::Property<bool> prop_scale;
+	Base::Property<int> prop_scale_factor;
+	Base::Property<int> prop_width;
+	Base::Property<int> prop_height;
+	Base::Property<int> prop_square_width;
+	Base::Property<int> prop_square_height;
 };
 
 } // namespace CvFindChessboardCorners {

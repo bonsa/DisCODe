@@ -90,7 +90,7 @@ SET(DisCODe_LIBRARIES ${DisCODe_LIBRARIES} Common)
 add_subdirectory(Base)
 SET(DisCODe_LIBRARIES ${DisCODe_LIBRARIES} Base)
 
-SET(DisCODe_Core_LIBRARIES ${DisCODe_LIBRARIES})
+SET(DisCODe_Core_LIBRARIES ${DisCODe_LIBRARIES} Network)
 
 # Create Types library
 add_subdirectory(Types)
@@ -101,6 +101,7 @@ add_subdirectory(Sources)
 add_subdirectory(Processors)
 add_subdirectory(Sinks)
 add_subdirectory(Proxies)
+add_subdirectory(Client)
 
 # User interface
 set(WITH_GUI ON CACHE BOOL "Build GUI")
