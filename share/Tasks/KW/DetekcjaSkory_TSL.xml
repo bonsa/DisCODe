@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- List of components, data: 01.03.10 -->
+	<Components>
+
+		<Movie type="Movie" thread="Exec1" group="s1">
+			<filename>/home/kasia/workspace/DisCODe/Filmy/28.02.avi</filename>
+		</Movie>
+		
+
+		
+		<Wnd1 type="CvWindow" thread="Exec1" group="s1">
+		</Wnd1>
+		
+		<Filtr type="KW_InitialFilter2" thread="Exec1" group="s1">
+				
+		</Filtr> 
+
+		<ConColor type="KW_RGB_TSL" thread="Exec1" group="s1">
+				
+		</ConColor> 
+		
+		<DecSkin type= "KW_Skin_Detection_TSL2" thread="Exec1" group="s1">
+				
+			</DecSkin>
+
+	
+	</Components>
+
+	<!-- Threads of execution -->
+	<Executors>
+		  
+		<Exec1 type="continuous">
+			<main_component>Movie</main_component>
+		</Exec1>
+        
+	</Executors>
+
+	<!-- Event connections -->
+	<Events>
+
+		<Event source="Movie.newImage" destination="Filtr.onNewImage"/>
+		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
+		<Event source="ConColor.newImage" destination="DecSkin.onNewImage"/>
+		<Event source="DecSkin.newImage" destination="Wnd1.onNewImage"/>
+		
+	
+	</Events>
+
+	<!-- Data stream assignments -->
+	<DataStreams>
+		<Movie>
+			<out_img type="out" group="Con1"/>
+		</Movie>
+		
+		
+		<Filtr>
+				<in_img  type="in" group="Con1"/>
+				<out_img type="out" group="Con2"/>
+		</Filtr> 
+
+				
+		<ConColor>
+				<in_img  type="in" group="Con2"/>
+				<out_img type="out" group="Con3"/>
+		</ConColor> 
+
+		<DecSkin>
+			<in_img  type="in" group="Con3"/>	
+			<out_img type="out" group="Con4"/>
+		</DecSkin>
+			
+		
+		<Wnd1>
+			<in_img  type="in" group="Con4"/>	
+		</Wnd1>
+		
+
+		
+	</DataStreams>
+
+</Task>
