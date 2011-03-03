@@ -13,6 +13,8 @@
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Props.hpp"
+#include "Property.hpp"
+
 
 #include <cv.h>
 #include <highgui.h>
@@ -117,6 +119,9 @@ protected:
 	Props props;
 
 private:
+	Base::Property<int> dark_R;
+	Base::Property<int> dark_G;
+	Base::Property<int> dark_B;
 	cv::Mat RGB_img;
 	cv::Mat Filtered_img;
 

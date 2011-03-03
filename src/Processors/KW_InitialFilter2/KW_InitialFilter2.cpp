@@ -17,10 +17,27 @@ namespace KW_Filter2 {
 // OpenCV writes hue in range 0..180 instead of 0..360
 #define H(x) (x>>1)
 
-KW_InitialFilter2::KW_InitialFilter2(const std::string & name) : Base::Component(name)
+KW_InitialFilter2::KW_InitialFilter2(const std::string & name) : Base::Component(name),
+
+		dark_R("R", 40, "range"),
+		dark_G("G", 40, "range"),
+		dark_B("B", 40, "range")
 {
 	LOG(LTRACE) << "Hello KW_InitialFilter2\n";
 	k = 0;
+
+	dark_R.addConstraint("0");
+	dark_R.addConstraint("255");
+
+	dark_G.addConstraint("0");
+	dark_G.addConstraint("255");
+
+	dark_B.addConstraint("0");
+	dark_B.addConstraint("255");
+
+	registerProperty(dark_R);
+	registerProperty(dark_G);
+	registerProperty(dark_B);
 }
 
 KW_InitialFilter2::~KW_InitialFilter2()
@@ -110,7 +127,7 @@ void KW_InitialFilter2::onNewImage()
 
 				if((B > 160 && R < 180 && G < 180) || // too much blue
 					(G > 160 && R < 180 && B < 180)|| // too much green
-					(B < 30 && R < 30 && G < 30) || // too dark
+					(B < dark_B && R < dark_R && G < dark_G) || // too dark
 					(G > 200) || //Green
 					(R+G > 400) || // too much red and green (yellow like color)
 					(G > 150 && B < 90)|| // too Yellow like also

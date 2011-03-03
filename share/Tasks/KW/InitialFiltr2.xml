@@ -3,7 +3,7 @@
 	<!-- List of components -->
 	<Components>
 
-		<Movie type="Movie" thread="Exec1" group="s1">
+		<Movie type="CameraOpenCV" thread="Exec1" group="s1">
 			<filename>/home/kasia/workspace/DisCODe/Filmy/28.02.avi</filename>
 		</Movie>
 		
