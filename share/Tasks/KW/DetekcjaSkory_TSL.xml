@@ -11,7 +11,7 @@
 		<Wnd1 type="CvWindow" thread="Exec1" group="s1">
 		</Wnd1>
 		
-		<Wnd2 type="CvWindow" thread="Exec1" group="s1">
+		<Wnd2 type="CvWindow" thread="Exec2" group="s1">
 		</Wnd2>
 		
 		<Filtr type="KW_InitialFilter2" thread="Exec1" group="s1">
@@ -24,7 +24,7 @@
 		
 		<DecSkin type= "KW_Skin_Detection_TSL2" thread="Exec1" group="s1">
 				
-			</DecSkin>
+		</DecSkin>
 
 	
 	</Components>
@@ -36,6 +36,10 @@
 			<main_component>Movie</main_component>
 		</Exec1>
 		
+		<Exec2 type="periodic">
+			<main_component>Wnd2</main_component>
+			<interval>0.2</interval>
+		</Exec2>
         
 	</Executors>
 
