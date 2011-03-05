@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- List of components, data: 05.03.11 -->
+	<Components>
+
+		<Camera type="CameraOpenCV" thread="Exec1" group="s1">
+		</Camera>
+
+		<Filtr type="KW_InitialFilterAkademik" thread="Exec1" group="s1">
+				
+		</Filtr> 
+
+		<ConColor type="KW_RGB_TSL" thread="Exec1" group="s1">
+				
+		</ConColor> 
+		
+		<SkinDec type="KW_SkinDetectionAkademik" thread="Exec1" group="s1">
+		</SkinDec>
+		
+		<Blob type="BlobExtractor" thread="Exec1" group="s1">
+			<min_size>5000</min_size>
+		</Blob>
+
+		<Wnd1 type="CvWindow" thread="Exec1" group="s1">
+		</Wnd1>
+
+	
+	</Components>
+
+	<!-- Threads of execution -->
+	<Executors>
+		  
+		<Exec1 type="continuous">
+			<main_component>Camera</main_component>
+		</Exec1>
+		
+
+
+	</Executors>
+
+	<!-- Event connections -->
+	<Events>
+
+		<Event source="Camera.newImage" destination="Filtr.onNewImage"/>
+		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
+		<Event source="ConColor.newImage" destination="SkinDec.onNewImage"/>
+		<Event source="SkinDec.newImage" destination="Blob.onNewImage"/>	
+		<Event source="Blob.newBlobs" destination="Wnd1.onNewImage"/>
+		<Event source="Camera.newImage" destination="Wnd1.onNewImage"/>
+
+	
+	</Events>
+
+	<!-- Data stream assignments -->
+	<DataStreams>
+		<Camera>
+			<out_img type="out" group="Con1"/>
+		</Camera>
+		
+		
+		<Filtr>
+				<in_img  type="in" group="Con1"/>
+				<out_img type="out" group="Con2"/>
+		</Filtr> 
+
+				
+		<ConColor>
+				<in_img  type="in" group="Con2"/>
+				<out_img type="out" group="Con3"/>
+		</ConColor> 
+		
+		<SkinDec>
+				<in_img  type="in" group="Con3"/>
+				<out_img type="out" group="Con4"/>
+		</SkinDec> 
+		
+		<Blob>
+				<in_img  type="in" group="Con4"/>
+				<out_blobs type="out" group="Con5"/>
+		</Blob> 
+		
+		<Wnd1>
+			<in_img type="in" group="Con1"/>
+			<in_draw type="in" group="Con5"/>	
+
+		</Wnd1>
+		
+
+
+		
+	</DataStreams>
+
+</Task>

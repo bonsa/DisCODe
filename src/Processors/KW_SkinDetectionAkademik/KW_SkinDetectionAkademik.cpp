@@ -101,18 +101,29 @@ void KW_SkinDetectionAkademik::onNewImage()
 
 
 			int j,k = 0;
-			for (j = 0; j < size.width; j += 3) {
-
-				if ((c_p[j] >= 0) && (c_p[j] <=25))
+			for (j = 0; j < size.width; j += 3) 
+			{
+				if((c_p[j]>200))
 				{
-					if((c_p[j+1] >= 45) && (c_p[j+1] <= 255))
-					{
-						skin_p[k] = 255;
-
-					}
-				}
-				else {
 					skin_p[k] = 0;
+		
+				}
+
+
+				else if ((c_p[j]>40)&&(c_p[j]<120) && (c_p[j+1]<40) && (c_p[j+1]>5))
+				{
+					skin_p[k] = 255;
+	
+				}
+				else if (c_p[j+2]<140)
+				{
+					skin_p[k] = 0;
+	
+				}
+
+				else{
+					skin_p[k] = 0;
+	
 				}
 
 

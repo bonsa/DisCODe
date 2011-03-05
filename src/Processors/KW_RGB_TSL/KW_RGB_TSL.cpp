@@ -161,33 +161,7 @@ void KW_RGB_TSL::onNewImage()
 					{
 						MinMax.maxS = S;
 					}
-					if((TSL_img_p[j]>200))
-					{
-						TSL_img_p[j] = 0;
-						TSL_img_p[j + 1] = 0;
-						TSL_img_p[j + 2] = 0;
-					}
 
-
-					else if ((TSL_img_p[j]>40)&&(TSL_img_p[j]<120) && (TSL_img_p[j+1]<40) && (TSL_img_p[j+1]>5))
-					{
-						TSL_img_p[j] = 255;
-						TSL_img_p[j + 1] = 255;
-						TSL_img_p[j + 2] = 255;
-					}
-					else if (TSL_img_p[j+2]<140)
-					{
-						TSL_img_p[j] = 0;
-						TSL_img_p[j + 1] = 0;
-						TSL_img_p[j + 2] = 0;
-					}
-
-
-					else{
-						TSL_img_p[j] = 0;
-						TSL_img_p[j + 1] = 0;
-						TSL_img_p[j + 2] = 0;
-					}
 
 				}
 
