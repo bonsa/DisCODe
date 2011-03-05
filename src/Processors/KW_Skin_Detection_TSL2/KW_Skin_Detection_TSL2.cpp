@@ -110,7 +110,7 @@ void KW_Skin_Detection_TSL2::onNewImage()
 
 		cv::Size size = TSL_img.size();		//rozmiar obrazka
 
-		skin_img.create(size, CV_8UC3);		//8bitów, 0-255, 1 kanał
+		skin_img.create(size, CV_8UC1);		//8bitów, 0-255, 1 kanał
 
 
 
@@ -140,7 +140,7 @@ void KW_Skin_Detection_TSL2::onNewImage()
 
 				if ((c_p[j] >= MIN_T) && (c_p[j] <=MAX_T) &&
 					(c_p[j+1] >= MIN_S) && (c_p[j+1] <= MAX_S)&&
-					(c_p[j+1] >= MIN_L) && (c_p[j+1] <= MAX_L))
+					(c_p[j+2] >= MIN_L) && (c_p[j+2] <= MAX_L))
 				{
 							skin_p[k] = 255;
 				}

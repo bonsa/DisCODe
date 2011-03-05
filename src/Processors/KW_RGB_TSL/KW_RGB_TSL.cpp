@@ -115,43 +115,82 @@ void KW_RGB_TSL::onNewImage()
 			int j;
 			for (j = 0; j < size.width; j += 3)
 			{
+
 				B = RGB_p[j];
 				G = RGB_p[j + 1];
 				R = RGB_p[j + 2];
 
-				r_ = 1.0*R/(R+G+B+1)-1./3;
-				g_ = 1.0*G/(R+G+B+1)-1./3;
+				if (B == 0 && G == 0 && R == 0)
+				{
+					TSL_img_p[j] = 0;
+					TSL_img_p[j + 1] = 0;
+					TSL_img_p[j + 2] = 0;
 
-				if (g_!=0)
-				{
-					T = atan(r_/g_)/3.141592 + 0.5;
 				}
-				else 
+				else
 				{
-					T = 0;
-				}
-				S = sqrt(9.0/5.0*(r_*r_+g_*g_));
-				L = 0.299*R + 0.587*G + 0.114*B;
+					r_ = 1.0*R/(R+G+B+1)-1./3;
+					g_ = 1.0*G/(R+G+B+1)-1./3;
 
-				
-				TSL_img_p[j] = T*255;
-				TSL_img_p[j + 1] = S*255;
-				TSL_img_p[j + 2] = L;
-				
-				if (MinMax.maxT < T)
-				{
-					MinMax.maxT = T;
-				}
-				if (MinMax.minS > S)
-				{
-					MinMax.minS = S;
-				}
-				if (MinMax.maxS < S)
-				{
-					MinMax.maxS = S;
+					if (g_!=0)
+					{
+						T = atan(r_/g_)/3.141592 + 0.5;
+					}
+					else
+					{
+						T = 0;
+					}
+					S = sqrt(9.0/5.0*(r_*r_+g_*g_));
+					L = 0.299*R + 0.587*G + 0.114*B;
+
+
+					TSL_img_p[j] = T*255;
+					TSL_img_p[j + 1] = S*255;
+					TSL_img_p[j + 2] = L;
+
+
+					if (MinMax.maxT < T)
+					{
+						MinMax.maxT = T;
+					}
+					if (MinMax.minS > S)
+					{
+						MinMax.minS = S;
+					}
+					if (MinMax.maxS < S)
+					{
+						MinMax.maxS = S;
+					}
+					if((TSL_img_p[j]>200))
+					{
+						TSL_img_p[j] = 0;
+						TSL_img_p[j + 1] = 0;
+						TSL_img_p[j + 2] = 0;
+					}
+
+
+					else if ((TSL_img_p[j]>40)&&(TSL_img_p[j]<120) && (TSL_img_p[j+1]<40) && (TSL_img_p[j+1]>5))
+					{
+						TSL_img_p[j] = 255;
+						TSL_img_p[j + 1] = 255;
+						TSL_img_p[j + 2] = 255;
+					}
+					else if (TSL_img_p[j+2]<140)
+					{
+						TSL_img_p[j] = 0;
+						TSL_img_p[j + 1] = 0;
+						TSL_img_p[j + 2] = 0;
+					}
+
+
+					else{
+						TSL_img_p[j] = 0;
+						TSL_img_p[j + 1] = 0;
+						TSL_img_p[j + 2] = 0;
+					}
+
 				}
 
-				++k;
 			}
 
 

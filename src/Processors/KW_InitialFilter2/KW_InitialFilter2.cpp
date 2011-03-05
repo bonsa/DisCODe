@@ -20,16 +20,16 @@ namespace KW_Filter2 {
 KW_InitialFilter2::KW_InitialFilter2(const std::string & name) : Base::Component(name),
 
 		blue_B("grupa1|  down_blue_B", 160, "range"),
-		blue_R("grupa1|  up_blue_R", 180, "range"),
+		blue_R("grupa1|  up_blue_R", 131, "range"),
 		blue_G("grupa1|  up_blue_G", 180, "range"),
 
-		green_G("grupa2|  down_green_G", 160, "range"),
+		green_G("grupa2|  down_green_G", 169, "range"),
 		green_R("grupa2|  up_green_R", 180, "range"),
 		green_B("grupa2|  up_green_B", 180, "range"),
 
-		dark_R("grupa3|  up_dark_R", 40, "range"),
-		dark_G("grupa3|  up_dark_G", 40, "range"),
-		dark_B("grupa3|  up_dark_B", 40, "range"),
+		dark_R("grupa3|  up_dark_R", 212, "range"),
+		dark_G("grupa3|  up_dark_G", 131, "range"),
+		dark_B("grupa3|  up_dark_B", 112, "range"),
 
 		green("grupa4|  down_green", 200, "range"),
 		red_green("grupa4|  down_red_green", 400, "range"),
@@ -210,9 +210,9 @@ void KW_InitialFilter2::onNewImage()
 				//	(R < 102 && G > 100 && B > 110 && G < 140 && B <160)
 					)
 					{
-						Filtered_img_p[j] = 255;
-						Filtered_img_p[j + 1] = 255;
-						Filtered_img_p[j + 2] = 255;
+						Filtered_img_p[j] = 0;
+						Filtered_img_p[j + 1] = 0;
+						Filtered_img_p[j + 2] = 0;
 					}
 				else
 				{
