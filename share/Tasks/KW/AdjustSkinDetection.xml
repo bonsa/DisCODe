@@ -7,8 +7,10 @@
 		</Movie>
 		
 
-		<Wnd1 type="CvWindow" thread="Exec1" group="s1">
-		</Wnd1>
+		<Window type="CvWindow" thread="Exec1" group="s1">
+			<count>3</count>
+		</Window>
+		
 		
 
 		<Filtr type="KW_InitialFilterAkademik" thread="Exec1" group="s1">
@@ -20,8 +22,12 @@
 		</ConColor> 
 		
 		
-		<SkinDec type="KW_SkinDetectionAkademik" thread="Exec1" group="s1">
+		<SkinDec type="KW_Skin_Detection_TSL2" thread="Exec1" group="s1">
 		</SkinDec>
+		
+		<Split type="CvSplit" thread="Exec1" group="s1">
+			<channels>3</channels>
+		</Split>
 		
 		<Sink type="CvVideoWriter" thread="Exec1" group="s1">
 			<filename>/home/kasia/output2.avi</filename>
@@ -50,7 +56,13 @@
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
 		<Event source="ConColor.newImage" destination="SkinDec.onNewImage"/>
 		<Event source="SkinDec.newImage" destination="Sink.onNewImage"/>
-		<Event source="SkinDec.newImage" destination="Wnd1.onNewImage"/>
+		<Event source="SkinDec.newImage" destination="Window.onNewImage"/>
+
+		<Event source="SkinDec.newImage" destination="Split.onNewImage"/>
+		<Event source="Split.newImage" destination="Window.onNewImage0"/>
+		<Event source="Split.newImage" destination="Window.onNewImage1"/>
+		<Event source="Split.newImage" destination="Window.onNewImage2"/>
+
 
 	
 	
@@ -85,11 +97,22 @@
 
 		</Sink>
 		
-		<Wnd1>
+		<Split>
 			<in_img type="in" group="Con4"/>
+			<out_img_0 type="out" group="Con00"/>
+			<out_img_1 type="out" group="Con01"/>
+			<out_img_2 type="out" group="Con02"/>
 
-		</Wnd1>
+		</Split>
 		
+		<Window>
+			<in_img0 type="in" group="Con00"/>
+			<in_img1 type="in" group="Con01"/>
+			<in_img2 type="in" group="Con02"/>
+
+		</Window>
+		
+
 
 
 		

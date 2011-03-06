@@ -19,14 +19,14 @@ namespace KW_Skin_TSL2 {
 
 KW_Skin_Detection_TSL2::KW_Skin_Detection_TSL2(const std::string & name) : Base::Component(name),
 
-	MIN_T("grupa1|  MIN_T", 0, "range"),
-	MAX_T("grupa1|  MAX_T", 255, "range"),
+	MIN_T("grupa1|  MIN_T", 20, "range"),
+	MAX_T("grupa1|  MAX_T", 35, "range"),
 
-	MIN_S("grupa2|  MIN_S", 0, "range"),
-	MAX_S("grupa2|  MAX_S", 255, "range"),
+	MIN_S("grupa2|  MIN_S", 25, "range"),
+	MAX_S("grupa2|  MAX_S", 35, "range"),
 
-	MIN_L("grupa3|  MIN_L", 0, "range"),
-	MAX_L("grupa3|  MAX_L", 255, "range")
+	MIN_L("grupa3|  MIN_L", 130, "range"),
+	MAX_L("grupa3|  MAX_L", 180, "range")
 
 {
 	LOG(LTRACE) << "Hello KW_Skin_Detection_TSL2\n";
@@ -110,7 +110,7 @@ void KW_Skin_Detection_TSL2::onNewImage()
 
 		cv::Size size = TSL_img.size();		//rozmiar obrazka
 
-		skin_img.create(size, CV_8UC1);		//8bitów, 0-255, 1 kanał
+		skin_img.create(size, CV_8UC3);		//8bitów, 0-255, 1 kanał
 
 
 
@@ -142,11 +142,15 @@ void KW_Skin_Detection_TSL2::onNewImage()
 					(c_p[j+1] >= MIN_S) && (c_p[j+1] <= MAX_S)&&
 					(c_p[j+2] >= MIN_L) && (c_p[j+2] <= MAX_L))
 				{
-							skin_p[k] = 255;
+							skin_p[j] = 255;
+							skin_p[j+1] = 255;
+							skin_p[j+2] = 255;
 				}
 				else
 				{
-					skin_p[k] = 0;
+					skin_p[j] = c_p[j];
+					skin_p[j+1] = c_p[j+1];
+					skin_p[j+2] = c_p[j+2];
 				}
 
 				++k;

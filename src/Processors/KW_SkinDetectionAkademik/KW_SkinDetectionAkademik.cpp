@@ -105,17 +105,17 @@ void KW_SkinDetectionAkademik::onNewImage()
 			{
 				if((c_p[j]>80)||(c_p[j+2]<120))
 				{
-					skin_p[j] = 0;
-					skin_p[j+1] = 0;
-					skin_p[j+2] = 0;
+			//		skin_p[j] = 0;
+			//		skin_p[j+1] = 0;
+			//		skin_p[j+2] = 0;
 		
 				}
 
 			else if ((c_p[j]>35)&&(c_p[j]<20) && (c_p[j+1]<35) && (c_p[j+1]>20)&& (c_p[j+2]<180) && (c_p[j+2]>130))
 			{
-				skin_p[j] = 0;
-				skin_p[j+1] = 0;
-				skin_p[j+2] = 0;
+			//	skin_p[j] = 0;
+			//	skin_p[j+1] = 0;
+			//	skin_p[j+2] = 0;
 
 			}
 
@@ -128,24 +128,25 @@ void KW_SkinDetectionAkademik::onNewImage()
 	
 			//	}
 		//		else if (c_p[j+2]<140)
-				else if(c_p[j]<c_p[j+1])
-				{
-					skin_p[j] = 0;
-					skin_p[j+1] = 0;
-					skin_p[j+2] = 0;
+			else if(c_p[j]<c_p[j+1])
+			{
+			//	skin_p[j] = 0;
+			//	skin_p[j+1] = 0;
+			//	skin_p[j+2] = 0;
 	
-				}
+			}
 
-				else{
-					skin_p[j] = c_p[j];
-					skin_p[j+1] = c_p[j+1];
-					skin_p[j+2] = c_p[j+2];
+			else
+			{
+				skin_p[j] = c_p[j];
+				skin_p[j+1] = c_p[j+1];
+				skin_p[j+2] = c_p[j+2];
 	
-				}
+			}
 
-		//		skin_p[j] = c_p[j];
-		//		skin_p[j+1] = c_p[j+1];
-		//		skin_p[j+2] = c_p[j+2];
+				skin_p[j] = c_p[j];
+				skin_p[j+1] = c_p[j+1];
+				skin_p[j+2] = c_p[j+2];
 
 				++k;
 			}
