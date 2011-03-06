@@ -8,7 +8,7 @@
 		</Movie>
 		
 		
-		<Filtr type="KW_InitialFilter2" thread="Exec1" group="s1">
+		<Filtr type="KW_InitialFilterAkademik" thread="Exec1" group="s1">
 				
 		</Filtr> 
 	

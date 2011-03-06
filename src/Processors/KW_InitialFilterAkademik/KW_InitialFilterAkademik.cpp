@@ -19,17 +19,17 @@ namespace KW_FilterAkademik {
 
 KW_InitialFilterAkademik::KW_InitialFilterAkademik(const std::string & name) : Base::Component(name),
 
-		blue_B("grupa1|  down_blue_B", 160, "range"),
-		blue_R("grupa1|  up_blue_R", 131, "range"),
-		blue_G("grupa1|  up_blue_G", 180, "range"),
+		blue_B("grupa1|  down_blue_B", 76, "range"),
+		blue_R("grupa1|  up_blue_R", 138, "range"),
+		blue_G("grupa1|  up_blue_G", 192, "range"),
 
-		green_G("grupa2|  down_green_G", 169, "range"),
-		green_R("grupa2|  up_green_R", 180, "range"),
-		green_B("grupa2|  up_green_B", 180, "range"),
+		green_G("grupa2|  down_green_G", 165, "range"),
+		green_R("grupa2|  up_green_R", 255, "range"),
+		green_B("grupa2|  up_green_B", 255, "range"),
 
-		dark_R("grupa3|  up_dark_R", 212, "range"),
-		dark_G("grupa3|  up_dark_G", 131, "range"),
-		dark_B("grupa3|  up_dark_B", 112, "range"),
+		dark_R("grupa3|  up_dark_R", 119, "range"),
+		dark_G("grupa3|  up_dark_G", 165, "range"),
+		dark_B("grupa3|  up_dark_B", 189, "range"),
 
 		green("grupa4|  down_green", 200, "range"),
 		red_green("grupa4|  down_red_green", 400, "range"),

@@ -4,17 +4,14 @@
 	<Components>
 
 		<Movie type="CameraOpenCV" thread="Exec1" group="s1">
-			<filename>/home/kasia/Filmy/slon.avi</filename>
 		</Movie>
 		
 
 		<Wnd1 type="CvWindow" thread="Exec1" group="s1">
 		</Wnd1>
 		
-				<Wnd2 type="CvWindow" thread="Exec1" group="s1">
-		</Wnd2>
 
-		<Filtr type="KW_InitialFilter2" thread="Exec1" group="s1">
+		<Filtr type="KW_InitialFilterAkademik" thread="Exec1" group="s1">
 				
 		</Filtr> 
 
@@ -22,17 +19,10 @@
 				
 		</ConColor> 
 		
-		<ColorBW type="CvColorConv" thread="Exec1" group="s1">
-			<type>BGR2GRAY</type>
-		</ColorBW>
-		 
-		<DecSkin type= "KW_Skin_Detection_TSL2" thread="Exec1" group="s1">
-				
-		</DecSkin>
 		
-		<Blob type="BlobExtractor" thread="Exec1" group="s1">
-			<min_size>5000</min_size>
-		</Blob>
+		<SkinDec type="KW_SkinDetectionAkademik" thread="Exec1" group="s1">
+		</SkinDec>
+	
 
 	
 	</Components>
@@ -53,16 +43,10 @@
 
 		<Event source="Movie.newImage" destination="Filtr.onNewImage"/>
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
-		<Event source="Filtr.newImage" destination="Wnd2.onNewImage"/>
+		<Event source="ConColor.newImage" destination="SkinDec.onNewImage"/>
+		<Event source="SkinDec.newImage" destination="Wnd1.onNewImage"/>
 
-		<Event source="ConColor.newImage" destination="DecSkin.onNewImage"/>
-
-		<Event source="ConColor.newImage" destination="ColorBW.onNewImage"/>
-		<Event source="ColorBW.newImage" destination="Blob.onNewImage"/>
-			
-		<Event source="Blob.newBlobs" destination="Wnd1.onNewImage"/>
-		<Event source="Movie.newImage" destination="Wnd1.onNewImage"/>
-
+	
 	
 	</Events>
 
@@ -84,19 +68,14 @@
 				<out_img type="out" group="Con3"/>
 		</ConColor> 
 		
-		<ColorBW>
+		<SkinDec>
 				<in_img  type="in" group="Con3"/>
 				<out_img type="out" group="Con4"/>
-		</ColorBW> 
+		</SkinDec> 
 		
-		<Blob>
-				<in_img  type="in" group="Con4"/>
-				<out_blobs type="out" group="Con5"/>
-		</Blob> 
 		
 		<Wnd1>
-			<in_img type="in" group="Con1"/>
-			<in_draw type="in" group="Con5"/>	
+			<in_img type="in" group="Con4"/>
 
 		</Wnd1>
 		

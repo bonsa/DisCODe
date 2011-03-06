@@ -17,6 +17,22 @@
 		<SkinDec type="KW_SkinDetectionAkademik" thread="Exec1" group="s1">
 		</SkinDec>
 		
+		<MorphClose1 type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_CLOSE</type>
+			<iterations>1</iterations>
+		</MorphClose1>
+		
+		<MorphOpen type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_OPEN</type>
+			<iterations>1</iterations>
+		</MorphOpen>	
+		
+		<MorphClose2 type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_CLOSE</type>
+			<iterations>1</iterations>
+		</MorphClose2>
+		
+		
 		<Blob type="BlobExtractor" thread="Exec1" group="s1">
 			<min_size>5000</min_size>
 		</Blob>
@@ -44,7 +60,13 @@
 		<Event source="Camera.newImage" destination="Filtr.onNewImage"/>
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
 		<Event source="ConColor.newImage" destination="SkinDec.onNewImage"/>
-		<Event source="SkinDec.newImage" destination="Blob.onNewImage"/>	
+		
+		<Event source="SkinDec.newImage" destination="MorphClose1.onNewImage"/>
+		<Event source="MorphClose1.newImage" destination="MorphOpen.onNewImage"/>
+		<Event source="MorphOpen.newImage" destination="MorphClose2.onNewImage"/>
+		
+		
+		<Event source="MorphClose2.newImage" destination="Blob.onNewImage"/>	
 		<Event source="Blob.newBlobs" destination="Wnd1.onNewImage"/>
 		<Event source="Camera.newImage" destination="Wnd1.onNewImage"/>
 
@@ -74,14 +96,30 @@
 				<out_img type="out" group="Con4"/>
 		</SkinDec> 
 		
-		<Blob>
+		<MorphClose1>
 				<in_img  type="in" group="Con4"/>
-				<out_blobs type="out" group="Con5"/>
+				<out_img type="out" group="Con5"/>
+		</MorphClose1> 
+
+				
+		<MorphOpen>
+				<in_img  type="in" group="Con5"/>
+				<out_img type="out" group="Con6"/>
+		</MorphOpen> 
+		
+		<MorphClose2>
+				<in_img  type="in" group="Con6"/>
+				<out_img type="out" group="Con7"/>
+		</MorphClose2> 
+		
+		<Blob>
+				<in_img  type="in" group="Con7"/>
+				<out_blobs type="out" group="Con8"/>
 		</Blob> 
 		
 		<Wnd1>
 			<in_img type="in" group="Con1"/>
-			<in_draw type="in" group="Con5"/>	
+			<in_draw type="in" group="Con8"/>	
 
 		</Wnd1>
 		
