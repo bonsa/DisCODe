@@ -7,11 +7,13 @@
 		</Movie>
 		
 
-		<Window type="CvWindow" thread="Exec1" group="s1">
-			<count>3</count>
-		</Window>
+		<Window1 type="CvWindow" thread="Exec1" group="s1">
+
+		</Window1>
 		
-		
+		<Window2 type="CvWindow" thread="Exec1" group="s1">
+
+		</Window2>
 
 		<Filtr type="KW_InitialFilterAkademik" thread="Exec1" group="s1">
 				
@@ -25,10 +27,34 @@
 		<SkinDec type="KW_Skin_Detection_TSL2" thread="Exec1" group="s1">
 		</SkinDec>
 		
+		<BW type="CvColorConv" thread="Exec1" group="s1">
+		<type>BGR2GRAY</type>
+		</BW>
+		
+		<MorphClose1 type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_CLOSE</type>
+			<iterations>1</iterations>
+		</MorphClose1>
+		
+		<MorphOpen type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_OPEN</type>
+			<iterations>1</iterations>
+		</MorphOpen>	
+		
+		<MorphClose2 type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_CLOSE</type>
+			<iterations>1</iterations>
+		</MorphClose2>
+		
+		<Window3 type="CvWindow" thread="Exec1" group="s1">
+
+		</Window3>
+	
+	
 		<Split type="CvSplit" thread="Exec1" group="s1">
 			<channels>3</channels>
 		</Split>
-		
+	
 		<Sink type="CvVideoWriter" thread="Exec1" group="s1">
 			<filename>/home/kasia/output2.avi</filename>
 			<fourcc>XVID</fourcc>
@@ -53,16 +79,25 @@
 	<Events>
 
 		<Event source="Movie.newImage" destination="Filtr.onNewImage"/>
+		<Event source="Filtr.newImage" destination="Window1.onNewImage"/>
+		
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
 		<Event source="ConColor.newImage" destination="SkinDec.onNewImage"/>
 		<Event source="SkinDec.newImage" destination="Sink.onNewImage"/>
-		<Event source="SkinDec.newImage" destination="Window.onNewImage"/>
-
+		<Event source="SkinDec.newImage" destination="Window2.onNewImage"/>
+		
+		<Event source="SkinDec.newImage" destination="BW.onNewImage"/>
+			
+		<Event source="BW.newImage" destination="MorphClose1.onNewImage"/>
+		<Event source="MorphClose1.newImage" destination="MorphOpen.onNewImage"/>
+		<Event source="MorphOpen.newImage" destination="MorphClose2.onNewImage"/>
+		<Event source="MorphClose2.newImage" destination="Window3.onNewImage"/>
+<!--
 		<Event source="SkinDec.newImage" destination="Split.onNewImage"/>
 		<Event source="Split.newImage" destination="Window.onNewImage0"/>
 		<Event source="Split.newImage" destination="Window.onNewImage1"/>
 		<Event source="Split.newImage" destination="Window.onNewImage2"/>
-
+-->
 
 	
 	
@@ -80,6 +115,9 @@
 				<out_img type="out" group="Con2"/>
 		</Filtr> 
 
+		<Window1>
+			<in_img0 type="in" group="Con2"/>
+		</Window1>
 				
 		<ConColor>
 				<in_img  type="in" group="Con2"/>
@@ -97,7 +135,38 @@
 
 		</Sink>
 		
-		<Split>
+		<Window2>
+			<in_img0 type="in" group="Con4"/>
+		</Window2>
+		
+		<BW>
+				<in_img  type="in" group="Con4"/>
+				<out_img type="out" group="Con5"/>
+		</BW> 
+		
+		
+		<MorphClose1>
+				<in_img  type="in" group="Con5"/>
+				<out_img type="out" group="Con6"/>
+		</MorphClose1> 
+
+				
+		<MorphOpen>
+				<in_img  type="in" group="Con6"/>
+				<out_img type="out" group="Con7"/>
+		</MorphOpen> 
+		
+		<MorphClose2>
+				<in_img  type="in" group="Con7"/>
+				<out_img type="out" group="Con8"/>
+		</MorphClose2> 
+		
+		<Window3>
+			<in_img0 type="in" group="Con8"/>
+		</Window3>
+		
+		
+	<!--	<Split>
 			<in_img type="in" group="Con4"/>
 			<out_img_0 type="out" group="Con00"/>
 			<out_img_1 type="out" group="Con01"/>
@@ -111,8 +180,7 @@
 			<in_img2 type="in" group="Con02"/>
 
 		</Window>
-		
-
+-->
 
 
 		
