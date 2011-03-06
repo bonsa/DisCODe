@@ -19,14 +19,14 @@ namespace KW_Skin_TSL2 {
 
 KW_Skin_Detection_TSL2::KW_Skin_Detection_TSL2(const std::string & name) : Base::Component(name),
 
-	MIN_T("grupa1|  MIN_T", 200, "range"),
-	MAX_T("grupa1|  MAX_T", 22, "range"),
+	MIN_T("grupa1|  MIN_T", 22, "range"),
+	MAX_T("grupa1|  MAX_T", 200, "range"),
 
-	MIN_S("grupa2|  MIN_S", 28, "range"),
-	MAX_S("grupa2|  MAX_S", 0, "range"),
+	MIN_S("grupa2|  MIN_S", 0, "range"),
+	MAX_S("grupa2|  MAX_S", 28, "range"),
 
-	MIN_L("grupa3|  MIN_L", 255, "range"),
-	MAX_L("grupa3|  MAX_L", 104, "range")
+	MIN_L("grupa3|  MIN_L", 104, "range"),
+	MAX_L("grupa3|  MAX_L", 255, "range")
 
 {
 	LOG(LTRACE) << "Hello KW_Skin_Detection_TSL2\n";
