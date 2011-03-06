@@ -20,8 +20,13 @@
 namespace Processors {
 namespace BlobExtractor {
 
-BlobExtractor_Processor::BlobExtractor_Processor(const std::string & name) : Base::Component(name) {
+BlobExtractor_Processor::BlobExtractor_Processor(const std::string & name) : Base::Component(name),
+	min_size("min size", 5000, "range")
+{
 	LOG(LTRACE)<<"Hello BlobExtractor_Processor\n";
+	min_size.addConstraint("0");
+	min_size.addConstraint("1000000");
+	registerProperty(min_size);
 }
 
 BlobExtractor_Processor::~BlobExtractor_Processor() {
@@ -98,7 +103,7 @@ void BlobExtractor_Processor::onNewImage() {
 			LOG(LTRACE) << "blobs found";
 			Types::Blobs::BlobResult result(res);
 
-			result.Filter( result, B_EXCLUDE, Types::Blobs::BlobGetArea(), B_LESS, props.min_size );
+			result.Filter( result, B_EXCLUDE, Types::Blobs::BlobGetArea(), B_LESS, min_size );
 
 			out_blobs.write(result);
 			LOG(LTRACE) << "blobs written";
