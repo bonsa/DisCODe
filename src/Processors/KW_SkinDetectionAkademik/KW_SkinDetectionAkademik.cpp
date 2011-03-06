@@ -75,7 +75,7 @@ void KW_SkinDetectionAkademik::onNewImage()
 
 		cv::Size size = TSL_img.size();		//rozmiar obrazka
 
-		skin_img.create(size, CV_8UC1);		//8bitów, 0-255, 1 kanał
+		skin_img.create(size, CV_8UC3);		//8bitów, 0-255, 1 kanał
 
 
 
@@ -103,29 +103,49 @@ void KW_SkinDetectionAkademik::onNewImage()
 			int j,k = 0;
 			for (j = 0; j < size.width; j += 3) 
 			{
-				if((c_p[j]>200))
+				if((c_p[j]>80)||(c_p[j+2]<120))
 				{
-					skin_p[k] = 0;
+					skin_p[j] = 0;
+					skin_p[j+1] = 0;
+					skin_p[j+2] = 0;
 		
 				}
 
+			else if ((c_p[j]>35)&&(c_p[j]<20) && (c_p[j+1]<35) && (c_p[j+1]>20)&& (c_p[j+2]<180) && (c_p[j+2]>130))
+			{
+				skin_p[j] = 0;
+				skin_p[j+1] = 0;
+				skin_p[j+2] = 0;
 
-				else if ((c_p[j]>40)&&(c_p[j]<120) && (c_p[j+1]<40) && (c_p[j+1]>5))
-				{
-					skin_p[k] = 255;
+			}
+
+//				else if ((c_p[j]>40)&&(c_p[j]<120) && (c_p[j+1]<40) && (c_p[j+1]>5))
+			//
+			//	{
+			//		skin_p[j] = 255;
+			//		skin_p[j+1] = 255;
+			//		skin_p[j+2] = 255;
 	
-				}
-				else if (c_p[j+2]<140)
+			//	}
+		//		else if (c_p[j+2]<140)
+				else if(c_p[j]<c_p[j+1])
 				{
-					skin_p[k] = 0;
+					skin_p[j] = 0;
+					skin_p[j+1] = 0;
+					skin_p[j+2] = 0;
 	
 				}
 
 				else{
-					skin_p[k] = 0;
+					skin_p[j] = c_p[j];
+					skin_p[j+1] = c_p[j+1];
+					skin_p[j+2] = c_p[j+2];
 	
 				}
 
+		//		skin_p[j] = c_p[j];
+		//		skin_p[j+1] = c_p[j+1];
+		//		skin_p[j+2] = c_p[j+2];
 
 				++k;
 			}
