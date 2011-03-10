@@ -109,9 +109,9 @@ void BlobExtractor_Processor::onNewImage() {
 			LOG(LTRACE) << "blobs written";
 			newBlobs->raise();
 			LOG(LTRACE) << "blobs sent";
-			//result.draw(out, CV_RGB(255, 0, 0), 0, 0);
-			//out_img.write(in);
-			//newImage->raise();
+	//		result.draw(out, CV_RGB(255, 0, 0), 0, 0);
+	//		out_img.write(in);
+	//		newImage->raise();
 		}
 
 		LOG(LINFO) << "Blobing took " << timer.elapsed() << " seconds\n";

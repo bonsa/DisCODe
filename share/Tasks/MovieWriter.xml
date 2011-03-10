@@ -2,12 +2,12 @@
 <Task>
 	<!-- List of components -->
 	<Components>
-		<Source type="CameraUniCap" thread="Thread1" group="s1">
+		<Source type="CameraOpenCV" thread="Thread1" group="s1">
 		</Source>
 
 		<Sink type="CvVideoWriter" thread="Thread1" group="s1">
-			<filename>/tmp/output.avi</filename>
-			<fourcc>XVID</fourcc>
+			<filename>home/kasia/Filmy/output.avi</filename>
+			
 		</Sink>
 		
 		<Window type="CvWindow" thread="Thread1" group="s1">
