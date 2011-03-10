@@ -91,7 +91,6 @@
 		
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
 		<Event source="ConColor.newImage" destination="SkinDec.onNewImage"/>
-		<Event source="SkinDec.newImage" destination="Sink.onNewImage"/>
 		<Event source="SkinDec.newImage" destination="Window2.onNewImage"/>
 		
 		<Event source="SkinDec.newImage" destination="BW.onNewImage"/>
@@ -103,6 +102,7 @@
 		
 		<Event source="MorphClose2.newImage" destination="Blob.onNewImage"/>
 		<Event source="Blob.newBlobs" destination="Window4.onNewImage"/>
+		<Event source="Blob.newBlobs" destination="Sink.onNewImage"/>
 <!--
 		<Event source="SkinDec.newImage" destination="Split.onNewImage"/>
 		<Event source="Split.newImage" destination="Window.onNewImage0"/>
@@ -140,11 +140,7 @@
 				<out_img type="out" group="Con4"/>
 		</SkinDec> 
 		
-		
-		<Sink>
-			<in_img type="in" group="Con4"/>
-
-		</Sink>
+	
 		
 		<Window2>
 			<in_img0 type="in" group="Con4"/>
@@ -180,6 +176,11 @@
 				<in_img  type="in" group="Con8"/>
 				<out_blobs type="out" group="Con9"/>
 		</Blob> 
+		
+		<Sink>
+			<in_draw type="in" group="Con9"/>
+
+		</Sink>
 		
 		<Window4>
 			<in_img type="in" group="Con1"/>

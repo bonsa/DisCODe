@@ -164,7 +164,7 @@ void KW_InitialFilter2::onNewImage()
 {
 	LOG(LTRACE) << "KW_InitialFilter2::onNewImage\n";
 	try {
-		cv::Mat RGB_img = in_img.read();	//czytam obrazem w zejścia
+		cv::Mat RGB_img = in_img.read();	//czytam obrazem w wejścia
 
 		cv::Size size = RGB_img.size();		//rozmiar obrazka
 		
