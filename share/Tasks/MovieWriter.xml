@@ -6,8 +6,8 @@
 		</Source>
 
 		<Sink type="CvVideoWriter" thread="Thread1" group="s1">
-			<filename>home/kasia/Filmy/output.avi</filename>
-			
+			<filename>/tmp/output.avi</filename>
+			<fourcc>XVID</fourcc>
 		</Sink>
 		
 		<Window type="CvWindow" thread="Thread1" group="s1">
