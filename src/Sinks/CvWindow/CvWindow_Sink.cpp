@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <stdexcept>
 
 #include "CvWindow_Sink.hpp"
 #include "Logger.hpp"
@@ -47,10 +48,10 @@ bool CvWindow_Sink::onInit() {
 		handlers.push_back(hand);
 		registerHandler(std::string("onNewImage")+id, hand);
 
-		in_img.push_back(new Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest>);
+		in_img.push_back(new Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex>);
 		registerStream(std::string("in_img")+id, in_img[i]);
 
-		in_draw.push_back(new Base::DataStreamInPtr<Types::Drawable, Base::DataStreamBuffer::Newest>);
+		in_draw.push_back(new Base::DataStreamInPtr<Types::Drawable, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex>);
 		registerStream(std::string("in_draw")+id, in_draw[i]);
 
 		//cv::namedWindow(props.title + id);
@@ -123,7 +124,9 @@ void CvWindow_Sink::onNewImageN(int n) {
 	LOG(LTRACE) << name() << "::onNewImage(" << n << ")";
 
 	try {
-		img[n] = in_img[n]->read().clone();
+		if(!in_img[n]->empty()){
+			img[n] = in_img[n]->read().clone();
+		}
 
 		if (!in_draw[n]->empty()) {
 			to_draw[n] = in_draw[n]->read();
@@ -137,8 +140,8 @@ void CvWindow_Sink::onNewImageN(int n) {
 		// Display image.
 		onStep();
 	}
-	catch(...) {
-		LOG(LERROR) << "CvWindow::onNewImage failed\n";
+	catch(std::exception &ex) {
+		LOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "\n";
 	}
 }
 
