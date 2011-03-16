@@ -195,6 +195,7 @@ private:
 	Props props;
 
 	bool trig;
+	bool loop;
 };
 
 }//: namespace Sequence

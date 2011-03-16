@@ -58,11 +58,18 @@ bool Sequence::onStep() {
 		return true;
 
 	trig = false;
+	loop = true;
 
 	if (frame >= files.size()) {
-		LOG(LINFO) << name() << ": end of sequence\n";
-		endOfSequence->raise();
-		return false;
+			LOG(LNOTICE) << "Sequence loop";
+			if (loop) {
+	                frame = 0;
+	                LOG(LNOTICE) << "Sequence loop2";
+	        } else {
+	                LOG(LINFO) << name() << ": end of sequence\n";
+	                endOfSequence->raise();
+	                return false;
+	        }
 	}
 
 	LOG(LTRACE) << "Sequence: reading image " << files[frame];

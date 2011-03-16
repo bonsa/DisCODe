@@ -13,10 +13,10 @@
 		
 		<FindChessboard type="CvFindChessboardCorners" thread="ProcessingThread" group="s1">
 			<chessboard>
-				<width>6</width>
-				<height>9</height>
-				<square_height>0.028</square_height>
-				<square_width>0.028</square_width>
+				<width>4</width>
+				<height>3</height>
+				<square_height>0.02</square_height>
+				<square_width>0.02</square_width>
 			</chessboard>
 			
 			<scale>1</scale>
