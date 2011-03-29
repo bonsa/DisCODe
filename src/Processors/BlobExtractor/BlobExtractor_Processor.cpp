@@ -21,7 +21,7 @@ namespace Processors {
 namespace BlobExtractor {
 
 BlobExtractor_Processor::BlobExtractor_Processor(const std::string & name) : Base::Component(name),
-	min_size("min size", 5000, "range")
+	min_size("min size", 7000, "range")
 {
 	LOG(LTRACE)<<"Hello BlobExtractor_Processor\n";
 	min_size.addConstraint("0");
