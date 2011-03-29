@@ -58,11 +58,11 @@ bool Sequence::onStep() {
 		return true;
 
 	trig = false;
-	loop = true;
 
 	if (frame >= files.size()) {
 			LOG(LNOTICE) << "Sequence loop";
-			if (loop) {
+			LOG(LNOTICE) << props.loop;
+			if (props.loop) {
 	                frame = 0;
 	                LOG(LNOTICE) << "Sequence loop2";
 	        } else {
