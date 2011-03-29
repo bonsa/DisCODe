@@ -7,18 +7,7 @@
 		<filename>/home/kasia/Filmy/2903.avi</filename>
 		<loop>true</loop>
 		</Movie>
-		
-		<Seq type="Sequence" thread="Exec1" group="s1">
-			<directory>/home/kasia/Filmy/zdjecia/</directory> 
-			<loop>true</loop>
-			<triggered>true</triggered>	
-		
-		</Seq>
-		 
-		<Kbd1 type="Keyboard" thread="Exec3" group="s1">
-            <keys>t</keys> 
-        </Kbd1>
-		
+
 		
 		<Window1 type="CvWindow" thread="Exec2" group="s1">
 
@@ -54,18 +43,9 @@
 		
 		<MorphClose1 type="CvMorphology" thread="Exec1" group="s1">
 			<type>MORPH_CLOSE</type>
-			<iterations>0</iterations>
+			<iterations>4</iterations>
 		</MorphClose1>
-		
-		<MorphOpen type="CvMorphology" thread="Exec1" group="s1">
-			<type>MORPH_OPEN</type>
-			<iterations>0</iterations>
-		</MorphOpen>	
-		
-		<MorphClose2 type="CvMorphology" thread="Exec1" group="s1">
-			<type>MORPH_CLOSE</type>
-			<iterations>0</iterations>
-		</MorphClose2>
+
 		
 		
 		<Blob type="BlobExtractor" thread="Exec1" group="s1">
@@ -85,14 +65,10 @@
 			<main_component>Movie</main_component>
 		</Exec1>
 
-		<Exec3 type="continuous">
-			<main_component>Kbd1</main_component>
-			<keys>t</keys> 
-		</Exec3>
 		
 		<Exec2 type="periodic">
 			<main_component>Window1</main_component>
-			<interval>5</interval>
+			<interval>0.2</interval>
 		</Exec2>
 		
 
@@ -104,7 +80,6 @@
 
 		
 		<Event source="Movie.newImage" destination="Filtr.onNewImage"/>
-		<Event source="Kbd1.t_Pressed" destination="Seq.onTrigger"/>
 		<Event source="Filtr.newImage" destination="Window1.onNewImage"/>
 		
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
@@ -114,14 +89,12 @@
 		<Event source="SkinDec.newImage" destination="BW.onNewImage"/>
 			
 		<Event source="BW.newImage" destination="MorphClose1.onNewImage"/>
-		<Event source="MorphClose1.newImage" destination="MorphOpen.onNewImage"/>
-		<Event source="MorphOpen.newImage" destination="MorphClose2.onNewImage"/>
-		<Event source="MorphClose2.newImage" destination="Window3.onNewImage"/>
+		<Event source="MorphClose1.newImage" destination="Window3.onNewImage"/>
 		
-		<Event source="MorphClose2.newImage" destination="Blob.onNewImage"/>
+		<Event source="MorphClose1.newImage" destination="Blob.onNewImage"/>
 		<Event source="Blob.newBlobs" destination="Window4.onNewImage"/>
 
-		<Event source="Seq.newImage" destination="Window4.onNewImage"/>
+		<Event source="Movie.newImage" destination="Window4.onNewImage"/>
 
 	
 	
@@ -170,23 +143,13 @@
 				<out_img type="out" group="Con6"/>
 		</MorphClose1> 
 
-				
-		<MorphOpen>
-				<in_img  type="in" group="Con6"/>
-				<out_img type="out" group="Con7"/>
-		</MorphOpen> 
-		
-		<MorphClose2>
-				<in_img  type="in" group="Con7"/>
-				<out_img type="out" group="Con8"/>
-		</MorphClose2> 
 		
 		<Window3>
-			<in_img0 type="in" group="Con8"/>
+			<in_img0 type="in" group="Con6"/>
 		</Window3>
 		
 		<Blob>
-				<in_img  type="in" group="Con8"/>
+				<in_img  type="in" group="Con6"/>
 				<out_blobs type="out" group="Con9"/>
 		</Blob> 
 		
