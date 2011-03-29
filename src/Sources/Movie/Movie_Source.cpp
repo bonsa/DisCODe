@@ -68,7 +68,9 @@ bool Movie_Source::onStep() {
 	cap >> frame;
 	if (frame.empty()) {
 		if (props.loop) {
-			frame = 0;
+			//frame = 0;
+			cap.release();
+			cap.open(props.filename);
 		}
 		return false;
 	}

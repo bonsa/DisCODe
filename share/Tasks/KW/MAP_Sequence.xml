@@ -4,7 +4,7 @@
 	<Components>
 
 		<Movie type="Movie" thread="Exec1" group="s1">
-		<filename>/home/kasia/Filmy/2903.avi</filename>
+		<filename>/home/kasia/Filmy/10.03-2.avi</filename>
 		<loop>true</loop>
 		</Movie>
 		
@@ -81,8 +81,10 @@
 	<Executors>
 		  
 				
-		<Exec1 type="continuous">
-			<main_component>Movie</main_component>
+		<Exec1 type="periodic">
+			<main_component>Seq</main_component>
+			<interval>4</interval>
+	
 		</Exec1>
 
 		<Exec3 type="continuous">
@@ -103,7 +105,7 @@
 	<Events>
 
 		
-		<Event source="Movie.newImage" destination="Filtr.onNewImage"/>
+		<Event source="Seq.newImage" destination="Filtr.onNewImage"/>
 		<Event source="Kbd1.t_Pressed" destination="Seq.onTrigger"/>
 		<Event source="Filtr.newImage" destination="Window1.onNewImage"/>
 		
@@ -129,9 +131,9 @@
 
 	<!-- Data stream assignments -->
 	<DataStreams>
-		<Movie>
+		<Seq>
 			<out_img type="out" group="Con1"/>
-		</Movie>
+		</Seq>
 		
 		
 		<Filtr>
