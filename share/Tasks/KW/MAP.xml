@@ -3,22 +3,27 @@
 	<!-- List of components, data: 01.03.10 -->
 	<Components>
 
-		<Movie type="CameraOpenCV" thread="Exec1" group="s1">
+		<Movie type="Movie" thread="Exec1" group="s1">
+		<filename>/home/kasia/Filmy/10.03-2.avi</filename>
+		<loop>true</loop>
 		</Movie>
 		
-		<Seq1 type="Sequence" thread="Exec1" group="s1">
-			<directory>/home/kasia/Pobrane/</directory> 
-			<pattern>.*\.png</pattern>
-		</Seq1>
-		
 
-		<Window1 type="CvWindow" thread="Exec2" group="s1">
+		<Window1 type="CvWindow" thread="Exec1" group="s1">
 
 		</Window1>
 		
-		<Window2 type="CvWindow" thread="Exec2" group="s1">
+		<Window2 type="CvWindow" thread="Exec1" group="s1">
 
 		</Window2>
+		
+		<Window3 type="CvWindow" thread="Exec1" group="s1">
+
+		</Window3>
+		
+		<Window4 type="CvWindow" thread="Exec1" group="s1">
+
+		</Window4>
 
 		<Filtr type="KW_InitialFilterAkademik" thread="Exec1" group="s1">
 				
@@ -51,22 +56,11 @@
 			<iterations>0</iterations>
 		</MorphClose2>
 		
-		<Window3 type="CvWindow" thread="Exec2" group="s1">
-
-		</Window3>
 		
 		<Blob type="BlobExtractor" thread="Exec1" group="s1">
 			<min_size>5000</min_size>
 		</Blob>
-		
-		<Window4 type="CvWindow" thread="Exec2" group="s1">
 
-		</Window4>
-		
-		<Window5 type="CvWindow" thread="Exec2" group="s1">
-
-		</Window5>
-	
 	
 		<Sink type="CvVideoWriter" thread="Exec1" group="s1">
 			<filename>/home/kasia/output2.avi</filename>
@@ -80,16 +74,10 @@
 	<!-- Threads of execution -->
 	<Executors>
 		  
-		
-		<Exec1 type="periodic">
-			<main_component>Seq1</main_component>
-			<interval>0.01</interval>
+		<Exec1 type="continuous">
+			<main_component>Movie</main_component>
 		</Exec1>
-
-		<Exec2 type="periodic">
-			<main_component>Window1</main_component>
-			<interval>0.2</interval>
-		</Exec2>
+		
 
 
 	</Executors>
@@ -97,9 +85,8 @@
 	<!-- Event connections -->
 	<Events>
 
-		<Event source="Seq1.newImage" destination="Filtr.onNewImage"/>
-		<Event source="Seq1.newImage" destination="Window1.onNewImage"/>
-		<Event source="Filtr.newImage" destination="Window5.onNewImage"/>
+		<Event source="Movie.newImage" destination="Filtr.onNewImage"/>
+		<Event source="Filtr.newImage" destination="Window1.onNewImage"/>
 		
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
 		<Event source="ConColor.newImage" destination="SkinDec.onNewImage"/>
@@ -116,20 +103,6 @@
 		<Event source="Blob.newBlobs" destination="Window4.onNewImage"/>
 
 		<Event source="Movie.newImage" destination="Window4.onNewImage"/>
-<!--		<Event source="Blob.newBlobs" destination="Sink.onNewImage"/>
-
-
-	
-		<Event source="Blob.newBlobs" destination="Sink.onNewImage"/>
-
--->
-	<!--
-
-		<Event source="SkinDec.newImage" destination="Split.onNewImage"/>
-		<Event source="Split.newImage" destination="Window.onNewImage0"/>
-		<Event source="Split.newImage" destination="Window.onNewImage1"/>
-		<Event source="Split.newImage" destination="Window.onNewImage2"/>
--->
 
 	
 	
@@ -137,9 +110,9 @@
 
 	<!-- Data stream assignments -->
 	<DataStreams>
-		<Seq1>
+		<Movie>
 			<out_img type="out" group="Con1"/>
-		</Seq1>
+		</Movie>
 		
 		
 		<Filtr>
@@ -148,12 +121,8 @@
 		</Filtr> 
 
 		<Window1>
-			<in_img0 type="in" group="Con1"/>
-		</Window1>
-		
-		<Window5>
 			<in_img0 type="in" group="Con2"/>
-		</Window5>
+		</Window1>
 				
 		<ConColor>
 				<in_img  type="in" group="Con2"/>
@@ -205,6 +174,7 @@
 
 
 
+
 		
 		<Window4>
 			<in_img type="in" group="Con1"/>
@@ -234,3 +204,4 @@
 	</DataStreams>
 
 </Task>
+

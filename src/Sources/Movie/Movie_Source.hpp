@@ -69,12 +69,15 @@ struct Props : public Base::Props {
 	std::string filename;
 	bool triggered;
 
+	bool loop;
+
 	/*!
 	 * \copydoc Base::Props::load
 	 */
 	void load(const ptree & pt) {
 		filename  = pt.get("filename", "");
 		triggered = pt.get("triggered", false);
+		loop = pt.get("loop", false);
 	}
 
 	/*!
@@ -83,6 +86,7 @@ struct Props : public Base::Props {
 	void save(ptree & pt) {
 		pt.put("filename", filename);
 		pt.put("triggered", triggered);
+		pt.put("loop", loop);
 	}
 };
 

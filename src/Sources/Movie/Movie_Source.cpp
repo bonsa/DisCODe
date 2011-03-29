@@ -67,6 +67,9 @@ bool Movie_Source::onStep() {
 	LOG(LTRACE) << "Movie_Source::step() start\n";
 	cap >> frame;
 	if (frame.empty()) {
+		if (props.loop) {
+			frame = 0;
+		}
 		return false;
 	}
 
