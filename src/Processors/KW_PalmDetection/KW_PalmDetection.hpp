@@ -1,12 +1,12 @@
 /*!
- * \file KW_Palm_Description.hpp
- * \brief
+ * \file KW_PalmDetection.hpp
+ * \brief Rozpoznanie, który blob opisuje dłoń
  * \author kwasak
- * \date 2010-11-19
+ * \date 2011-03-31
  */
 
-#ifndef KW_PALM_DESCRIPTION_HPP_
-#define KW_PALM_DESCRIPTION_HPP_
+#ifndef KW_PALM_DETECTION_HPP_
+#define KW__HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -14,10 +14,10 @@
 #include "DataStream.hpp"
 #include "Props.hpp"
 
+#include <iostream>
+#include <fstream>
 #include <cv.h>
 #include <highgui.h>
-
-#include <vector>
 
 #include "Types/Blobs/BlobResult.hpp"
 #include "Types/DrawableContainer.hpp"
@@ -26,9 +26,10 @@ namespace Processors {
 namespace KW_Palm {
 
 using namespace cv;
+using namespace std;
 
 /*!
- * \brief KW_Palm_Description properties
+ * \brief KW_PalmDetection properties
  */
 struct Props: public Base::Props
 {
@@ -48,21 +49,24 @@ struct Props: public Base::Props
 };
 
 /*!
- * \class KW_Palm_Description
+ * \class KW_PalmDetection
  * \brief Example processor class.
  */
-class KW_Palm_Description: public Base::Component
+
+
+
+class KW_PalmDetection: public Base::Component
 {
 public:
 	/*!
 	 * Constructor.
 	 */
-	KW_Palm_Description(const std::string & name = "");
+	KW_PalmDetection(const std::string & name = "");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~KW_Palm_Description();
+	virtual ~KW_PalmDetection();
 
 	/*!
 	 * Return window properties
@@ -99,14 +103,15 @@ protected:
 	 */
 	bool onStop();
 
-
+	
+	
 	/*!
 	 * Event handler function.
 	 */
 	void onNewImage();
 
 	/// New image is waiting
-	Base::EventHandler <KW_Palm_Description> h_onNewImage;
+	Base::EventHandler <KW_PalmDetection> h_onNewImage;
 
 
 	/*!
@@ -115,33 +120,34 @@ protected:
 	void onNewBlobs();
 
 	/// New set of blobs is waiting
-	Base::EventHandler <KW_Palm_Description> h_onNewBlobs;
+	Base::EventHandler <KW_PalmDetection> h_onNewBlobs;
 
 
 	/// Input blobs
 	Base::DataStreamIn <Types::Blobs::BlobResult> in_blobs;
 
-	/// Input binary image
-	Base::DataStreamIn <cv::Mat> in_binary;
+	/// Input tsl image
+	Base::DataStreamIn <cv::Mat> in_tsl;
 
 	/// Event raised, when data is processed
 	Base::Event * newImage;
 
-	/*******************************************************************/
-	/// Output data stream - list of ellipses around found signs
-	Base::DataStreamOut < Types::DrawableContainer > out_dpalm;
+
+	Base::DataStreamOut < Types::DrawableContainer > out_signs;
 
 	/// Properties
 	Props props;
 
 private:
-	cv::Mat binary_img;
+
+	cv::Mat tsl_img;
 	cv::Mat segments;
 
 	bool blobs_ready;
-	bool binary_ready;
+	bool tsl_ready;
 
 	Types::Blobs::BlobResult blobs;
+
 };
 
 }//: namespace KW_Palm
@@ -151,7 +157,7 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("KW_Palm_Description", Processors::KW_Palm::KW_Palm_Description, Common::Panel_Empty)
+REGISTER_PROCESSOR_COMPONENT("KW_PalmDetection", Processors::KW_Palm::KW_PalmDetection, Common::Panel_Empty)
 
-#endif /* KW_PALM_DESCRIPTION_HPP_ */
+#endif /* KW_PALM_DETECTION_HPP_ */
 

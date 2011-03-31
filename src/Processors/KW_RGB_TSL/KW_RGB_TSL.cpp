@@ -76,7 +76,7 @@ void KW_RGB_TSL::onNewImage()
 	LOG(LTRACE) << "KW_RGB_TSL::onNewImage\n";
 	try {
 		cv::Mat RGB_img = in_img.read();	//czytam obrazem w zejścia
-
+		std::ofstream plik("/home/kasia/Test.txt");
 		cv::Size size = RGB_img.size();		//rozmiar obrazka
 		
 		TSL_img.create(size, CV_8UC3);
@@ -161,7 +161,7 @@ void KW_RGB_TSL::onNewImage()
 					{
 						MinMax.maxS = S;
 					}
-
+					plik<<L;
 
 				}
 
@@ -172,7 +172,7 @@ void KW_RGB_TSL::onNewImage()
 
 		out_img.write(TSL_img);
 		out_img2.write(MinMax);
-
+		plik.close();
 
 		newImage->raise();
 		

@@ -120,7 +120,6 @@ void KW_Skin_Detection_TSL::onNewImage()
 			}
 		}
 
-		LOG(LERROR) << "KW_Palm_LUT:*******************888****8\n";
 		out_img.write(skin_img);
 
 

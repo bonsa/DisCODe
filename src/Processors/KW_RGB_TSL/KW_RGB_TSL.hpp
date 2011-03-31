@@ -14,6 +14,8 @@
 #include "DataStream.hpp"
 #include "Props.hpp"
 
+#include <iostream>
+#include <fstream>
 #include <cv.h>
 #include <highgui.h>
 

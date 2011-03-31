@@ -59,7 +59,8 @@
 			<min_size>5000</min_size>
 		</Blob>
 
-
+		<DecPalm type="KW_Palm_Description" thread="Exec1" group="s1"> 
+		</DecPalm>
 
 	
 	</Components>
@@ -111,7 +112,8 @@
 
 		<Event source="Seq.newImage" destination="Window4.onNewImage"/>
 
-	
+		<Event source="MorphClose1.newImage" destination="DecPalm.onNewImage"/>
+		
 	
 	</Events>
 
@@ -158,10 +160,13 @@
 				<out_img type="out" group="Con6"/>
 		</MorphClose1> 
 
+		<DecPalm>
+			<in_img type="in" group="Con6"/>
+		</DecPalm>
 				
 
 		<Window3>
-			<in_img0 type="in" group="Con6"/>
+			<in_img type="in" group="Con6"/>
 		</Window3>
 		
 		<Blob>

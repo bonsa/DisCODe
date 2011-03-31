@@ -8,7 +8,7 @@ FIND_PACKAGE( OpenCV REQUIRED )
 FILE(GLOB files *.cpp)
 
 # Create an executable file from sources:
-ADD_LIBRARY(KW_Palm_Description SHARED ${files})
-TARGET_LINK_LIBRARIES(KW_Palm_Description ${OpenCV_LIBS} ${DisCODe_LIBRARIES} TypesBlobs)
+ADD_LIBRARY(KW_PalmDetection SHARED ${files})
+TARGET_LINK_LIBRARIES(KW_PalmDetection ${OpenCV_LIBS} ${DisCODe_LIBRARIES})
 
-INSTALL_PROCESSOR(KW_Palm_Description)
+INSTALL_PROCESSOR(KW_PalmDetection)
