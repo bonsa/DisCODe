@@ -61,28 +61,31 @@ bool KW_PalmDetection::onStep()
 	blobs_ready = img_ready = false;
 
 	try {
-		std::cout<<"jestem w try!\n";
+
 		int id = 0;
 		int i;
 		std::ofstream plik("/home/kasia/Test.txt");
 		IplImage h = IplImage(tsl_img);
 		Types::Blobs::Blob *currentBlob;
 		Types::Blobs::BlobResult result;
+		CvSeq * contour;
+		CvSeqReader reader;
+		CvPoint actualPoint;
+
+		double ExternPerimeter( IplImage *mask, bool xBorder  = true, bool yBorder = true );
 
 		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
 
 		// iterate through all found blobs
-		std::cout<<"Liczba blosów:"<<blobs.GetNumBlobs();
 
-		double m00, m10, m01, m11, m02, m20;
-		double M11, M02, M20, M7, M1, M2;
+//		double m00, m10, m01, m11, m02, m20;
+//		double M11, M02, M20, M7, M1, M2;
 		double Area, Perimeter, Ratio, MaxArea;
+
 
 		MaxArea = 0;
 		for (i = 0; i < blobs.GetNumBlobs(); i++ )
 		{
-
-			std::cout<<"jestem w for!\n";
 			currentBlob = blobs.GetBlob(i);
 
 			Area = currentBlob->Area();
@@ -90,33 +93,43 @@ bool KW_PalmDetection::onStep()
 			{
 				MaxArea = Area;
 				id = i;
-			}
-			Perimeter = currentBlob->Perimeter();
+				contour = currentBlob->GetExternalContour()->GetContourPoints();
+				cvStartReadSeq(contour, &reader);
 
-			Ratio = Perimeter * Perimeter / (4*3.14*Area);
+				for (int j = 0; j < contour->total; j=j+10) {
+					CV_READ_SEQ_ELEM( actualPoint, reader);
+
+					plik << actualPoint.x << " " << actualPoint.y << std::endl;
+				}
+
+			}
+
+		//	Perimeter = currentBlob->Perimeter();
+
+		//	Ratio = Perimeter * Perimeter / (4*3.14*Area);
 
 			// calculate moments
-			m00 = currentBlob->Moment(0,0);
-			m01 = currentBlob->Moment(0,1);
-			m10 = currentBlob->Moment(1,0);
-			m11 = currentBlob->Moment(1,1);
-			m02 = currentBlob->Moment(0,2);
-			m20 = currentBlob->Moment(2,0);
+		//	m00 = currentBlob->Moment(0,0);
+		//	m01 = currentBlob->Moment(0,1);
+		//	m10 = currentBlob->Moment(1,0);
+		//	m11 = currentBlob->Moment(1,1);
+		//	m02 = currentBlob->Moment(0,2);
+		//	m20 = currentBlob->Moment(2,0);
 
-			M11 = m11 - (m10*m01)/m00;
-			M02 = m02 - (m01*m01)/m00;
-			M20 = m20 - (m10*m10)/m00;
+		//	M11 = m11 - (m10*m01)/m00;
+		//	M02 = m02 - (m01*m01)/m00;
+		//	M20 = m20 - (m10*m10)/m00;
 
-			M1 = M20 + M02;
-			M2 = (M20 + M02)*(M20 + M02)+4*M11*M11;
-			M7 = (M20*M02-M11*M11) / (m00*m00*m00*m00);
+		//	M1 = M20 + M02;
+		//	M2 = (M20 + M02)*(M20 + M02)+4*M11*M11;
+		//	M7 = (M20*M02-M11*M11) / (m00*m00*m00*m00);
 
-			std::cout<<"\nArea ="<<Area<<"\n";
-			std::cout<<"\nM1 ="<<M1<<"\n";
-			std::cout<<"M2 ="<<M2<<"\n";
-			std::cout<<"M7 ="<<M7<<"\n";
-			std::cout<<"Stosunek ="<<Ratio<<"\n";
-			plik << M7;
+		//	std::cout<<"\nArea ="<<Area<<"\n";
+		//	std::cout<<"\nM1 ="<<M1<<"\n";
+		//	std::cout<<"M2 ="<<M2<<"\n";
+		//	std::cout<<"M7 ="<<M7<<"\n";
+		//	std::cout<<"Stosunek ="<<Ratio<<"\n";
+		//	plik << M7;
 
 		}
 		result.AddBlob(blobs.GetBlob(id));
