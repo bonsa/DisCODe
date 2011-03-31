@@ -7,7 +7,7 @@
 		<Seq type="Sequence" thread="Exec1" group="s1">
 			<directory>/home/kasia/Filmy/zdjecia/schowek</directory> 
 			<loop>true</loop>
-			<triggered>false</triggered>	
+			<triggered>true</triggered>	
 		
 		</Seq>
 		 
@@ -80,7 +80,7 @@
 	<!-- Event connections -->
 	<Events>
 
-		
+		<Event source="Kbd1.t_Pressed" destination="Seq.onTrigger"/>
 		<Event source="Seq.newImage" destination="Filtr.onNewImage"/>
 		
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
