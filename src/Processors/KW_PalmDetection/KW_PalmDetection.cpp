@@ -70,8 +70,10 @@ bool KW_PalmDetection::onStep()
 		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
 
 		// iterate through all found blobs
+		std::cout<<"Liczba blosów:"<<blobs.GetNumBlobs();
 		for (i = 0; i < blobs.GetNumBlobs(); i++ )
 		{
+			std::cout<<"jestem w for!\n";
 			currentBlob = blobs.GetBlob(i);
 
 			// get mean color from area coverd by blob (from hue component)
@@ -88,10 +90,6 @@ bool KW_PalmDetection::onStep()
 			// probability that current blob is the one we need (roadsign) in range 0..255
 			int prob;
 
-			// ignore blobs that have only one color
-			if (me < 130 || me > 155 || st < 20)
-				continue;
-
 			// calculate moments
 			m00 = currentBlob->Moment(0,0);
 			m01 = currentBlob->Moment(0,1);
@@ -107,6 +105,7 @@ bool KW_PalmDetection::onStep()
 			// for circle it should be ~0.0063
 			M7 = (M20*M02-M11*M11) / (m00*m00*m00*m00);
 
+			std::cout<<"\nM7 ="<<M7<<"\n";
 			plik << M7;
 
 			// circle
@@ -119,8 +118,6 @@ bool KW_PalmDetection::onStep()
 			else if (M7 < 0.011)
 				prob = 10;
 			else
-			// not circle for sure
-				continue;
 
 			++id;
 
