@@ -19,6 +19,7 @@
 #include <cv.h>
 #include <highgui.h>
 
+#include <vector>
 #include "Types/Blobs/BlobResult.hpp"
 #include "Types/DrawableContainer.hpp"
 
@@ -127,12 +128,12 @@ protected:
 	Base::DataStreamIn <Types::Blobs::BlobResult> in_blobs;
 
 	/// Input tsl image
-	Base::DataStreamIn <cv::Mat> in_tsl;
+	Base::DataStreamIn <cv::Mat> in_img;
 
 	/// Event raised, when data is processed
 	Base::Event * newImage;
 
-
+	/// Output data stream - list of ellipses around found signs
 	Base::DataStreamOut < Types::DrawableContainer > out_signs;
 
 	/// Properties
@@ -144,7 +145,7 @@ private:
 	cv::Mat segments;
 
 	bool blobs_ready;
-	bool tsl_ready;
+	bool img_ready;
 
 	Types::Blobs::BlobResult blobs;
 

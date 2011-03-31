@@ -16,18 +16,6 @@
         </Kbd1>
 		
 		
-		<Window1 type="CvWindow" thread="Exec2" group="s1">
-
-		</Window1>
-		
-		<Window2 type="CvWindow" thread="Exec2" group="s1">
-
-		</Window2>
-		
-		<Window3 type="CvWindow" thread="Exec2" group="s1">
-
-		</Window3>
-		
 		<Window4 type="CvWindow" thread="Exec2" group="s1">
 
 		</Window4>
@@ -59,7 +47,7 @@
 			<min_size>5000</min_size>
 		</Blob>
 
-		<DecPalm type="KW_Palm_Description" thread="Exec1" group="s1"> 
+		<DecPalm type="KW_PalmDetection" thread="Exec1" group="s1"> 
 		</DecPalm>
 
 	
@@ -81,7 +69,7 @@
 		</Exec3>
 		
 		<Exec2 type="periodic">
-			<main_component>Window1</main_component>
+			<main_component>Window4</main_component>
 			<interval>0.2</interval>
 		</Exec2>
 		
@@ -95,26 +83,21 @@
 		
 		<Event source="Seq.newImage" destination="Filtr.onNewImage"/>
 		
-		<Event source="Filtr.newImage" destination="Window1.onNewImage"/>
-		
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
 		<Event source="ConColor.newImage" destination="SkinDec.onNewImage"/>
-		<Event source="SkinDec.newImage" destination="Window2.onNewImage"/>
-		
-		<Event source="SkinDec.newImage" destination="BW.onNewImage"/>
-			
+		<Event source="SkinDec.newImage" destination="BW.onNewImage"/>	
 		<Event source="BW.newImage" destination="MorphClose1.onNewImage"/>
-
-		<Event source="MorphClose1.newImage" destination="Window3.onNewImage"/>
-		
 		<Event source="MorphClose1.newImage" destination="Blob.onNewImage"/>
-		<Event source="Blob.newBlobs" destination="Window4.onNewImage"/>
-
+		
 		<Event source="Seq.newImage" destination="Window4.onNewImage"/>
-
 		<Event source="MorphClose1.newImage" destination="DecPalm.onNewImage"/>
+		<Event source="Blob.newBlobs"       destination="DecPalm.onNewBlobs"/>
 		
 	
+
+		
+	
+		
 	</Events>
 
 	<!-- Data stream assignments -->
@@ -129,9 +112,6 @@
 				<out_img type="out" group="Con2"/>
 		</Filtr> 
 
-		<Window1>
-			<in_img0 type="in" group="Con2"/>
-		</Window1>
 				
 		<ConColor>
 				<in_img  type="in" group="Con2"/>
@@ -143,12 +123,6 @@
 				<out_img type="out" group="Con4"/>
 		</SkinDec> 
 		
-	
-		
-		<Window2>
-			<in_img0 type="in" group="Con4"/>
-		</Window2>
-		
 		<BW>
 				<in_img  type="in" group="Con4"/>
 				<out_img type="out" group="Con5"/>
@@ -159,26 +133,23 @@
 				<in_img  type="in" group="Con5"/>
 				<out_img type="out" group="Con6"/>
 		</MorphClose1> 
-
-		<DecPalm>
-			<in_img type="in" group="Con6"/>
-		</DecPalm>
 				
-
-		<Window3>
-			<in_img type="in" group="Con6"/>
-		</Window3>
 		
 		<Blob>
 				<in_img  type="in" group="Con6"/>
 				<out_blobs type="out" group="Con9"/>
 		</Blob> 
 		
-
+		<DecPalm>
+			<in_img type="in" group="Con6"/>
+			<in_blobs type="in" group="Con9"/>
+			<out_signs type="out" group="Con10"/>
+		</DecPalm>
+		
 	
 		<Window4>
 			<in_img type="in" group="Con1"/>
-			<in_draw type="in" group="Con9"/>	
+			<in_draw type="in" group="Con10"/>	
 
 		</Window4>
 		

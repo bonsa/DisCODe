@@ -11,6 +11,7 @@
 
 #include "KW_PalmDetection.hpp"
 #include "Logger.hpp"
+#include "Types/Ellipse.hpp"
 
 namespace Processors {
 namespace KW_Palm {
@@ -37,7 +38,7 @@ bool KW_PalmDetection::onInit()
 	registerHandler("onNewBlobs", &h_onNewBlobs);
 
 	registerStream("in_blobs", &in_blobs);
-	registerStream("in_tsl", &in_tsl);
+	registerStream("in_img", &in_img);
 
 	newImage = registerEvent("newImage");
 
@@ -57,11 +58,13 @@ bool KW_PalmDetection::onStep()
 {
 	LOG(LTRACE) << "KW_PalmDetection::step\n";
 
-	blobs_ready = tsl_ready = false;
+	blobs_ready = img_ready = false;
 
 	try {
+		std::cout<<"jestem w try!\n";
 		int id = 0;
 		int i;
+		std::ofstream plik("/home/kasia/Test.txt");
 		IplImage h = IplImage(tsl_img);
 		Types::Blobs::Blob *currentBlob;
 		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
@@ -104,6 +107,8 @@ bool KW_PalmDetection::onStep()
 			// for circle it should be ~0.0063
 			M7 = (M20*M02-M11*M11) / (m00*m00*m00*m00);
 
+			plik << M7;
+
 			// circle
 			if (M7 < 0.007)
 				prob = 255;
@@ -119,13 +124,17 @@ bool KW_PalmDetection::onStep()
 
 			++id;
 
-			signs.add(currentBlob);
+
+			signs.add(new Types::Ellipse(Point(r2.center.x, r2.center.y), Size(r2.size.width, r2.size.height), r2.angle));
+
+
 		}
 
 		out_signs.write(signs);
 
 		newImage->raise();
 
+		plik.close();
 		return true;
 	} catch (...) {
 		LOG(LERROR) << "KW_PalmDetection::onNewImage failed\n";
@@ -147,11 +156,11 @@ void KW_PalmDetection::onNewImage()
 {
 	LOG(LTRACE) << "KW_PalmDetection::onNewImage\n";
 
-	tsl_ready = true;
-	tsl_img = in_tsl.read();
+	img_ready = true;
+	tsl_img = in_img.read();
 	//co robi tak linijka?
 	tsl_img = tsl_img.clone();
-	if (blobs_ready && tsl_ready)
+	if (blobs_ready && img_ready)
 		onStep();
 }
 
@@ -161,7 +170,7 @@ void KW_PalmDetection::onNewBlobs()
 
 	blobs_ready = true;
 	blobs = in_blobs.read();
-	if (blobs_ready && tsl_ready)
+	if (blobs_ready && img_ready)
 		onStep();
 }
 

@@ -9,6 +9,6 @@ FILE(GLOB files *.cpp)
 
 # Create an executable file from sources:
 ADD_LIBRARY(KW_PalmDetection SHARED ${files})
-TARGET_LINK_LIBRARIES(KW_PalmDetection ${OpenCV_LIBS} ${DisCODe_LIBRARIES})
+TARGET_LINK_LIBRARIES(KW_PalmDetection ${OpenCV_LIBS} ${DisCODe_LIBRARIES} TypesBlobs)
 
 INSTALL_PROCESSOR(KW_PalmDetection)
