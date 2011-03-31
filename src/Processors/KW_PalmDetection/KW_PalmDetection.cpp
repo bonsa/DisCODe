@@ -67,6 +67,8 @@ bool KW_PalmDetection::onStep()
 		std::ofstream plik("/home/kasia/Test.txt");
 		IplImage h = IplImage(tsl_img);
 		Types::Blobs::Blob *currentBlob;
+		Types::Blobs::BlobResult result;
+
 		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
 
 		// iterate through all found blobs
@@ -118,16 +120,13 @@ bool KW_PalmDetection::onStep()
 			else if (M7 < 0.011)
 				prob = 10;
 			else
-
+				;
 			++id;
-
-
-			signs.add(new Types::Ellipse(Point(r2.center.x, r2.center.y), Size(r2.size.width, r2.size.height), r2.angle));
-
+			result.AddBlob(blobs.GetBlob(1));
 
 		}
 
-		out_signs.write(signs);
+		out_signs.write(result);
 
 		newImage->raise();
 

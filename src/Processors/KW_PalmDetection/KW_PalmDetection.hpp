@@ -134,7 +134,7 @@ protected:
 	Base::Event * newImage;
 
 	/// Output data stream - list of ellipses around found signs
-	Base::DataStreamOut < Types::DrawableContainer > out_signs;
+	Base::DataStreamOut < Types::Blobs::BlobResult > out_signs;
 
 	/// Properties
 	Props props;
