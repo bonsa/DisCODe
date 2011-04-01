@@ -136,6 +136,8 @@ protected:
 	/// Output data stream - list of ellipses around found signs
 	Base::DataStreamOut < Types::Blobs::BlobResult > out_signs;
 
+	Base::DataStreamOut < Types::DrawableContainer > out_draw;
+
 	/// Properties
 	Props props;
 
@@ -149,6 +151,7 @@ private:
 
 	Types::Blobs::BlobResult blobs;
 
+	double last_x, last_y;
 };
 
 }//: namespace KW_Palm

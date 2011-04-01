@@ -16,6 +16,7 @@
 namespace Processors {
 namespace KW_Palm {
 
+using namespace cv;
 
 KW_PalmDetection::KW_PalmDetection(const std::string & name) : Base::Component(name)
 {
@@ -43,6 +44,7 @@ bool KW_PalmDetection::onInit()
 	newImage = registerEvent("newImage");
 
 	registerStream("out_signs", &out_signs);
+	registerStream("out_draw", &out_draw);
 
 	return true;
 }
@@ -71,22 +73,27 @@ bool KW_PalmDetection::onStep()
 		CvSeq * contour;
 		CvSeqReader reader;
 		CvPoint actualPoint;
-
-		double ExternPerimeter( IplImage *mask, bool xBorder  = true, bool yBorder = true );
+		vector<CvPoint> contourPoints;
 
 		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
 
 		// iterate through all found blobs
 
-//		double m00, m10, m01, m11, m02, m20;
+		double m00, m10, m01, m11, m02, m20;
 //		double M11, M02, M20, M7, M1, M2;
-		double Area, Perimeter, Ratio, MaxArea;
+		double Area, Perimeter, Ratio, MaxArea, CenterOfGravity_x, CenterOfGravity_y, MaxY;
 
+
+		Types::DrawableContainer drawcont;
 
 		MaxArea = 0;
+		MaxY = 0;
+
 		for (i = 0; i < blobs.GetNumBlobs(); i++ )
 		{
 			currentBlob = blobs.GetBlob(i);
+
+			double xtot = 0, ytot = 0;
 
 			Area = currentBlob->Area();
 			if (Area > MaxArea)
@@ -96,10 +103,23 @@ bool KW_PalmDetection::onStep()
 				contour = currentBlob->GetExternalContour()->GetContourPoints();
 				cvStartReadSeq(contour, &reader);
 
-				for (int j = 0; j < contour->total; j=j+10) {
+				int cnt = 0;
+				for (int j = 0; j < contour->total; j=j+1) {
 					CV_READ_SEQ_ELEM( actualPoint, reader);
 
-					plik << actualPoint.x << " " << actualPoint.y << std::endl;
+
+					if (j%10 == 1) {
+						plik << actualPoint.x << " " << actualPoint.y << std::endl;
+						contourPoints.push_back(cvPoint(actualPoint.x, actualPoint.y));
+						if (actualPoint.y > MaxY)
+						{
+							MaxY = actualPoint.y;
+						}
+						cnt++;
+					}
+
+
+					//JAK TO NAMALOWAC!?
 				}
 
 			}
@@ -108,10 +128,32 @@ bool KW_PalmDetection::onStep()
 
 		//	Ratio = Perimeter * Perimeter / (4*3.14*Area);
 
+			//środek cięzkości
 			// calculate moments
-		//	m00 = currentBlob->Moment(0,0);
-		//	m01 = currentBlob->Moment(0,1);
-		//	m10 = currentBlob->Moment(1,0);
+			m00 = currentBlob->Moment(0,0);
+			m01 = currentBlob->Moment(0,1);
+			m10 = currentBlob->Moment(1,0);
+
+
+
+			CenterOfGravity_x = m10/m00;
+			CenterOfGravity_y = m01/m00;
+
+			//przesuniety punkt środka ciężkości
+			CenterOfGravity_y += (MaxY-CenterOfGravity_y)/2;
+
+			Types::Ellipse * el = new Types::Ellipse(Point2f(CenterOfGravity_x, CenterOfGravity_y), Size2f(20,20));
+			drawcont.add(el);
+			Types::Ellipse * el2 = new Types::Ellipse(Point2f(last_x, last_y), Size2f(7,7));
+			drawcont.add(el2);
+
+			last_x = CenterOfGravity_x;
+			last_y = CenterOfGravity_y;
+
+
+			plik <<"Punkt środka cieżkosci: "<< CenterOfGravity_x <<" "<< CenterOfGravity_y;
+
+
 		//	m11 = currentBlob->Moment(1,1);
 		//	m02 = currentBlob->Moment(0,2);
 		//	m20 = currentBlob->Moment(2,0);
@@ -135,6 +177,7 @@ bool KW_PalmDetection::onStep()
 		result.AddBlob(blobs.GetBlob(id));
 
 		out_signs.write(result);
+		out_draw.write(drawcont);
 
 		newImage->raise();
 
