@@ -92,7 +92,8 @@ bool KW_PalmDetection::onStep()
 		vector<int> indexPoint;
 		//powyzej tej odległości od środa cieżkosci moga znajdować sie ekstrema
 		int MINDIST = 12100;
-
+		// wektor zawierajacy elipsy punktów charakterystycznych
+		vector<Types::Ellipse *> Ellipse;
 
 		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
 
@@ -199,6 +200,8 @@ bool KW_PalmDetection::onStep()
 			else
 				lastSign = -1;
 
+			//pierwszy punktkontury to wierzchołek punktu środkowego.
+			indexPoint.push_back(0);
 			for(ii=1; ii < numerElements - 2; ii++)
 			{
 				derivative.push_back(meanDist[ii+1]- meanDist[ii]);
@@ -233,11 +236,20 @@ bool KW_PalmDetection::onStep()
 			last_x = CenterOfGravity_x;
 			last_y = CenterOfGravity_y;
 
-	//		for (ii=0; ii < indexPoint.size(); i++)
-	//		{
-				Types::Ellipse * el3 = new Types::Ellipse(Point2f(contourPoints[indexPoint[0]].x, contourPoints[indexPoint[0]].y), Size2f(10,10));
-				drawcont.add(el3);
-	//		}
+//			std:cout << "Liczba punktów:"<< indexPoint.size();
+
+		//	for (ii=0; ii < 9; i++)
+		//	{
+				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[0]].x, contourPoints[indexPoint[0]].y), Size2f(10,10)));
+				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[1]].x, contourPoints[indexPoint[1]].y), Size2f(10,10)));
+				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[2]].x, contourPoints[indexPoint[2]].y), Size2f(10,10)));
+				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[3]].x, contourPoints[indexPoint[3]].y), Size2f(10,10)));
+				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[4]].x, contourPoints[indexPoint[4]].y), Size2f(10,10)));
+				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[5]].x, contourPoints[indexPoint[5]].y), Size2f(10,10)));
+				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[6]].x, contourPoints[indexPoint[6]].y), Size2f(10,10)));
+				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[7]].x, contourPoints[indexPoint[7]].y), Size2f(10,10)));
+				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[8]].x, contourPoints[indexPoint[8]].y), Size2f(10,10)));
+		//	}
 
 
 			plik <<"Punkt środka cieżkosci: "<< CenterOfGravity_x <<" "<< CenterOfGravity_y;

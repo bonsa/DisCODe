@@ -143,7 +143,7 @@
 		<DecPalm>
 			<in_img type="in" group="Con6"/>
 			<in_blobs type="in" group="Con9"/>
-			<out_signs type="out" group="Con10"/>
+			<out_draw type="out" group="Con10"/>
 		</DecPalm>
 		
 	
