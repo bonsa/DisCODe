@@ -65,7 +65,7 @@ bool KW_PalmDetection::onStep()
 	try {
 
 		int id = 0;
-		int i;
+		int i,ii, numerElements ;
 		std::ofstream plik("/home/kasia/Test.txt");
 		IplImage h = IplImage(tsl_img);
 		Types::Blobs::Blob *currentBlob;
@@ -74,6 +74,12 @@ bool KW_PalmDetection::onStep()
 		CvSeqReader reader;
 		CvPoint actualPoint;
 		vector<CvPoint> contourPoints;
+		vector<float> dist;
+		vector<float> meanDist;
+		vector<float> derivative;
+		vector<CvPoint> characteristicPoint;
+		float TempDist;
+		characteristic points
 
 		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
 
@@ -122,57 +128,99 @@ bool KW_PalmDetection::onStep()
 					//JAK TO NAMALOWAC!?
 				}
 
+
+			//	Perimeter = currentBlob->Perimeter();
+
+			//	Ratio = Perimeter * Perimeter / (4*3.14*Area);
+
+				//środek cięzkości
+				// calculate moments
+				m00 = currentBlob->Moment(0,0);
+				m01 = currentBlob->Moment(0,1);
+				m10 = currentBlob->Moment(1,0);
+
+
+
+				CenterOfGravity_x = m10/m00;
+				CenterOfGravity_y = m01/m00;
+
+				//przesuniety punkt środka ciężkości
+				CenterOfGravity_y += (MaxY-CenterOfGravity_y)*2/3;
+
+				//obliczenie roznicy miedzy punktami z odwodu a środkiem ciężkosci
+				for(ii=0; ii < contourPoints.size(); ii++)
+				{
+					TempDist = (contourPoints[ii].x - CenterOfGravity_x)*(contourPoints[ii].x - CenterOfGravity_x)+(contourPoints[ii].y - CenterOfGravity_y)*(contourPoints[ii].y - CenterOfGravity_y);
+					if(TempDist > 12100)
+						dist.push_back(TempDist);
+					else
+						dist.push_back(12100);
+				}
+
+				//uśredniam, usuwanim szumy z wektora odległości
+				TempDist = (dist[1]+dist[2]+dist[0])/3;
+				meanDist.push_back(TempDist);
+
+				TempDist = (dist[1]+dist[2]+dist[3]+dist[0])/4;
+				meanDist.push_back(TempDist);
+
+				numerElements = dist.size();
+				for(ii=2; ii < numerElements - 2; ii++)
+				{
+					TempDist = (dist[ii-2]+dist[ii-1]+dist[ii]+dist[ii+1]+dist[ii+2])/5;
+					meanDist.push_back(TempDist);
+				}
+
+				TempDist = (dist[numerElements-1]+dist[numerElements-2]+dist[numerElements-3]+dist[numerElements-4])/4;
+				meanDist.push_back(TempDist);
+
+				TempDist = (dist[numerElements-1]+dist[numerElements-2]+dist[numerElements-3])/3;
+				meanDist.push_back(TempDist);
+
+				for(ii=0; ii < numerElements - 1; ii++)
+				{
+					derivative.push_back = meanDist[ii]- meanDist[ii+1];
+					TempDist = (dist[ii-2]+dist[ii-1]+dist[ii]+dist[ii+1]+dist[ii+2])/5;
+					meanDist.push_back(TempDist);
+				}
+				//obliczenie pochodnej, szukanie ekstremów
+
+
+				derivative
+
+
+				Types::Ellipse * el = new Types::Ellipse(Point2f(CenterOfGravity_x, CenterOfGravity_y), Size2f(20,20));
+				drawcont.add(el);
+				Types::Ellipse * el2 = new Types::Ellipse(Point2f(last_x, last_y), Size2f(7,7));
+				drawcont.add(el2);
+
+				last_x = CenterOfGravity_x;
+				last_y = CenterOfGravity_y;
+
+
+				plik <<"Punkt środka cieżkosci: "<< CenterOfGravity_x <<" "<< CenterOfGravity_y;
+
+
+			//	m11 = currentBlob->Moment(1,1);
+			//	m02 = currentBlob->Moment(0,2);
+			//	m20 = currentBlob->Moment(2,0);
+
+			//	M11 = m11 - (m10*m01)/m00;
+			//	M02 = m02 - (m01*m01)/m00;
+			//	M20 = m20 - (m10*m10)/m00;
+
+			//	M1 = M20 + M02;
+			//	M2 = (M20 + M02)*(M20 + M02)+4*M11*M11;
+			//	M7 = (M20*M02-M11*M11) / (m00*m00*m00*m00);
+
+			//	std::cout<<"\nArea ="<<Area<<"\n";
+			//	std::cout<<"\nM1 ="<<M1<<"\n";
+			//	std::cout<<"M2 ="<<M2<<"\n";
+			//	std::cout<<"M7 ="<<M7<<"\n";
+			//	std::cout<<"Stosunek ="<<Ratio<<"\n";
+			//	plik << M7;
+
 			}
-
-		//	Perimeter = currentBlob->Perimeter();
-
-		//	Ratio = Perimeter * Perimeter / (4*3.14*Area);
-
-			//środek cięzkości
-			// calculate moments
-			m00 = currentBlob->Moment(0,0);
-			m01 = currentBlob->Moment(0,1);
-			m10 = currentBlob->Moment(1,0);
-
-
-
-			CenterOfGravity_x = m10/m00;
-			CenterOfGravity_y = m01/m00;
-
-			//przesuniety punkt środka ciężkości
-			CenterOfGravity_y += (MaxY-CenterOfGravity_y)/2;
-
-			Types::Ellipse * el = new Types::Ellipse(Point2f(CenterOfGravity_x, CenterOfGravity_y), Size2f(20,20));
-			drawcont.add(el);
-			Types::Ellipse * el2 = new Types::Ellipse(Point2f(last_x, last_y), Size2f(7,7));
-			drawcont.add(el2);
-
-			last_x = CenterOfGravity_x;
-			last_y = CenterOfGravity_y;
-
-
-			plik <<"Punkt środka cieżkosci: "<< CenterOfGravity_x <<" "<< CenterOfGravity_y;
-
-
-		//	m11 = currentBlob->Moment(1,1);
-		//	m02 = currentBlob->Moment(0,2);
-		//	m20 = currentBlob->Moment(2,0);
-
-		//	M11 = m11 - (m10*m01)/m00;
-		//	M02 = m02 - (m01*m01)/m00;
-		//	M20 = m20 - (m10*m10)/m00;
-
-		//	M1 = M20 + M02;
-		//	M2 = (M20 + M02)*(M20 + M02)+4*M11*M11;
-		//	M7 = (M20*M02-M11*M11) / (m00*m00*m00*m00);
-
-		//	std::cout<<"\nArea ="<<Area<<"\n";
-		//	std::cout<<"\nM1 ="<<M1<<"\n";
-		//	std::cout<<"M2 ="<<M2<<"\n";
-		//	std::cout<<"M7 ="<<M7<<"\n";
-		//	std::cout<<"Stosunek ="<<Ratio<<"\n";
-		//	plik << M7;
-
 		}
 		result.AddBlob(blobs.GetBlob(id));
 
