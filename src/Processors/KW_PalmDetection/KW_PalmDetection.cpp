@@ -200,7 +200,7 @@ bool KW_PalmDetection::onStep()
 			else
 				lastSign = -1;
 
-			//pierwszy punktkontury to wierzchołek punktu środkowego.
+			//pierwszy punkt kontury to wierzchołek punktu środkowego.
 			indexPoint.push_back(0);
 			for(ii=1; ii < numerElements - 2; ii++)
 			{

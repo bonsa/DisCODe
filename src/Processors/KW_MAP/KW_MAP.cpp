@@ -87,7 +87,7 @@ bool KW_MAP::onStep()
 		float TempDist;
 		//zapamietuje poprzedni znak różnicy miedzy punktami,
 		//1- funkcja jest rosnoca, -1 - funkcja malejąca
-		int lastSign;
+		int lastSign, lastMinDist;
 		//idenksy punktów charakterystycznych;
 		vector<int> indexPoint;
 		//powyzej tej odległości od środa cieżkosci moga znajdować sie ekstrema
@@ -135,7 +135,7 @@ bool KW_MAP::onStep()
 
 
 				if (j%10 == 1) {
-					plik << actualPoint.x << " " << actualPoint.y << std::endl;
+					//plik << actualPoint.x << " " << actualPoint.y << std::endl;
 					contourPoints.push_back(cvPoint(actualPoint.x, actualPoint.y));
 					if (actualPoint.y > MaxY)
 					{
@@ -178,32 +178,48 @@ bool KW_MAP::onStep()
 			else
 				lastSign = -1;
 
+			lastMinDist = 0;
 			//pierwszy punkt kontury to wierzchołek punktu środkowego.
 			indexPoint.push_back(0);
 
 			for(ii=1; ii < numerElements - 2; ii++)
 			{
-				plik << dist << "\n";
+				plik << dist[ii] << "\n";
 				derivative.push_back(dist[ii+1]- dist[ii]);
 
-				if (dist[ii] > MINDIST && dist[ii]> MINDIST)
+				if (dist[ii+1] > MINDIST && dist[ii]> MINDIST )
 				{
+					if (lastMinDist == 1)
+					{
+						lastSign = 1;
+						lastMinDist = 0;
+					}
 					//maksiumum, funkcja rosła i zaczeła maleć
 					if (derivative[ii] < 0 && lastSign == 1)
 					{
 						indexPoint.push_back(ii);
 						lastSign = -1;
+					//	plik << dist[ii] << "\n";
 
 					}
 					//minimum
-					if (derivative[ii] > 0 && lastSign == -1)
+					else if (derivative[ii] > 0 && lastSign == -1)
 					{
 						indexPoint.push_back(ii);
 						lastSign = 1;
+					//	plik << dist[ii] << "\n";
 
 					}
+					else
+					{
+					//	plik << 0 << "\n";
+					}
 				}
-
+				else
+				{
+					//plik << 0 << "\n";
+					lastMinDist = 1;
+				}
 			}
 
 
@@ -229,7 +245,7 @@ bool KW_MAP::onStep()
 			drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[6]].x, contourPoints[indexPoint[6]].y), Size2f(10,10)));
 			drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[7]].x, contourPoints[indexPoint[7]].y), Size2f(10,10)));
 			drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[8]].x, contourPoints[indexPoint[8]].y), Size2f(10,10)));
-			drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[9]].x, contourPoints[indexPoint[9]].y), Size2f(10,10)));
+		//	drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[9]].x, contourPoints[indexPoint[9]].y), Size2f(10,10)));
 //}
 
 
