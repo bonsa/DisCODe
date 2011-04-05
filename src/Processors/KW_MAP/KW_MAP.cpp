@@ -209,7 +209,7 @@ void KW_MAP::getCharPoints()
 			MINDIST = (MaxY-CenterOfGravity_y)*(MaxY-CenterOfGravity_y)*4/9;
 			//przesuniety punkt środka ciężkości
 			CenterOfGravity_y += (MaxY-CenterOfGravity_y)*2/3;
-
+			charPoint.push_back(cvPoint(CenterOfGravity_x,CenterOfGravity_y));
 
 			numerElements = contourPoints.size();
 
