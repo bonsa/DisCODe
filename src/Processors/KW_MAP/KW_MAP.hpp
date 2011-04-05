@@ -80,6 +80,11 @@ public:
 protected:
 
 	/*!
+	 * Otrzymanie punktów na konturze dłoni
+	 */
+	void getCharPoints();
+
+	/*!
 	 * Connects source to given device.
 	 */
 	bool onInit();
@@ -149,9 +154,13 @@ private:
 	bool blobs_ready;
 	bool img_ready;
 
+
 	Types::Blobs::BlobResult blobs;
 
 	double last_x, last_y;
+
+	// wspołrzędne punktów charakterystycznych konturu
+	vector<CvPoint> charPoint;
 };
 
 }//: namespace KW_MAP
