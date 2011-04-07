@@ -150,12 +150,14 @@ protected:
 	/*!
 	 * Funkcja obracająca punkt p o kąt angle względem układu współrzędnych znajdującego się w punkcie pO
 	 */
-	CvPoint rot(CvPoint p, double angle, CvPoint p0);
+	cv::Point rot(cv::Point p, double angle, cv::Point p0);
 
 
 	void charPointsToState();
 
-	void fingerToState(CvPoint p2, CvPoint p1, int sig);
+	void fingerToState(cv::Point p2, cv::Point p1, int sig);
+
+	void stateToCharPoint();
 
 private:
 
@@ -173,10 +175,10 @@ private:
 	Types::DrawableContainer drawcont;
 
 	// wspołrzędne punktów charakterystycznych konturu
-	vector<CvPoint> charPoint;
-
+	vector<cv::Point> charPoint;
 	// wektor obserwacji dłoni
-	vector<int> z;
+	vector<cv::Point> z;
+
 	// wektor stanu dłoni
 	vector<int> state;
 };

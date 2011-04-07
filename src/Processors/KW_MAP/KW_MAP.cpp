@@ -69,6 +69,7 @@ bool KW_MAP::onStep() {
 
 		getCharPoints();
 		charPointsToState();
+		stateToCharPoint();
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -123,9 +124,9 @@ void KW_MAP::getCharPoints() {
 		Types::Blobs::BlobResult result;
 		CvSeq * contour;
 		CvSeqReader reader;
-		CvPoint actualPoint;
+		cv::Point actualPoint;
 		// wektor zawierający punkty konturu
-		vector<CvPoint> contourPoints;
+		vector<cv::Point> contourPoints;
 		// wektor odległości między punktami konturu a przesuniętym środkiem ciężkości
 		vector<float> dist;
 		//usredniony (wygładzony) wektor odległości między punktami konturu a przesuniętym środkiem ciężkości
@@ -176,7 +177,7 @@ void KW_MAP::getCharPoints() {
 
 			if (j % 10 == 1) {
 				//plik << actualPoint.x << " " << actualPoint.y << std::endl;
-				contourPoints.push_back(cvPoint(actualPoint.x, actualPoint.y));
+				contourPoints.push_back(cv::Point(actualPoint.x, actualPoint.y));
 				if (actualPoint.y > MaxY) {
 					MaxY = actualPoint.y;
 				}
@@ -193,23 +194,17 @@ void KW_MAP::getCharPoints() {
 		CenterOfGravity_x = m10 / m00;
 		CenterOfGravity_y = m01 / m00;
 
-		MINDIST = (MaxY - CenterOfGravity_y) * (MaxY - CenterOfGravity_y) * 4
-				/ 9;
+		MINDIST = (MaxY - CenterOfGravity_y) * (MaxY - CenterOfGravity_y) * 4/ 9;
 		//przesuniety punkt środka ciężkości
-		charPoint.push_back(cvPoint(CenterOfGravity_x, CenterOfGravity_y + (MaxY - CenterOfGravity_y) * 4 / 5));
+		charPoint.push_back(cv::Point(CenterOfGravity_x, CenterOfGravity_y + (MaxY - CenterOfGravity_y) * 4 / 5));
 		CenterOfGravity_y += (MaxY - CenterOfGravity_y) * 2 / 3;
-		z.push_back(charPoint[0].x);
-		z.push_back(charPoint[0].y);
 
 		numerElements = contourPoints.size();
 
 		//******************************************************************
 		//obliczenie roznicy miedzy punktami z odwodu a środkiem ciężkosci
 		for (unsigned int i = 0; i < numerElements; i++) {
-			TempDist = (contourPoints[i].x - CenterOfGravity_x)
-					* (contourPoints[i].x - CenterOfGravity_x)
-					+ (contourPoints[i].y - CenterOfGravity_y)
-							* (contourPoints[i].y - CenterOfGravity_y);
+			TempDist = (contourPoints[i].x - CenterOfGravity_x)	* (contourPoints[i].x - CenterOfGravity_x)	+ (contourPoints[i].y - CenterOfGravity_y) * (contourPoints[i].y - CenterOfGravity_y);
 			if (TempDist > MINDIST)
 				dist.push_back(TempDist);
 			else
@@ -272,17 +267,13 @@ void KW_MAP::getCharPoints() {
 		}
 
 		for (int i = idLeftPoint; i >= 0; i--) {
-			z.push_back(contourPoints[indexPoint[i]].x);
-			z.push_back(contourPoints[indexPoint[i]].y);
-			charPoint.push_back(cvPoint(contourPoints[indexPoint[i]].x,
+			charPoint.push_back(cv::Point(contourPoints[indexPoint[i]].x,
 					contourPoints[indexPoint[i]].y));
 			//	drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
 		}
 
 		for (int i = indexPoint.size() - 1; i > idLeftPoint; i--) {
-			z.push_back(contourPoints[indexPoint[i]].x);
-			z.push_back(contourPoints[indexPoint[i]].y);
-			charPoint.push_back(cvPoint(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y));
+			charPoint.push_back(cv::Point(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y));
 			//	drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
 		}
 
@@ -298,16 +289,17 @@ void KW_MAP::getCharPoints() {
 }
 
 void KW_MAP::charPointsToState() {
+	LOG(LTRACE) << "KW_MAP::charPointsToState\n";
 
 	//obliczanie parametrów prostokątaq opisującego wewnętrzą część dłoni
 	//wspolrzedna x lewego gornego punktu
-	state.push_back(z[0] - (z[16] - z[0]));
+	state.push_back(charPoint[0].x - (charPoint[8].x - charPoint[0].x ));
 	//wspolrzedna y lewego gornego punktu
-	state.push_back(z[13]);
+	state.push_back(charPoint[6].y);
 	//szerokosc
-	state.push_back(abs(2 * (z[16] - z[0])));
+	state.push_back(abs(2 * (charPoint[8].x - charPoint[0].x )));
 	//wysokosc
-	state.push_back(abs(z[1] - z[13]));
+	state.push_back(abs(charPoint[0].y - charPoint[6].y));
 
 	drawcont.add(new Types::Rectangle(state[0], state[1], state[2], state[3]));
 	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[1].x, charPoint[1].y)));
@@ -323,24 +315,24 @@ void KW_MAP::charPointsToState() {
 	fingerToState(charPoint[9], charPoint[8], -1);
 }
 
-CvPoint KW_MAP::rot(CvPoint p, double angle, CvPoint p0) {
-	CvPoint t;
+cv::Point KW_MAP::rot(cv::Point p, double angle, cv::Point p0) {
+	cv::Point t;
 	t.x = p0.x + (int) ((double) (p.x - p0.x) * cos(angle) - (double) (p.y - p0.y) * sin(angle));
 	t.y = p0.y + (int) ((double) (p.x - p0.x) * sin(angle) + (double) (p.y - p0.y) * cos(angle));
 	return t;
 }
 
 //p2 - czubek palca, p1 - punkt miedzy palcami
-void KW_MAP::fingerToState(CvPoint p2, CvPoint p1, int sig) {
+void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	double uj = (double) (-p2.x + charPoint[0].x) / (-p2.y + charPoint[0].y);
 	double angle = atan(uj);
-	CvPoint pt1 = rot(p1, angle, charPoint[0]);
-	CvPoint pt2 = rot(p2, angle, charPoint[0]);
+	cv::Point pt1 = rot(p1, angle, charPoint[0]);
+	cv::Point pt2 = rot(p2, angle, charPoint[0]);
 
-	CvPoint statePoint;
-	CvPoint statePoint2;
-	CvPoint statePoint3;
-	CvPoint statePoint4;
+	cv::Point statePoint;
+	cv::Point statePoint2;
+	cv::Point statePoint3;
+	cv::Point statePoint4;
 
 	if(sig == 1)
 		statePoint.x = pt2.x - (pt1.x - pt2.x);
@@ -379,6 +371,26 @@ void KW_MAP::fingerToState(CvPoint p2, CvPoint p1, int sig) {
 	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y), cv::Point(statePoint4.x, statePoint4.y)));
 	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y), cv::Point(statePoint.x, statePoint.y)));
 }
+
+void KW_MAP::stateToCharPoint()
+{
+	z.push_back(cv::Point((state[0] + 0.5*state[2]), (state[1] + state[3])));
+
+	z.push_back(cv::Point((state[4] + 0.5 * state[6]), state[5]));
+	z.push_back(cv::Point((state[4] + state[6]),(state[5] + state[7])));
+
+	z.push_back(cv::Point((state[8] + 0.5 * state[10]), state[9]));
+	z.push_back(cv::Point((state[8] + state[10]),(state[9] + state[11])));
+
+	z.push_back(cv::Point((state[12] + 0.5 * state[14]), state[13]));
+	z.push_back(cv::Point((state[12] + state[14]),(state[13] + state[15])));
+
+	z.push_back(cv::Point((state[16] + 0.5 * state[18]), state[17]));
+
+	z.push_back(cv::Point(state[20],(state[21] + state[23])));
+	z.push_back(cv::Point((state[20] + 0.5 * state[22]), state[21]));
+}
+
 
 }//: namespace KW_MAP
 }//: namespace Processors

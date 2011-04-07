@@ -43,7 +43,7 @@ public:
 
 	virtual void draw(cv::Mat& image, CvScalar color, int offsetX = 0, int offsetY = 0)
 	{
-		cv::line(image, p1, p2, color);
+		cv::line(image, p1, p2, color,2);
 	}
 
 	double getDistanceFromPoint(cv::Point p)
