@@ -156,7 +156,7 @@ protected:
 	void charPointsToState();
 
 	void fingerToStateLeft(CvPoint p2, CvPoint p1);
-	void fingerToStateRigt();
+	void fingerToStateRight(CvPoint p2, CvPoint p1);
 
 
 private:
