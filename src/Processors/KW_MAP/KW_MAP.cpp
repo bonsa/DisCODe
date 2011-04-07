@@ -13,6 +13,7 @@
 #include "Logger.hpp"
 #include "Types/Ellipse.hpp"
 #include "Types/Line.hpp"
+#include "Types/Rectangle.hpp"
 #include <vector>
 
 namespace Processors {
@@ -68,7 +69,11 @@ bool KW_MAP::onStep()
 	blobs_ready = img_ready = false;
 
 	try {
-		//drawcont.clear();
+		drawcont.clear();
+		z.clear();
+		state.clear();
+		charPoint.clear();
+
 		getCharPoints();
 		charPointsToState();
 
@@ -208,8 +213,10 @@ void KW_MAP::getCharPoints()
 
 			MINDIST = (MaxY-CenterOfGravity_y)*(MaxY-CenterOfGravity_y)*4/9;
 			//przesuniety punkt środka ciężkości
+			charPoint.push_back(cvPoint(CenterOfGravity_x,CenterOfGravity_y+(MaxY-CenterOfGravity_y)));
 			CenterOfGravity_y += (MaxY-CenterOfGravity_y)*2/3;
-			charPoint.push_back(cvPoint(CenterOfGravity_x,CenterOfGravity_y));
+			z.push_back(charPoint[0].x);
+			z.push_back(charPoint[0].y);
 
 			numerElements = contourPoints.size();
 
@@ -267,10 +274,10 @@ void KW_MAP::getCharPoints()
 				}
 			}
 
-			Types::Ellipse * el = new Types::Ellipse(Point2f(CenterOfGravity_x, CenterOfGravity_y), Size2f(20,20));
-			drawcont.add(el);
-			Types::Ellipse * el2 = new Types::Ellipse(Point2f(last_x, last_y), Size2f(7,7));
-			drawcont.add(el2);
+		//	Types::Ellipse * el = new Types::Ellipse(Point2f(CenterOfGravity_x, CenterOfGravity_y), Size2f(20,20));
+		//	drawcont.add(el);
+		//	Types::Ellipse * el2 = new Types::Ellipse(Point2f(last_x, last_y), Size2f(7,7));
+		//	drawcont.add(el2);
 
 			last_x = CenterOfGravity_x;
 			last_y = CenterOfGravity_y;
@@ -293,14 +300,22 @@ void KW_MAP::getCharPoints()
 				z.push_back(contourPoints[indexPoint[i]].x);
 				z.push_back(contourPoints[indexPoint[i]].y);
 				charPoint.push_back(cvPoint(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y));
-				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
+			//	drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
 			}
+
+
 
 			for (int i=indexPoint.size() - 1; i > idLeftPoint; i--)
 			{
+				z.push_back(contourPoints[indexPoint[i]].x);
+				z.push_back(contourPoints[indexPoint[i]].y);
 				charPoint.push_back(cvPoint(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y));
-				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
+			//	drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
 			}
+			drawcont.add(new Types::Ellipse(Point2f(z[0], z[1]), Size2f(10,10)));
+			drawcont.add(new Types::Ellipse(Point2f(z[2], z[3]), Size2f(10,10)));
+			drawcont.add(new Types::Ellipse(Point2f(z[12], z[13]), Size2f(10,10)));
+			drawcont.add(new Types::Ellipse(Point2f(z[16], z[17]), Size2f(10,10)));
 
 			//plik <<"Punkt środka cieżkosci: "<< CenterOfGravity_x <<" "<< CenterOfGravity_y;
 
@@ -328,12 +343,18 @@ void KW_MAP::charPointsToState()
 	//obliczanie parametrów prostokątaq opisującego wewnętrzą część dłoni
 	//wspolrzedna x lewego gornego punktu
 	state.push_back(z[0]-(z[16]-z[0]));
-	state.push_back(z[12]);
-	state.push_back(2*(z[16]-z[0]));
-	state.push_back(z[1]-z[14]);
-
-	drawcont.add(new Types::Line(cv::Point(charPoint[1].x, charPoint[1].y),cv::Point(charPoint[0].x, charPoint[0].y)));
-	drawcont.add(new Types::Line(cv::Point(charPoint[2].x, charPoint[2].y),cv::Point(charPoint[3].x, charPoint[3].y)));
+	state.push_back(z[13]);
+	state.push_back(abs(2*(z[16]-z[0])));
+	state.push_back(abs(z[1]-z[13]));
+	cout<<"\n"<<z[0]<<", "<<z[1]<<", "<<z[12]<<", "<<z[14]<<", "<<z[16]<<"\n";
+	cout<<state[0]<<", "<<state[1]<<", "<<state[2]<<", "<<state[3]<<"\n";
+	drawcont.add(new Types::Ellipse(Point2f(state[0], state[1]), Size2f(13,13)));
+	drawcont.add(new Types::Rectangle(state[0], state[1], state[2], state[3]));
+	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[1].x, charPoint[1].y)));
+	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[3].x, charPoint[3].y)));
+	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[5].x, charPoint[5].y)));
+	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[7].x, charPoint[7].y)));
+	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[9].x, charPoint[9].y)));
 
 }
 
