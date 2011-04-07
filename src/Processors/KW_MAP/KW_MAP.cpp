@@ -196,8 +196,7 @@ void KW_MAP::getCharPoints() {
 		MINDIST = (MaxY - CenterOfGravity_y) * (MaxY - CenterOfGravity_y) * 4
 				/ 9;
 		//przesuniety punkt środka ciężkości
-		charPoint.push_back(cvPoint(CenterOfGravity_x, CenterOfGravity_y
-				+ (MaxY - CenterOfGravity_y)));
+		charPoint.push_back(cvPoint(CenterOfGravity_x, CenterOfGravity_y + (MaxY - CenterOfGravity_y) * 4 / 5));
 		CenterOfGravity_y += (MaxY - CenterOfGravity_y) * 2 / 3;
 		z.push_back(charPoint[0].x);
 		z.push_back(charPoint[0].y);
@@ -317,13 +316,11 @@ void KW_MAP::charPointsToState() {
 	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[7].x, charPoint[7].y)));
 	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[9].x, charPoint[9].y)));
 
-	fingerToStateLeft(charPoint[1], charPoint[2]);
-	fingerToStateLeft(charPoint[3], charPoint[4]);
-	fingerToStateLeft(charPoint[5], charPoint[6]);
-	fingerToStateRight(charPoint[7], charPoint[6]);
-	fingerToStateRight(charPoint[9], charPoint[8]);
-
-
+	fingerToState(charPoint[1], charPoint[2], 1);
+	fingerToState(charPoint[3], charPoint[4], 1);
+	fingerToState(charPoint[5], charPoint[6], 1);
+	fingerToState(charPoint[7], charPoint[6], -1);
+	fingerToState(charPoint[9], charPoint[8], -1);
 }
 
 CvPoint KW_MAP::rot(CvPoint p, double angle, CvPoint p0) {
@@ -334,7 +331,7 @@ CvPoint KW_MAP::rot(CvPoint p, double angle, CvPoint p0) {
 }
 
 //p2 - czubek palca, p1 - punkt miedzy palcami
-void KW_MAP::fingerToStateLeft(CvPoint p2, CvPoint p1) {
+void KW_MAP::fingerToState(CvPoint p2, CvPoint p1, int sig) {
 	double uj = (double) (-p2.x + charPoint[0].x) / (-p2.y + charPoint[0].y);
 	double angle = atan(uj);
 	CvPoint pt1 = rot(p1, angle, charPoint[0]);
@@ -345,10 +342,14 @@ void KW_MAP::fingerToStateLeft(CvPoint p2, CvPoint p1) {
 	CvPoint statePoint3;
 	CvPoint statePoint4;
 
-	statePoint.x = pt2.x - (pt1.x - pt2.x);
+	if(sig == 1)
+		statePoint.x = pt2.x - (pt1.x - pt2.x);
+	else if (sig == -1)
+		statePoint.x = pt1.x;
+
 	statePoint.y = pt2.y;
-	int width = 2 * (pt1.x - pt2.x);
-	int height = (pt1.y - pt2.y);
+	int width = abs(2 * (pt1.x - pt2.x));
+	int height = abs(pt1.y - pt2.y);
 
 	statePoint2.x = statePoint.x;
 	statePoint2.y = statePoint.y + height;
@@ -378,53 +379,6 @@ void KW_MAP::fingerToStateLeft(CvPoint p2, CvPoint p1) {
 	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y), cv::Point(statePoint4.x, statePoint4.y)));
 	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y), cv::Point(statePoint.x, statePoint.y)));
 }
-
-void KW_MAP::fingerToStateRight(CvPoint p2, CvPoint p1)
-{
-	double uj = (double) (-p2.x + charPoint[0].x) / (-p2.y + charPoint[0].y);
-	double angle = atan(uj);
-	CvPoint pt1 = rot(p1, angle, charPoint[0]);
-	CvPoint pt2 = rot(p2, angle, charPoint[0]);
-
-	CvPoint statePoint;
-	CvPoint statePoint2;
-	CvPoint statePoint3;
-	CvPoint statePoint4;
-
-	statePoint.x = pt1.x;
-	statePoint.y = pt2.y;
-	int width = -2 * (pt1.x - pt2.x);
-	int height = (pt1.y - pt2.y);
-
-	cout<< width<<" "<<height<<"\n";
-	statePoint2.x = statePoint.x;
-	statePoint2.y = statePoint.y + height;
-
-	statePoint3.x = statePoint.x + width;
-	statePoint3.y = statePoint.y + height;
-
-	statePoint4.x = statePoint.x + width;
-	statePoint4.y = statePoint.y;
-
-	angle = -angle;
-	statePoint = rot(statePoint, angle, charPoint[0]);
-	statePoint2 = rot(statePoint2, angle, charPoint[0]);
-	statePoint3 = rot(statePoint3, angle, charPoint[0]);
-	statePoint4 = rot(statePoint4, angle, charPoint[0]);
-
-	//górny lewy wierzchołek
-	state.push_back(statePoint.x);
-	state.push_back(statePoint.y);
-	//szerokosc
-	state.push_back(width);
-	//wysokosc
-	state.push_back(height);
-
-	drawcont.add(new Types::Line(cv::Point(statePoint.x, statePoint.y), cv::Point(statePoint2.x, statePoint2.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y), cv::Point(statePoint3.x, statePoint3.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y), cv::Point(statePoint4.x, statePoint4.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y), cv::Point(statePoint.x, statePoint.y)));
-};
 
 }//: namespace KW_MAP
 }//: namespace Processors
