@@ -12,6 +12,7 @@
 #include "KW_MAP.hpp"
 #include "Logger.hpp"
 #include "Types/Ellipse.hpp"
+#include "Types/Line.hpp"
 #include <vector>
 
 namespace Processors {
@@ -67,11 +68,12 @@ bool KW_MAP::onStep()
 	blobs_ready = img_ready = false;
 
 	try {
-
+		//drawcont.clear();
 		getCharPoints();
+		charPointsToState();
 
 
-
+		out_draw.write(drawcont);
 		newImage->raise();
 
 		return true;
@@ -156,8 +158,6 @@ void KW_MAP::getCharPoints()
 
 		double m00, m10, m01;
 		double Area, MaxArea, CenterOfGravity_x, CenterOfGravity_y, MaxY;
-
-		Types::DrawableContainer drawcont;
 
 		MaxArea = 0;
 		MaxY = 0;
@@ -290,6 +290,8 @@ void KW_MAP::getCharPoints()
 
 			for (int i=idLeftPoint; i >= 0; i--)
 			{
+				z.push_back(contourPoints[indexPoint[i]].x);
+				z.push_back(contourPoints[indexPoint[i]].y);
 				charPoint.push_back(cvPoint(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y));
 				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
 			}
@@ -304,7 +306,7 @@ void KW_MAP::getCharPoints()
 
 		result.AddBlob(blobs.GetBlob(id));
 		out_signs.write(result);
-		out_draw.write(drawcont);
+
 
 	} catch (...) {
 		LOG(LERROR) << "KW_MAP::getCharPoints failed\n";
@@ -318,6 +320,21 @@ CvPoint KW_MAP::rot(CvPoint p, double angle, CvPoint p0)
     t.x = p0.x + (int)((double)(p.x - p0.x) * cos(angle) - (double)(p.y-p0.y) * sin(angle));
     t.y = p0.y + (int)((double)(p.x - p0.x) * sin(angle) + (double)(p.y-p0.y) * cos(angle));
     return t;
+}
+
+void KW_MAP::charPointsToState()
+{
+
+	//obliczanie parametrów prostokątaq opisującego wewnętrzą część dłoni
+	//wspolrzedna x lewego gornego punktu
+	state.push_back(z[0]-(z[16]-z[0]));
+	state.push_back(z[12]);
+	state.push_back(2*(z[16]-z[0]));
+	state.push_back(z[1]-z[14]);
+
+	drawcont.add(new Types::Line(cv::Point(charPoint[1].x, charPoint[1].y),cv::Point(charPoint[0].x, charPoint[0].y)));
+	drawcont.add(new Types::Line(cv::Point(charPoint[2].x, charPoint[2].y),cv::Point(charPoint[3].x, charPoint[3].y)));
+
 }
 
 

@@ -32,6 +32,10 @@ public:
 		items.push_back(it);
 	}
 
+	void clear() {
+		items.clear();
+	}
+
 	virtual Drawable * clone() {
 		DrawableContainer * ret = new DrawableContainer;
 		BOOST_FOREACH(Drawable * item, items) {
