@@ -80,11 +80,6 @@ public:
 protected:
 
 	/*!
-	 * Otrzymanie punktów na konturze dłoni
-	 */
-	void getCharPoints();
-
-	/*!
 	 * Connects source to given device.
 	 */
 	bool onInit();
@@ -145,6 +140,15 @@ protected:
 
 	/// Properties
 	Props props;
+
+
+	/*!
+	 * Otrzymanie punktów na konturze dłoni
+	 */
+	void getCharPoints();
+
+	CvPoint rot(CvPoint p, double angle, CvPoint p0);
+
 
 private:
 

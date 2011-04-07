@@ -275,7 +275,26 @@ void KW_MAP::getCharPoints()
 			last_x = CenterOfGravity_x;
 			last_y = CenterOfGravity_y;
 
+			int idLeftPoint = 0;
+			int xLeftPoint = 1000000;
 			for (unsigned int i=0; i < indexPoint.size(); i++)
+			{
+				//znajdujemy punkt najbardziej wysynięty na lewo, czyli wierzchołek małego palca
+				if (xLeftPoint > contourPoints[indexPoint[i]].x)
+				{
+					xLeftPoint = contourPoints[indexPoint[i]].x;
+					idLeftPoint = i;
+				}
+
+			}
+
+			for (int i=idLeftPoint; i >= 0; i--)
+			{
+				charPoint.push_back(cvPoint(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y));
+				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
+			}
+
+			for (int i=indexPoint.size() - 1; i > idLeftPoint; i--)
 			{
 				charPoint.push_back(cvPoint(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y));
 				drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
@@ -292,6 +311,15 @@ void KW_MAP::getCharPoints()
 
 	}
 }
+
+CvPoint KW_MAP::rot(CvPoint p, double angle, CvPoint p0)
+{
+    CvPoint t;
+    t.x = p0.x + (int)((double)(p.x - p0.x) * cos(angle) - (double)(p.y-p0.y) * sin(angle));
+    t.y = p0.y + (int)((double)(p.x - p0.x) * sin(angle) + (double)(p.y-p0.y) * cos(angle));
+    return t;
+}
+
 
 }//: namespace KW_MAP
 }//: namespace Processors
