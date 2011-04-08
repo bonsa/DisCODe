@@ -310,6 +310,8 @@ void KW_MAP::charPointsToState() {
 	//wysokosc
 	state.push_back(abs(charPoint[0].y - charPoint[6].y));
 
+	cout<<"state: "<<state.size();
+
 //	drawcont.add(new Types::Rectangle(state[0], state[1], state[2], state[3]));
 //	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[1].x, charPoint[1].y)));
 //	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[3].x, charPoint[3].y)));
@@ -333,6 +335,9 @@ cv::Point KW_MAP::rot(cv::Point p, double angle, cv::Point p0) {
 
 //p2 - czubek palca, p1 - punkt miedzy palcami
 void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
+
+	LOG(LTRACE) << "KW_MAP::fingerToState\n";
+
 	double uj = (double) (-p2.x + charPoint[0].x) / (-p2.y + charPoint[0].y);
 	double angle = atan(uj);
 	cv::Point pt1 = rot(p1, angle, charPoint[0]);
@@ -374,7 +379,7 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	state.push_back(width);
 	//wysokosc
 	state.push_back(height);
-	stateAngle.push_back(-angle);
+	state.push_back(-angle);
 
 
 //	drawcont.add(new Types::Line(cv::Point(statePoint.x, statePoint.y), cv::Point(statePoint2.x, statePoint2.y)));
@@ -386,8 +391,10 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 //******************************************SPRAWDŹ CZY DZIALA***********************************************
 
 //funkcja obliczajaca punkty charakterystyczne trzech lewych palców
-void KW_MAP::stateToFinger(int s1, int s2, int s3, int s4, double angle, int sig)
+void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double angle, int sig)
 {
+	LOG(LTRACE) << "KW_MAP::stateToFinger\n";
+
 	cv::Point rotPoint;
 	cv::Point tempPoint;
 
@@ -428,21 +435,23 @@ void KW_MAP::stateToFinger(int s1, int s2, int s3, int s4, double angle, int sig
 
 void KW_MAP::stateToCharPoint()
 {
+	LOG(LTRACE) << "KW_MAP::stateToCharPoint\n";
+
 	cv::Point rotPoint;
 	cv::Point tempPoint;
 	// punkt dołu dłoni
 	z.push_back(cv::Point((state[0] + 0.5*state[2]), (state[1] + state[3])));
 
 	//punkty pierwszego palca od lewej
-	stateToFinger(state[4], state[5], state[6], state[7], stateAngle[0],1);
+	stateToFinger(state[4], state[5], state[6], state[7], state[8],1);
 	//punkty drugiego palca od lewej
-	stateToFinger(state[8], state[9], state[10], state[11], stateAngle[1],1);
+	stateToFinger(state[9], state[10], state[11], state[12], state[13],1);
 	//punkty środkowego palca
-	stateToFinger(state[12], state[13], state[14], state[15], stateAngle[2],1);
+	stateToFinger(state[14], state[15], state[16], state[17], state[18],1);
 	//punkty czwartego palca od lewej
-	stateToFinger(state[16], state[17], state[18], state[19], stateAngle[3],2);
+	stateToFinger(state[19], state[20], state[21], state[22], state[23],2);
 	//punkty kciuka
-	stateToFinger(state[20], state[21], state[22], state[23], stateAngle[4],3);
+	stateToFinger(state[24], state[25], state[26], state[27], state[28],3);
 
 	drawcont.add(new Types::Ellipse(Point2f(z[0].x, z[0].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[1].x, z[1].y), Size2f(14,14)));
@@ -459,6 +468,8 @@ void KW_MAP::stateToCharPoint()
 
 void KW_MAP::calculateDiff()
 {
+	LOG(LTRACE) << "KW_MAP::calculateDiff\n";
+
 	//różnica
 	vector<Point> D;
     for (unsigned int i = 0; i < z.size(); i++)

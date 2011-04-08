@@ -157,7 +157,7 @@ protected:
 
 	void fingerToState(cv::Point p2, cv::Point p1, int sig);
 
-	void stateToFinger(int s1, int s2, int s3, int s4, double angle, int sig);
+	void stateToFinger(double s1, double s2, double s3, double s4, double angle, int sig);
 
 	void stateToCharPoint();
 
@@ -185,7 +185,7 @@ private:
 	vector<cv::Point> diff;
 
 	// wektor stanu dłoni
-	vector<int> state;
+	vector<double> state;
 
 	vector<double> stateAngle;
 };
