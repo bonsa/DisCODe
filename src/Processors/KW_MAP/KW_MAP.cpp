@@ -197,6 +197,7 @@ void KW_MAP::getCharPoints() {
 		MINDIST = (MaxY - CenterOfGravity_y) * (MaxY - CenterOfGravity_y) * 4/ 9;
 		//przesuniety punkt środka ciężkości
 		charPoint.push_back(cv::Point(CenterOfGravity_x, CenterOfGravity_y + (MaxY - CenterOfGravity_y) * 4 / 5));
+
 		CenterOfGravity_y += (MaxY - CenterOfGravity_y) * 2 / 3;
 
 		numerElements = contourPoints.size();
@@ -279,6 +280,14 @@ void KW_MAP::getCharPoints() {
 
 		//plik <<"Punkt środka cieżkosci: "<< CenterOfGravity_x <<" "<< CenterOfGravity_y;
 
+		drawcont.add(new Types::Ellipse(Point2f(charPoint[0].x, charPoint[0].y), Size2f(10,10)));
+		drawcont.add(new Types::Ellipse(Point2f(charPoint[1].x, charPoint[1].y), Size2f(10,10)));
+		drawcont.add(new Types::Ellipse(Point2f(charPoint[2].x, charPoint[2].y), Size2f(10,10)));
+		drawcont.add(new Types::Ellipse(Point2f(charPoint[3].x, charPoint[3].y), Size2f(10,10)));
+		drawcont.add(new Types::Ellipse(Point2f(charPoint[4].x, charPoint[4].y), Size2f(10,10)));
+		drawcont.add(new Types::Ellipse(Point2f(charPoint[5].x, charPoint[5].y), Size2f(10,10)));
+		drawcont.add(new Types::Ellipse(Point2f(charPoint[6].x, charPoint[6].y), Size2f(10,10)));
+
 		result.AddBlob(blobs.GetBlob(id));
 		out_signs.write(result);
 
@@ -301,12 +310,12 @@ void KW_MAP::charPointsToState() {
 	//wysokosc
 	state.push_back(abs(charPoint[0].y - charPoint[6].y));
 
-	drawcont.add(new Types::Rectangle(state[0], state[1], state[2], state[3]));
-	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[1].x, charPoint[1].y)));
-	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[3].x, charPoint[3].y)));
-	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[5].x, charPoint[5].y)));
-	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[7].x, charPoint[7].y)));
-	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[9].x, charPoint[9].y)));
+//	drawcont.add(new Types::Rectangle(state[0], state[1], state[2], state[3]));
+//	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[1].x, charPoint[1].y)));
+//	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[3].x, charPoint[3].y)));
+//	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[5].x, charPoint[5].y)));
+//	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[7].x, charPoint[7].y)));
+//	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[9].x, charPoint[9].y)));
 
 	fingerToState(charPoint[1], charPoint[2], 1);
 	fingerToState(charPoint[3], charPoint[4], 1);
@@ -365,31 +374,101 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	state.push_back(width);
 	//wysokosc
 	state.push_back(height);
+	stateAngle.push_back(-angle);
 
-	drawcont.add(new Types::Line(cv::Point(statePoint.x, statePoint.y), cv::Point(statePoint2.x, statePoint2.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y), cv::Point(statePoint3.x, statePoint3.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y), cv::Point(statePoint4.x, statePoint4.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y), cv::Point(statePoint.x, statePoint.y)));
+
+//	drawcont.add(new Types::Line(cv::Point(statePoint.x, statePoint.y), cv::Point(statePoint2.x, statePoint2.y)));
+//	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y), cv::Point(statePoint3.x, statePoint3.y)));
+//	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y), cv::Point(statePoint4.x, statePoint4.y)));
+//	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y), cv::Point(statePoint.x, statePoint.y)));
+}
+
+//******************************************SPRAWDŹ CZY DZIALA***********************************************
+
+//funkcja obliczajaca punkty charakterystyczne trzech lewych palców
+void KW_MAP::stateToFinger(int s1, int s2, int s3, int s4, double angle, int sig)
+{
+	cv::Point rotPoint;
+	cv::Point tempPoint;
+
+	// obrót górnego lewego punktu do pionu
+	rotPoint = rot(cv::Point(s1, s2), angle, charPoint[0]);
+
+	if (sig == 1)
+	{
+		//punkt wierzchołka palca
+		tempPoint.x = rotPoint.x + 0.5 * s3;
+		tempPoint.y = rotPoint.y;
+		z.push_back(rot(tempPoint, - angle, charPoint[0]));
+
+		//punkt miedzypalcowy
+		tempPoint.x = rotPoint.x + s3;
+		tempPoint.y = rotPoint.y + s4;
+		z.push_back(rot(tempPoint, - angle, charPoint[0]));
+	}
+	else if (sig == 2)
+	{
+		tempPoint.x = rotPoint.x + 0.5 * s3;
+		tempPoint.y = rotPoint.y;
+		z.push_back(rot(tempPoint, - angle, charPoint[0]));
+	}
+	else if (sig == 3)
+	{
+		//punkt miedzypalcowy
+		tempPoint.x = rotPoint.x;
+		tempPoint.y = rotPoint.y + s4;
+		z.push_back(rot(tempPoint, - angle, charPoint[0]));
+
+		//punkt wierzchołka palca
+		tempPoint.x = rotPoint.x + 0.5 * s3;
+		tempPoint.y = rotPoint.y;
+		z.push_back(rot(tempPoint, - angle, charPoint[0]));
+	}
 }
 
 void KW_MAP::stateToCharPoint()
 {
+	cv::Point rotPoint;
+	cv::Point tempPoint;
+	// punkt dołu dłoni
 	z.push_back(cv::Point((state[0] + 0.5*state[2]), (state[1] + state[3])));
 
-	z.push_back(cv::Point((state[4] + 0.5 * state[6]), state[5]));
-	z.push_back(cv::Point((state[4] + state[6]),(state[5] + state[7])));
+	//punkty pierwszego palca od lewej
+	stateToFinger(state[4], state[5], state[6], state[7], stateAngle[0],1);
+	//punkty drugiego palca od lewej
+	stateToFinger(state[8], state[9], state[10], state[11], stateAngle[1],1);
+	//punkty środkowego palca
+	stateToFinger(state[12], state[13], state[14], state[15], stateAngle[2],1);
+	//punkty czwartego palca od lewej
+	stateToFinger(state[16], state[17], state[18], state[19], stateAngle[3],2);
+	//punkty kciuka
+	stateToFinger(state[20], state[21], state[22], state[23], stateAngle[4],3);
 
-	z.push_back(cv::Point((state[8] + 0.5 * state[10]), state[9]));
-	z.push_back(cv::Point((state[8] + state[10]),(state[9] + state[11])));
+	drawcont.add(new Types::Ellipse(Point2f(z[0].x, z[0].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[1].x, z[1].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[2].x, z[2].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[3].x, z[3].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[4].x, z[4].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[5].x, z[5].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[6].x, z[6].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[8].x, z[8].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[9].x, z[9].y), Size2f(14,14)));
 
-	z.push_back(cv::Point((state[12] + 0.5 * state[14]), state[13]));
-	z.push_back(cv::Point((state[12] + state[14]),(state[13] + state[15])));
-
-	z.push_back(cv::Point((state[16] + 0.5 * state[18]), state[17]));
-
-	z.push_back(cv::Point(state[20],(state[21] + state[23])));
-	z.push_back(cv::Point((state[20] + 0.5 * state[22]), state[21]));
 }
+
+void KW_MAP::calculateDiff()
+{
+	//różnica
+	vector<Point> D;
+    for (unsigned int i = 0; i < z.size(); i++)
+    {
+        D[i].x =  charPoint[i].x - z[i].x;
+        D[i].y =  charPoint[i].y - z[i].y;
+    }
+
+}
+
 
 
 }//: namespace KW_MAP

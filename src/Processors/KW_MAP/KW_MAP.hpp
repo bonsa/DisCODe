@@ -157,8 +157,11 @@ protected:
 
 	void fingerToState(cv::Point p2, cv::Point p1, int sig);
 
+	void stateToFinger(int s1, int s2, int s3, int s4, double angle, int sig);
+
 	void stateToCharPoint();
 
+	void calculateDiff();
 private:
 
 	cv::Mat tsl_img;
@@ -178,9 +181,13 @@ private:
 	vector<cv::Point> charPoint;
 	// wektor obserwacji dłoni
 	vector<cv::Point> z;
+	// różnica stanów
+	vector<cv::Point> diff;
 
 	// wektor stanu dłoni
 	vector<int> state;
+
+	vector<double> stateAngle;
 };
 
 }//: namespace KW_MAP
