@@ -70,6 +70,7 @@ bool KW_MAP::onStep() {
 		getCharPoints();
 		charPointsToState();
 		stateToCharPoint();
+		calculateDiff();
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -310,7 +311,6 @@ void KW_MAP::charPointsToState() {
 	//wysokosc
 	state.push_back(abs(charPoint[0].y - charPoint[6].y));
 
-	cout<<"state: "<<state.size();
 
 //	drawcont.add(new Types::Rectangle(state[0], state[1], state[2], state[3]));
 //	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[1].x, charPoint[1].y)));
@@ -466,6 +466,19 @@ void KW_MAP::stateToCharPoint()
 
 }
 
+void KW_MAP::calculateH()
+{
+	for(int i = 0; i < 29; i++)
+	{
+		for(int j = 0; j < 20; j++)
+		{
+			H[i][j]=0;
+			cout << H[i][j]<<" ";
+		}
+		cout<<"\n";
+	}
+}
+
 void KW_MAP::calculateDiff()
 {
 	LOG(LTRACE) << "KW_MAP::calculateDiff\n";
@@ -474,9 +487,11 @@ void KW_MAP::calculateDiff()
 	vector<Point> D;
     for (unsigned int i = 0; i < z.size(); i++)
     {
-        D[i].x =  charPoint[i].x - z[i].x;
-        D[i].y =  charPoint[i].y - z[i].y;
+        D.push_back(cv::Point(charPoint[i].x - z[i].x, charPoint[i].y - z[i].y));
+
     }
+
+    calculateH();
 
 }
 

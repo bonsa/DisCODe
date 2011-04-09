@@ -161,6 +161,8 @@ protected:
 
 	void stateToCharPoint();
 
+	void calculateH();
+
 	void calculateDiff();
 private:
 
@@ -187,7 +189,9 @@ private:
 	// wektor stanu dłoni
 	vector<double> state;
 
-	vector<double> stateAngle;
+	//macierz H
+	double H[29][20];
+
 };
 
 }//: namespace KW_MAP
