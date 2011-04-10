@@ -70,23 +70,24 @@ bool KW_MAP::onStep() {
 		z.clear();
 		charPoint.clear();
 		diff.clear();
+		state.clear();
 
 		getCharPoints();
 
-		if(first == true)
-		{
+	//	if(first == true)
+	//	{
 			 // z --> s, z pomiarów oblicza stan
 			charPointsToState();
-			first = false;
-		}
-		else
-		{
+	//		first = false;
+	//	}
+	//	else
+	//	{
 
 			// s --> z
 			stateToCharPoint();
-			calculateDiff();
-			updateState();
-		}
+		//	calculateDiff();
+		//	updateState();
+		//}
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -414,7 +415,19 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double an
 	cv::Point rotPoint;
 	cv::Point tempPoint;
 
-	// obrót górnego lewego punktu do pionu
+	if (sig == 1)
+	{
+		tempPoint.x = s1 + 0.5*s3*cos(angle);
+		tempPoint.y = s2 - 0.5*s3*sin(angle);
+		z.push_back(tempPoint);
+
+		tempPoint.x = s1 + s3 * cos(angle) + s4 * sin(angle);
+		tempPoint.y = s2 - s3 * sin(angle) + s4 * cos(angle);
+		z.push_back(tempPoint);
+
+	}
+
+/*	// obrót górnego lewego punktu do pionu
 	rotPoint = rot(cv::Point(s1, s2), angle, charPoint[0]);
 
 	if (sig == 1)
@@ -446,7 +459,7 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double an
 		tempPoint.x = rotPoint.x + 0.5 * s3;
 		tempPoint.y = rotPoint.y;
 		z.push_back(rot(tempPoint, - angle, charPoint[0]));
-	}
+	}*/
 }
 
 void KW_MAP::stateToCharPoint()
@@ -461,25 +474,25 @@ void KW_MAP::stateToCharPoint()
 	//punkty pierwszego palca od lewej
 	stateToFinger(state[4], state[5], state[6], state[7], state[8],1);
 	//punkty drugiego palca od lewej
-	stateToFinger(state[9], state[10], state[11], state[12], state[13],1);
+//	stateToFinger(state[9], state[10], state[11], state[12], state[13],1);
 	//punkty środkowego palca
-	stateToFinger(state[14], state[15], state[16], state[17], state[18],1);
+//	stateToFinger(state[14], state[15], state[16], state[17], state[18],1);
 	//punkty czwartego palca od lewej
-	stateToFinger(state[19], state[20], state[21], state[22], state[23],2);
+//	stateToFinger(state[19], state[20], state[21], state[22], state[23],2);
 	//punkty kciuka
-	stateToFinger(state[24], state[25], state[26], state[27], state[28],3);
+//	stateToFinger(state[24], state[25], state[26], state[27], state[28],3);
 
 	drawcont.add(new Types::Ellipse(Point2f(z[0].x, z[0].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[1].x, z[1].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[2].x, z[2].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[3].x, z[3].y), Size2f(14,14)));
+/*	drawcont.add(new Types::Ellipse(Point2f(z[3].x, z[3].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[4].x, z[4].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[5].x, z[5].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[6].x, z[6].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[8].x, z[8].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[9].x, z[9].y), Size2f(14,14)));
-
+*/
 }
 
 void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, double d, double e, int sig)
@@ -499,12 +512,12 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, d
 	{
 		H[indexR][indexC] = 1;
 		H[indexR + 3][indexC] = sinE;
-		H[indexR + 4][indexC] = cosE * (-(b - y) * cosE  - (a - x) * sinE) + cosE * (d + (b - y) * cosE  + (a - x) * sinE);
+		H[indexR + 4][indexC] = 0;//cosE * (-(b - y) * cosE  - (a - x) * sinE) + cosE * (d + (b - y) * cosE  + (a - x) * sinE);
 
 		indexC +=1;
 		H[indexR + 1][indexC] = 1;
 		H[indexR + 3][indexC] = cosE;
-		H[indexR + 4][indexC] = -sinE *(-(b - y) * cosE - (a - x) * sinE) -	sinE * (d + (b - y) * cosE  + (a - x) * sinE);
+		H[indexR + 4][indexC] = 0;//-sinE *(-(b - y) * cosE - (a - x) * sinE) -	sinE * (d + (b - y) * cosE  + (a - x) * sinE);
 
 		//przechodze do nastepnej kolumny
 		indexC +=1;
@@ -512,12 +525,12 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, d
 
 	H[indexR][indexC] = 1;
 	H[indexR + 2][indexC] = 0.5 * cosE;
-	H[indexR + 4][indexC] = cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * ((b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (0.5 * c + (a - x) * cosE - (b - y) * sinE);
+	H[indexR + 4][indexC] = 0;//cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * ((b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (0.5 * c + (a - x) * cosE - (b - y) * sinE);
 
 	indexC +=1;
 	H[indexR + 1][indexC] = 1;
 	H[indexR + 2][indexC] = -0.5 * sinE;
-	H[indexR + 4][indexC] = sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE *((b - y) * cosE + (a - x) * sinE) + cosE *((a - x) * cosE - (b - y) * sinE) - cosE * (0.5* c + (a - x) * cosE - (b - y) * sinE);
+	H[indexR + 4][indexC] = 0;//sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE *((b - y) * cosE + (a - x) * sinE) + cosE *((a - x) * cosE - (b - y) * sinE) - cosE * (0.5* c + (a - x) * cosE - (b - y) * sinE);
 
 	if(sig == 1)
 	{
@@ -525,13 +538,13 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, d
 		H[indexR ][indexC] = 1;
 		H[indexR + 2][indexC] = cosE;
 		H[indexR + 3][indexC] = sinE;
-		H[indexR + 4][indexC] = cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * (d + (b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (c + (a - x) * cosE - (b - y) * sinE);
+		H[indexR + 4][indexC] = 0;//cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * (d + (b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (c + (a - x) * cosE - (b - y) * sinE);
 
 		indexC +=1;
 		H[indexR + 1][indexC] = 1;
 		H[indexR + 2][indexC] = -sinE;
 		H[indexR + 3][indexC] = cosE;
-		H[indexR + 4][indexC] = -sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE * (d + (b - y)  * cosE + (a - x) * sinE) + cosE * ((a - x) * cosE - (b - y) * sinE) - cosE * (c + (a - x) * cosE - (b - y) * sinE);
+		H[indexR + 4][indexC] = 0;//-sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE * (d + (b - y)  * cosE + (a - x) * sinE) + cosE * ((a - x) * cosE - (b - y) * sinE) - cosE * (c + (a - x) * cosE - (b - y) * sinE);
 	}
 
 
@@ -553,7 +566,6 @@ void KW_MAP::calculateH()
 	H[1][1] = 1;
 	H[3][1] = 1;
 
-	cout<<state.size()<<"\n";
 	derivatives(4,2, state[4], state[5], state[6], state[7], state[8],1);
 	derivatives(9,6, state[9], state[10], state[11], state[12], state[13],1);
 	derivatives(14,10,state[14], state[15], state[16], state[17], state[18],1);
@@ -591,8 +603,6 @@ void KW_MAP::calculateDiff()
     calculateH();
 
     double t[29];
-
-    //zadeklarowac t!!!!!!!!!!!!!!!!!!!!!!!!!!111
     for (unsigned int i = 0; i < state.size(); i++)
     {
         t[i] = 0;
@@ -605,7 +615,7 @@ void KW_MAP::calculateDiff()
         }
         cout << "\n";
         //wspolczynnik zapominania
-        //t[i] *= learnRate * 4;
+        t[i] *= learnRate;
         //obliczony blad
         error += abs(t[i]);
     cout<<t[i]<<"\n";
