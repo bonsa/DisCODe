@@ -48,6 +48,9 @@ bool KW_MAP::onInit() {
 	registerStream("out_signs", &out_signs);
 	registerStream("out_draw", &out_draw);
 
+	learnRate = 0.1;
+	first = true;
+
 	return true;
 }
 
@@ -65,13 +68,25 @@ bool KW_MAP::onStep() {
 	try {
 		drawcont.clear();
 		z.clear();
-		state.clear();
 		charPoint.clear();
+		diff.clear();
 
 		getCharPoints();
-		charPointsToState();
-		stateToCharPoint();
-		calculateDiff();
+
+		if(first == true)
+		{
+			 // z --> s, z pomiarów oblicza stan
+			charPointsToState();
+			first = false;
+		}
+		else
+		{
+
+			// s --> z
+			stateToCharPoint();
+			calculateDiff();
+			updateState();
+		}
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -560,16 +575,52 @@ void KW_MAP::calculateDiff()
 	LOG(LTRACE) << "KW_MAP::calculateDiff\n";
 
 	//różnica
-	vector<Point> D;
-    for (unsigned int i = 0; i < z.size(); i++)
-    {
-        D.push_back(cv::Point(charPoint[i].x - z[i].x, charPoint[i].y - z[i].y));
+	double D[20];
+	double error = 0;
+	unsigned int j = 0;
 
+    for (unsigned int i = 0 ; i < z.size() * 2; i = i + 2)
+    {
+        D[i] = charPoint[j].x - z[j].x;
+        cout<<"D:"<< D[i]<<"\n";
+        D[i + 1] = charPoint[j].y - z[j].y;
+        cout<<"D:"<< D[i + 1]<<"\n";
+        j += 1;
     }
 
     calculateH();
 
+    double t[29];
+
+    //zadeklarowac t!!!!!!!!!!!!!!!!!!!!!!!!!!111
+    for (unsigned int i = 0; i < state.size(); i++)
+    {
+        t[i] = 0;
+        for  (j = 0; j < z.size() * 2; j++)
+        {
+
+            //mnożenie macierzy H * roznica S
+            t[i] += H[i][j] * D[j];
+
+        }
+        cout << "\n";
+        //wspolczynnik zapominania
+        //t[i] *= learnRate * 4;
+        //obliczony blad
+        error += abs(t[i]);
+    cout<<t[i]<<"\n";
+    diff.push_back(t[i]);
+    }
 }
+
+void KW_MAP::updateState()
+ {
+     for (unsigned int i = 0; i < state.size(); i++)
+     {
+         state[i] = state[i] - diff[i];
+     }
+ }
+
 
 
 

@@ -166,6 +166,9 @@ protected:
 	void calculateH();
 
 	void calculateDiff();
+
+	void updateState();
+
 private:
 
 	cv::Mat tsl_img;
@@ -173,6 +176,7 @@ private:
 
 	bool blobs_ready;
 	bool img_ready;
+	bool first;
 
 
 	Types::Blobs::BlobResult blobs;
@@ -186,13 +190,15 @@ private:
 	// wektor obserwacji dłoni
 	vector<cv::Point> z;
 	// różnica stanów
-	vector<cv::Point> diff;
+	vector<double> diff;
 
 	// wektor stanu dłoni
 	vector<double> state;
 
 	//macierz H
 	double H[29][20];
+
+	double learnRate;
 
 };
 
