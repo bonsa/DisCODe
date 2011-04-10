@@ -161,7 +161,7 @@ protected:
 
 	void stateToCharPoint();
 
-	void derivatives1(int indexR, int indexC, double a, double b, double c, double d, double e);
+	void derivatives(int indexR, int indexC, double a, double b, double c, double d, double e, int sig);
 
 	void calculateH();
 
