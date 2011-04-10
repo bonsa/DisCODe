@@ -420,53 +420,33 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double an
 
 	if (sig == 1)
 	{
-		if (angle > 0)
-		{
-			cout<<"angle "<<angle<<"\n";
-			tempPoint.x = s1 + 0.5 * s3 * cos(angle);
-			tempPoint.y = s2 - 0.5 * s3 * sin(angle);
-			z.push_back(tempPoint);
+		cout<<"angle "<<angle<<"\n";
+		tempPoint.x = s1 + 0.5 * s3 * cos(angle);
+		tempPoint.y = s2 - 0.5 * s3 * sin(angle);
+		z.push_back(tempPoint);
 
-			tempPoint.x = s1 + s3 * cos(angle) + s4 * sin(angle);
-			tempPoint.y = s2 - s3 * sin(angle) + s4 * cos(angle);
-			z.push_back(tempPoint);
-		}
-
+		tempPoint.x = s1 + s3 * cos(angle) + s4 * sin(angle);
+		tempPoint.y = s2 - s3 * sin(angle) + s4 * cos(angle);
+		z.push_back(tempPoint);
 	}
-
-/*	// obrót górnego lewego punktu do pionu
-	rotPoint = rot(cv::Point(s1, s2), angle, charPoint[0]);
-
-	if (sig == 1)
+	if (sig == 2)
 	{
-		//punkt wierzchołka palca
-		tempPoint.x = rotPoint.x + 0.5 * s3;
-		tempPoint.y = rotPoint.y;
-		z.push_back(rot(tempPoint, - angle, charPoint[0]));
-
-		//punkt miedzypalcowy
-		tempPoint.x = rotPoint.x + s3;
-		tempPoint.y = rotPoint.y + s4;
-		z.push_back(rot(tempPoint, - angle, charPoint[0]));
+		cout<<"angle "<<angle<<"\n";
+		tempPoint.x = s1 +  0.5 * s3 * cos(angle);
+		tempPoint.y = s2 -  0.5 * s3 * sin(angle);
+		z.push_back(tempPoint);
 	}
-	else if (sig == 2)
+	if (sig == 3)
 	{
-		tempPoint.x = rotPoint.x + 0.5 * s3;
-		tempPoint.y = rotPoint.y;
-		z.push_back(rot(tempPoint, - angle, charPoint[0]));
-	}
-	else if (sig == 3)
-	{
-		//punkt miedzypalcowy
-		tempPoint.x = rotPoint.x;
-		tempPoint.y = rotPoint.y + s4;
-		z.push_back(rot(tempPoint, - angle, charPoint[0]));
+		cout<<"angle "<<angle<<"\n";
+		tempPoint.x = s1 + s4 * sin(angle);
+		tempPoint.y = s2 + s4 * cos(angle);
+		z.push_back(tempPoint);
 
-		//punkt wierzchołka palca
-		tempPoint.x = rotPoint.x + 0.5 * s3;
-		tempPoint.y = rotPoint.y;
-		z.push_back(rot(tempPoint, - angle, charPoint[0]));
-	}*/
+		tempPoint.x = s1 +  0.5 * s3 * cos(angle);
+		tempPoint.y = s2 -  0.5 * s3 * sin(angle);
+		z.push_back(tempPoint);
+	}
 }
 
 void KW_MAP::stateToCharPoint()
@@ -485,9 +465,9 @@ void KW_MAP::stateToCharPoint()
 	//punkty środkowego palca
 	stateToFinger(state[14], state[15], state[16], state[17], state[18],1);
 	//punkty czwartego palca od lewej
-	stateToFinger(state[19], state[20], state[21], state[22], state[23],1);
+	stateToFinger(state[19], state[20], state[21], state[22], state[23],2);
 	//punkty kciuka
-	stateToFinger(state[24], state[25], state[26], state[27], state[28],1);
+	stateToFinger(state[24], state[25], state[26], state[27], state[28],3);
 
 	drawcont.add(new Types::Ellipse(Point2f(z[0].x, z[0].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[1].x, z[1].y), Size2f(14,14)));
@@ -496,10 +476,11 @@ void KW_MAP::stateToCharPoint()
 	drawcont.add(new Types::Ellipse(Point2f(z[4].x, z[4].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[5].x, z[5].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[6].x, z[6].y), Size2f(14,14)));
-/*	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[8].x, z[8].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[9].x, z[9].y), Size2f(14,14)));
-*/
+
+
 }
 
 void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, double d, double e, int sig)
