@@ -15,6 +15,7 @@
 #include "Types/Line.hpp"
 #include "Types/Rectangle.hpp"
 #include <vector>
+#include <iomanip>
 
 namespace Processors {
 namespace KW_MAP {
@@ -466,6 +467,42 @@ void KW_MAP::stateToCharPoint()
 
 }
 
+void KW_MAP::derivatives1(int indexR, int indexC, double a, double b, double c, double d, double e)
+{
+	double cosE = cos(e);
+	double sinE = sin(e);
+	int x = charPoint[0].x;
+	int y = charPoint[0].y;
+
+	//cos(-e)
+//	double cos_E = cos(-e);
+	//sin(-e)
+//	double sin_E = sin(-e);
+
+	H[indexR][indexC] = 1;
+	H[indexR + 2][indexC] = 0.5 * cosE;
+	H[indexR + 4][indexC] = cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * ((b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (0.5 * c + (a - x) * cosE - (b - y) * sinE);
+
+	indexC +=1;
+	H[indexR + 1][indexC] = 1;
+	H[indexR + 2][indexC] = -0.5 * sinE;
+	H[indexR + 4][indexC] = sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE *((b - y) * cosE + (a - x) * sinE) + cosE *((a - x) * cosE - (b - y) * sinE) - cosE * (0.5* c + (a - x) * cosE - (b - y) * sinE);
+
+	indexC +=1;
+	H[indexR ][indexC] = 1;
+	H[indexR + 2][indexC] = cosE;
+	H[indexR + 3][indexC] = sinE;
+	H[indexR + 4][indexC] = cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * (d + (b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (c + (a - x) * cosE - (b - y) * sinE);
+
+	indexC +=1;
+	H[indexR + 1][indexC] = 1;
+	H[indexR + 2][indexC] = -sinE;
+	H[indexR + 3][indexC] = cosE;
+	H[indexR + 4][indexC] = -sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE * (d + (b - y)  * cosE + (a - x) * sinE) + cosE * ((a - x) * cosE - (b - y) * sinE) - cosE * (c + (a - x) * cosE - (b - y) * sinE);
+
+}
+
+
 void KW_MAP::calculateH()
 {
 	for(int i = 0; i < 29; i++)
@@ -473,7 +510,23 @@ void KW_MAP::calculateH()
 		for(int j = 0; j < 20; j++)
 		{
 			H[i][j]=0;
-			cout << H[i][j]<<" ";
+		}
+		cout<<"\n";
+	}
+	H[0][0] = 1;
+	H[2][0] = 0.5;
+	H[1][1] = 1;
+	H[3][1] = 1;
+
+	derivatives1(4,2, state[5], state[6], state[7], state[8], state[9]);
+	derivatives1(9,6, state[10], state[11], state[12], state[13], state[14]);
+	derivatives1(14,10, state[15], state[16], state[17], state[18], state[19]);
+
+	for(int i = 0; i < 29; i++)
+	{
+		for(int j = 0; j < 20; j++)
+		{
+			cout << setprecision(3)<<H[i][j]<<"\t";
 		}
 		cout<<"\n";
 	}
