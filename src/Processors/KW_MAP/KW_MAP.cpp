@@ -305,6 +305,9 @@ void KW_MAP::getCharPoints() {
 		drawcont.add(new Types::Ellipse(Point2f(charPoint[4].x, charPoint[4].y), Size2f(10,10)));
 		drawcont.add(new Types::Ellipse(Point2f(charPoint[5].x, charPoint[5].y), Size2f(10,10)));
 		drawcont.add(new Types::Ellipse(Point2f(charPoint[6].x, charPoint[6].y), Size2f(10,10)));
+		drawcont.add(new Types::Ellipse(Point2f(charPoint[7].x, charPoint[7].y), Size2f(10,10)));
+		drawcont.add(new Types::Ellipse(Point2f(charPoint[8].x, charPoint[8].y), Size2f(10,10)));
+		drawcont.add(new Types::Ellipse(Point2f(charPoint[9].x, charPoint[9].y), Size2f(10,10)));
 
 		result.AddBlob(blobs.GetBlob(id));
 		out_signs.write(result);
@@ -417,13 +420,17 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double an
 
 	if (sig == 1)
 	{
-		tempPoint.x = s1 + 0.5*s3*cos(angle);
-		tempPoint.y = s2 - 0.5*s3*sin(angle);
-		z.push_back(tempPoint);
+		if (angle > 0)
+		{
+			cout<<"angle "<<angle<<"\n";
+			tempPoint.x = s1 + 0.5 * s3 * cos(angle);
+			tempPoint.y = s2 - 0.5 * s3 * sin(angle);
+			z.push_back(tempPoint);
 
-		tempPoint.x = s1 + s3 * cos(angle) + s4 * sin(angle);
-		tempPoint.y = s2 - s3 * sin(angle) + s4 * cos(angle);
-		z.push_back(tempPoint);
+			tempPoint.x = s1 + s3 * cos(angle) + s4 * sin(angle);
+			tempPoint.y = s2 - s3 * sin(angle) + s4 * cos(angle);
+			z.push_back(tempPoint);
+		}
 
 	}
 
@@ -474,22 +481,22 @@ void KW_MAP::stateToCharPoint()
 	//punkty pierwszego palca od lewej
 	stateToFinger(state[4], state[5], state[6], state[7], state[8],1);
 	//punkty drugiego palca od lewej
-//	stateToFinger(state[9], state[10], state[11], state[12], state[13],1);
+	stateToFinger(state[9], state[10], state[11], state[12], state[13],1);
 	//punkty środkowego palca
-//	stateToFinger(state[14], state[15], state[16], state[17], state[18],1);
+	stateToFinger(state[14], state[15], state[16], state[17], state[18],1);
 	//punkty czwartego palca od lewej
-//	stateToFinger(state[19], state[20], state[21], state[22], state[23],2);
+	stateToFinger(state[19], state[20], state[21], state[22], state[23],1);
 	//punkty kciuka
-//	stateToFinger(state[24], state[25], state[26], state[27], state[28],3);
+	stateToFinger(state[24], state[25], state[26], state[27], state[28],1);
 
 	drawcont.add(new Types::Ellipse(Point2f(z[0].x, z[0].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[1].x, z[1].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[2].x, z[2].y), Size2f(14,14)));
-/*	drawcont.add(new Types::Ellipse(Point2f(z[3].x, z[3].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[3].x, z[3].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[4].x, z[4].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[5].x, z[5].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[6].x, z[6].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(14,14)));
+/*	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[8].x, z[8].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[9].x, z[9].y), Size2f(14,14)));
 */
