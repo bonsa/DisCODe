@@ -479,32 +479,46 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, d
 	//sin(-e)
 //	double sin_E = sin(-e);
 
-	if ((sig == 1)||(sig == 2))
+
+	if (sig==3)
 	{
 		H[indexR][indexC] = 1;
-		H[indexR + 2][indexC] = 0.5 * cosE;
-		H[indexR + 4][indexC] = cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * ((b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (0.5 * c + (a - x) * cosE - (b - y) * sinE);
+		H[indexR + 3][indexC] = sinE;
+		H[indexR + 4][indexC] = cosE * (-(b - y) * cosE  - (a - x) * sinE) + cosE * (d + (b - y) * cosE  + (a - x) * sinE);
 
 		indexC +=1;
 		H[indexR + 1][indexC] = 1;
-		H[indexR + 2][indexC] = -0.5 * sinE;
-		H[indexR + 4][indexC] = sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE *((b - y) * cosE + (a - x) * sinE) + cosE *((a - x) * cosE - (b - y) * sinE) - cosE * (0.5* c + (a - x) * cosE - (b - y) * sinE);
+		H[indexR + 3][indexC] = cosE;
+		H[indexR + 4][indexC] = -sinE *(-(b - y) * cosE - (a - x) * sinE) -	sinE * (d + (b - y) * cosE  + (a - x) * sinE);
 
-		if(sig == 1)
-		{
-			indexC +=1;
-			H[indexR ][indexC] = 1;
-			H[indexR + 2][indexC] = cosE;
-			H[indexR + 3][indexC] = sinE;
-			H[indexR + 4][indexC] = cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * (d + (b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (c + (a - x) * cosE - (b - y) * sinE);
-
-			indexC +=1;
-			H[indexR + 1][indexC] = 1;
-			H[indexR + 2][indexC] = -sinE;
-			H[indexR + 3][indexC] = cosE;
-			H[indexR + 4][indexC] = -sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE * (d + (b - y)  * cosE + (a - x) * sinE) + cosE * ((a - x) * cosE - (b - y) * sinE) - cosE * (c + (a - x) * cosE - (b - y) * sinE);
-		}
+		//przechodze do nastepnej kolumny
+		indexC +=1;
 	}
+
+	H[indexR][indexC] = 1;
+	H[indexR + 2][indexC] = 0.5 * cosE;
+	H[indexR + 4][indexC] = cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * ((b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (0.5 * c + (a - x) * cosE - (b - y) * sinE);
+
+	indexC +=1;
+	H[indexR + 1][indexC] = 1;
+	H[indexR + 2][indexC] = -0.5 * sinE;
+	H[indexR + 4][indexC] = sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE *((b - y) * cosE + (a - x) * sinE) + cosE *((a - x) * cosE - (b - y) * sinE) - cosE * (0.5* c + (a - x) * cosE - (b - y) * sinE);
+
+	if(sig == 1)
+	{
+		indexC +=1;
+		H[indexR ][indexC] = 1;
+		H[indexR + 2][indexC] = cosE;
+		H[indexR + 3][indexC] = sinE;
+		H[indexR + 4][indexC] = cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * (d + (b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (c + (a - x) * cosE - (b - y) * sinE);
+
+		indexC +=1;
+		H[indexR + 1][indexC] = 1;
+		H[indexR + 2][indexC] = -sinE;
+		H[indexR + 3][indexC] = cosE;
+		H[indexR + 4][indexC] = -sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE * (d + (b - y)  * cosE + (a - x) * sinE) + cosE * ((a - x) * cosE - (b - y) * sinE) - cosE * (c + (a - x) * cosE - (b - y) * sinE);
+	}
+
 
 }
 
@@ -524,10 +538,12 @@ void KW_MAP::calculateH()
 	H[1][1] = 1;
 	H[3][1] = 1;
 
-	derivatives(4,2, state[5], state[6], state[7], state[8], state[9],1);
-	derivatives(9,6, state[10], state[11], state[12], state[13], state[14],1);
-	derivatives(14,10, state[15], state[16], state[17], state[18], state[19],1);
-	derivatives(19,14, state[20], state[21], state[22], state[23], state[24],2);
+	cout<<state.size()<<"\n";
+	derivatives(4,2, state[4], state[5], state[6], state[7], state[8],1);
+	derivatives(9,6, state[9], state[10], state[11], state[12], state[13],1);
+	derivatives(14,10,state[14], state[15], state[16], state[17], state[18],1);
+	derivatives(19,14,state[19], state[20], state[21], state[22], state[23],2);
+	derivatives(24,16,state[24], state[25], state[26], state[27], state[28],3);
 
 	for(int i = 0; i < 29; i++)
 	{
