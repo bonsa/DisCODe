@@ -85,8 +85,8 @@ bool KW_MAP::onStep() {
 
 			// s --> z
 			stateToCharPoint();
-		//	calculateDiff();
-		//	updateState();
+			calculateDiff();
+			updateState();
 		//}
 
 		out_draw.write(drawcont);
@@ -487,54 +487,47 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, d
 {
 	double cosE = cos(e);
 	double sinE = sin(e);
-	int x = charPoint[0].x;
-	int y = charPoint[0].y;
 
-	//cos(-e)
-//	double cos_E = cos(-e);
-	//sin(-e)
-//	double sin_E = sin(-e);
-
-
-	if (sig==3)
+	if(sig==3)
 	{
+
 		H[indexR][indexC] = 1;
 		H[indexR + 3][indexC] = sinE;
-		H[indexR + 4][indexC] = 0;//cosE * (-(b - y) * cosE  - (a - x) * sinE) + cosE * (d + (b - y) * cosE  + (a - x) * sinE);
+		H[indexR + 4][indexC] = d * cosE;
 
-		indexC +=1;
+		indexC += 1;
 		H[indexR + 1][indexC] = 1;
 		H[indexR + 3][indexC] = cosE;
-		H[indexR + 4][indexC] = 0;//-sinE *(-(b - y) * cosE - (a - x) * sinE) -	sinE * (d + (b - y) * cosE  + (a - x) * sinE);
+		H[indexR + 4][indexC] = - d * sinE;
 
-		//przechodze do nastepnej kolumny
-		indexC +=1;
+		indexC += 1;
+
 	}
 
 	H[indexR][indexC] = 1;
 	H[indexR + 2][indexC] = 0.5 * cosE;
-	H[indexR + 4][indexC] = 0;//cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * ((b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (0.5 * c + (a - x) * cosE - (b - y) * sinE);
+	H[indexR + 4][indexC] = -0.5 * c * sinE;
 
-	indexC +=1;
+	indexC += 1;
 	H[indexR + 1][indexC] = 1;
 	H[indexR + 2][indexC] = -0.5 * sinE;
-	H[indexR + 4][indexC] = 0;//sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE *((b - y) * cosE + (a - x) * sinE) + cosE *((a - x) * cosE - (b - y) * sinE) - cosE * (0.5* c + (a - x) * cosE - (b - y) * sinE);
+	H[indexR + 4][indexC] = -0.5 * c * cosE;
 
 	if(sig == 1)
 	{
-		indexC +=1;
-		H[indexR ][indexC] = 1;
+		indexC += 1;
+		H[indexR][indexC] = 1;
 		H[indexR + 2][indexC] = cosE;
 		H[indexR + 3][indexC] = sinE;
-		H[indexR + 4][indexC] = 0;//cosE * (-(b - y) * cosE - (a - x) * sinE) + cosE * (d + (b - y) * cosE + (a - x) * sinE) + sinE * ((a - x) * cosE - (b - y) * sinE) - sinE * (c + (a - x) * cosE - (b - y) * sinE);
+		H[indexR + 4][indexC] = - c * sinE + d * cosE;
 
-		indexC +=1;
+		indexC += 1;
 		H[indexR + 1][indexC] = 1;
-		H[indexR + 2][indexC] = -sinE;
+		H[indexR + 2][indexC] = - sinE;
 		H[indexR + 3][indexC] = cosE;
-		H[indexR + 4][indexC] = 0;//-sinE * (-(b - y) * cosE - (a - x) * sinE) - sinE * (d + (b - y)  * cosE + (a - x) * sinE) + cosE * ((a - x) * cosE - (b - y) * sinE) - cosE * (c + (a - x) * cosE - (b - y) * sinE);
-	}
+		H[indexR + 4][indexC] = - c * cosE - d * sinE;
 
+	}
 
 }
 
