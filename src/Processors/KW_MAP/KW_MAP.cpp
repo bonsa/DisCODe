@@ -48,7 +48,7 @@ bool KW_MAP::onInit() {
 	registerStream("out_signs", &out_signs);
 	registerStream("out_draw", &out_draw);
 
-	learnRate = 0.1;
+	learnRate = 0.01;
 	first = true;
 
 	return true;
@@ -70,24 +70,27 @@ bool KW_MAP::onStep() {
 		z.clear();
 		charPoint.clear();
 		diff.clear();
-		state.clear();
+		//state.clear();
 
 		getCharPoints();
 
-	//	if(first == true)
-	//	{
+		if(first == true)
+		{
+			cout<<first<<"!!!!!!!!!!!!!!!!!!!!\n";
 			 // z --> s, z pomiarów oblicza stan
 			charPointsToState();
-	//		first = false;
-	//	}
-	//	else
-	//	{
+			first = false;
+		}
+		else
+		{
+			cout<<first<<"lalalallalalallalal!!!!!!!!!!!!!!!!!!\n";
+			cout<<"jestem tulalalallalalallalal!!!!!!!!!!!!!!!!!!\n";
 
 			// s --> z
 			stateToCharPoint();
 			calculateDiff();
 			updateState();
-		//}
+		}
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -420,7 +423,6 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double an
 
 	if (sig == 1)
 	{
-		cout<<"angle "<<angle<<"\n";
 		tempPoint.x = s1 + 0.5 * s3 * cos(angle);
 		tempPoint.y = s2 - 0.5 * s3 * sin(angle);
 		z.push_back(tempPoint);
@@ -431,14 +433,12 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double an
 	}
 	if (sig == 2)
 	{
-		cout<<"angle "<<angle<<"\n";
 		tempPoint.x = s1 +  0.5 * s3 * cos(angle);
 		tempPoint.y = s2 -  0.5 * s3 * sin(angle);
 		z.push_back(tempPoint);
 	}
 	if (sig == 3)
 	{
-		cout<<"angle "<<angle<<"\n";
 		tempPoint.x = s1 + s4 * sin(angle);
 		tempPoint.y = s2 + s4 * cos(angle);
 		z.push_back(tempPoint);
@@ -478,7 +478,7 @@ void KW_MAP::stateToCharPoint()
 	drawcont.add(new Types::Ellipse(Point2f(z[6].x, z[6].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(14,14)));
 	drawcont.add(new Types::Ellipse(Point2f(z[8].x, z[8].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[9].x, z[9].y), Size2f(14,14)));
+	drawcont.add(new Types::Ellipse(Point2f(z[9].x, z[9].y), Size2f(23,23)));
 
 
 }
@@ -540,7 +540,7 @@ void KW_MAP::calculateH()
 		{
 			H[i][j]=0;
 		}
-		cout<<"\n";
+		//cout<<"\n";
 	}
 	H[0][0] = 1;
 	H[2][0] = 0.5;
@@ -557,9 +557,9 @@ void KW_MAP::calculateH()
 	{
 		for(int j = 0; j < 20; j++)
 		{
-			cout << setprecision(3)<<H[i][j]<<"\t";
+			//cout << setprecision(3)<<H[i][j]<<"\t";
 		}
-		cout<<"\n";
+		//cout<<"\n";
 	}
 }
 
@@ -567,6 +567,7 @@ void KW_MAP::calculateDiff()
 {
 	LOG(LTRACE) << "KW_MAP::calculateDiff\n";
 
+	cout<<"KW_MAP::calculateDiff\n";
 	//różnica
 	double D[20];
 	double error = 0;
@@ -575,9 +576,9 @@ void KW_MAP::calculateDiff()
     for (unsigned int i = 0 ; i < z.size() * 2; i = i + 2)
     {
         D[i] = charPoint[j].x - z[j].x;
-        cout<<"D:"<< D[i]<<"\n";
+   //     cout<<"D:"<< D[i]<<"\n";
         D[i + 1] = charPoint[j].y - z[j].y;
-        cout<<"D:"<< D[i + 1]<<"\n";
+   //     cout<<"D:"<< D[i + 1]<<"\n";
         j += 1;
     }
 
@@ -599,16 +600,18 @@ void KW_MAP::calculateDiff()
         t[i] *= learnRate;
         //obliczony blad
         error += abs(t[i]);
-    cout<<t[i]<<"\n";
+ //   cout<<t[i]<<"\n";
     diff.push_back(t[i]);
     }
 }
 
 void KW_MAP::updateState()
  {
+	cout<<"KW_MAP::updateState\n";
      for (unsigned int i = 0; i < state.size(); i++)
      {
          state[i] = state[i] - diff[i];
+         cout<<"nowy state"<<state[i]<<"\n";
      }
  }
 
