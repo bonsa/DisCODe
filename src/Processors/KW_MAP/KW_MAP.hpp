@@ -195,6 +195,12 @@ private:
 	// wektor stanu dłoni
 	vector<double> state;
 
+	// średni wektor stanu
+	double pMean[29];
+
+	// ile
+	int ileObrazkow;
+
 	//macierz H
 	double H[29][20];
 

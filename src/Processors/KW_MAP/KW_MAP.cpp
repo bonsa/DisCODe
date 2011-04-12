@@ -25,6 +25,7 @@ using namespace cv;
 KW_MAP::KW_MAP(const std::string & name) :
 	Base::Component(name) {
 	LOG(LTRACE) << "Hello KW_MAP\n";
+	ileObrazkow = 0;
 }
 
 KW_MAP::~KW_MAP() {
@@ -49,6 +50,13 @@ bool KW_MAP::onInit() {
 	registerStream("out_draw", &out_draw);
 
 	learnRate = 0.01;
+/*
+	for( int i = 0; i < 29; i++)
+	{
+		pMean[i] = 0;
+		cout<<pMean[i]<<"\n";
+	}
+*/
 	first = true;
 
 	return true;
@@ -57,6 +65,12 @@ bool KW_MAP::onInit() {
 bool KW_MAP::onFinish() {
 	LOG(LTRACE) << "KW_MAP::finish\n";
 
+/*	for (unsigned int i = 0; i < state.size(); i++)
+    {
+		pMean[i] = pMean[i]/ileObrazkow;
+        cout<<pMean[i]<<"\n";
+    }
+*/
 	return true;
 }
 
@@ -65,7 +79,11 @@ bool KW_MAP::onStep() {
 
 	blobs_ready = img_ready = false;
 
+
 	try {
+		//ileObrazkow = ileObrazkow + 1;
+		//cout<<"ilosc obrazkow"<<ileObrazkow<<"\n" ;
+
 		drawcont.clear();
 		z.clear();
 		charPoint.clear();
@@ -348,6 +366,14 @@ void KW_MAP::charPointsToState() {
 	fingerToState(charPoint[5], charPoint[6], 1);
 	fingerToState(charPoint[7], charPoint[6], -1);
 	fingerToState(charPoint[9], charPoint[8], -1);
+/*
+	for(unsigned int i = 0; i < state.size(); i++)
+	{
+		pMean[i] += state[i];
+		//cout<<pMean[i]<<"\n";
+	}
+
+*/
 }
 
 cv::Point KW_MAP::rot(cv::Point p, double angle, cv::Point p0) {
@@ -404,6 +430,7 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	//wysokosc
 	state.push_back(height);
 	state.push_back(-angle);
+
 
 
 //	drawcont.add(new Types::Line(cv::Point(statePoint.x, statePoint.y), cv::Point(statePoint2.x, statePoint2.y)));
@@ -494,12 +521,14 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, d
 
 		H[indexR][indexC] = 1;
 		H[indexR + 3][indexC] = sinE;
-		H[indexR + 4][indexC] = d * cosE;
+		H[indexR + 4][indexC] = cosE;
+	//	H[indexR + 4][indexC] = d * cosE;
 
 		indexC += 1;
 		H[indexR + 1][indexC] = 1;
 		H[indexR + 3][indexC] = cosE;
-		H[indexR + 4][indexC] = - d * sinE;
+		H[indexR + 4][indexC] = - sinE;
+	//	H[indexR + 4][indexC] = - d * sinE;
 
 		indexC += 1;
 
@@ -507,12 +536,14 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, d
 
 	H[indexR][indexC] = 1;
 	H[indexR + 2][indexC] = 0.5 * cosE;
-	H[indexR + 4][indexC] = -0.5 * c * sinE;
+	H[indexR + 4][indexC] = -0.5 * sinE;
+	//H[indexR + 4][indexC] = -0.5 * c * sinE;
 
 	indexC += 1;
 	H[indexR + 1][indexC] = 1;
 	H[indexR + 2][indexC] = -0.5 * sinE;
-	H[indexR + 4][indexC] = -0.5 * c * cosE;
+	//H[indexR + 4][indexC] = -0.5 * c * cosE;
+	H[indexR + 4][indexC] = -0.5 * cosE;
 
 	if(sig == 1)
 	{
@@ -520,13 +551,16 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, d
 		H[indexR][indexC] = 1;
 		H[indexR + 2][indexC] = cosE;
 		H[indexR + 3][indexC] = sinE;
-		H[indexR + 4][indexC] = - c * sinE + d * cosE;
+		H[indexR + 4][indexC] = - sinE + cosE;
+	//	H[indexR + 4][indexC] = - c * sinE + d * cosE;
+
 
 		indexC += 1;
 		H[indexR + 1][indexC] = 1;
 		H[indexR + 2][indexC] = - sinE;
 		H[indexR + 3][indexC] = cosE;
-		H[indexR + 4][indexC] = - c * cosE - d * sinE;
+		H[indexR + 4][indexC] = - cosE - sinE;
+	//	H[indexR + 4][indexC] = - c * cosE - d * sinE;
 
 	}
 
@@ -576,9 +610,9 @@ void KW_MAP::calculateDiff()
 
     for (unsigned int i = 0 ; i < z.size() * 2; i = i + 2)
     {
-        D[i] = z[j].x - charPoint[j].x ;
+        D[i] = - z[j].x + charPoint[j].x ;
    //     cout<<"D:"<< D[i]<<"\n";
-        D[i + 1] = z[j].y - charPoint[j].y;
+        D[i + 1] = - z[j].y + charPoint[j].y;
    //     cout<<"D:"<< D[i + 1]<<"\n";
         j += 1;
     }
@@ -603,7 +637,7 @@ void KW_MAP::calculateDiff()
         //obliczony blad
         error += abs(t[i]);
         cout<<"t "<<t[i]<<"\n";
-    diff.push_back(t[i]);
+        diff.push_back(t[i]);
     }
 }
 
@@ -611,14 +645,10 @@ void KW_MAP::updateState()
  {
 	cout<<"KW_MAP::updateState\n";
 
-	diff[8] = 0;
-	diff[13] = 0;
-	diff[18] = 0;
-	diff[23] = 0;
-	diff[28] = 0;
 
      for (unsigned int i = 0; i < state.size(); i++)
      {
+
          state[i] = state[i] + diff[i];
        //  cout<<"nowy state"<<state[i]<<"\n";
      }
