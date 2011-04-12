@@ -79,6 +79,7 @@ bool KW_MAP::onStep() {
 			cout<<first<<"!!!!!!!!!!!!!!!!!!!!\n";
 			 // z --> s, z pomiarów oblicza stan
 			charPointsToState();
+			stateToCharPoint();
 			first = false;
 		}
 		else
@@ -469,16 +470,16 @@ void KW_MAP::stateToCharPoint()
 	//punkty kciuka
 	stateToFinger(state[24], state[25], state[26], state[27], state[28],3);
 
-	drawcont.add(new Types::Ellipse(Point2f(z[0].x, z[0].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[1].x, z[1].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[2].x, z[2].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[3].x, z[3].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[4].x, z[4].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[5].x, z[5].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[6].x, z[6].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[8].x, z[8].y), Size2f(14,14)));
-	drawcont.add(new Types::Ellipse(Point2f(z[9].x, z[9].y), Size2f(23,23)));
+	drawcont.add(new Types::Ellipse(Point2f(z[0].x, z[0].y), Size2f(20,20)));
+	drawcont.add(new Types::Ellipse(Point2f(z[1].x, z[1].y), Size2f(20,20)));
+	drawcont.add(new Types::Ellipse(Point2f(z[2].x, z[2].y), Size2f(20,20)));
+	drawcont.add(new Types::Ellipse(Point2f(z[3].x, z[3].y), Size2f(20,20)));
+	drawcont.add(new Types::Ellipse(Point2f(z[4].x, z[4].y), Size2f(20,20)));
+	drawcont.add(new Types::Ellipse(Point2f(z[5].x, z[5].y), Size2f(20,20)));
+	drawcont.add(new Types::Ellipse(Point2f(z[6].x, z[6].y), Size2f(20,20)));
+	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(20,20)));
+	drawcont.add(new Types::Ellipse(Point2f(z[8].x, z[8].y), Size2f(20,20)));
+	drawcont.add(new Types::Ellipse(Point2f(z[9].x, z[9].y), Size2f(20,20)));
 
 
 }
@@ -575,9 +576,9 @@ void KW_MAP::calculateDiff()
 
     for (unsigned int i = 0 ; i < z.size() * 2; i = i + 2)
     {
-        D[i] = charPoint[j].x - z[j].x;
+        D[i] = z[j].x - charPoint[j].x ;
    //     cout<<"D:"<< D[i]<<"\n";
-        D[i + 1] = charPoint[j].y - z[j].y;
+        D[i + 1] = z[j].y - charPoint[j].y;
    //     cout<<"D:"<< D[i + 1]<<"\n";
         j += 1;
     }
@@ -595,12 +596,13 @@ void KW_MAP::calculateDiff()
             t[i] += H[i][j] * D[j];
 
         }
-        cout << "\n";
+       // cout << "\n";
         //wspolczynnik zapominania
+        learnRate = 0.01;
         t[i] *= learnRate;
         //obliczony blad
         error += abs(t[i]);
- //   cout<<t[i]<<"\n";
+        cout<<"t "<<t[i]<<"\n";
     diff.push_back(t[i]);
     }
 }
@@ -608,10 +610,17 @@ void KW_MAP::calculateDiff()
 void KW_MAP::updateState()
  {
 	cout<<"KW_MAP::updateState\n";
+
+	diff[8] = 0;
+	diff[13] = 0;
+	diff[18] = 0;
+	diff[23] = 0;
+	diff[28] = 0;
+
      for (unsigned int i = 0; i < state.size(); i++)
      {
-         state[i] = state[i] - diff[i];
-         cout<<"nowy state"<<state[i]<<"\n";
+         state[i] = state[i] + diff[i];
+       //  cout<<"nowy state"<<state[i]<<"\n";
      }
  }
 
