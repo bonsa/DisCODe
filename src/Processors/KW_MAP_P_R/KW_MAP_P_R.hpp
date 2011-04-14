@@ -124,6 +124,16 @@ protected:
 	Base::EventHandler <KW_MAP_P_R> h_onNewBlobs;
 
 
+	/*!
+	 * Event handler function.
+	 */
+	void calculate();
+
+	/// Event handler.
+	/// New image is waiting
+	Base::EventHandler <KW_MAP_P_R> h_calculate;
+
+
 	/// Input blobs
 	Base::DataStreamIn <Types::Blobs::BlobResult> in_blobs;
 
@@ -159,15 +169,6 @@ protected:
 
 	void stateToFinger(double s1, double s2, double s3, double s4, double angle, int sig);
 
-	void stateToCharPoint();
-
-	void derivatives(int indexR, int indexC, double a, double b, double c, double d, double e, int sig);
-
-	void calculateH();
-
-	void calculateDiff();
-
-	void updateState();
 
 private:
 
@@ -201,17 +202,29 @@ private:
 	//macierz przechowująca parametry stanu dla kilku obrazków
 	double nStates[29][18];
 
+	//średni wektor parametrów stanu
+	vector<double> meanStates;
+
 	// średni wektor obserwacji
 	int rMean[20];
 
 	//macierz przechowująca punkty char dla kilku obrazków
 	int nChar[20][18];
 
-	// ile
+	//średni wektor punktów charakterystycznych
+	vector<int> meanChar;
+
+	// ile obrazków w sekwencji juz task podbrał
 	int ileObrazkow;
 
 	//macierz H
 	double H[29][20];
+
+	//macierz kowariancji P
+	double P[29][29];
+
+	//macierz kowariancji R
+	double R[20][20];
 
 	double learnRate;
 

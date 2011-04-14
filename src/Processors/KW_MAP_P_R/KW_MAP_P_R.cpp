@@ -41,6 +41,9 @@ bool KW_MAP_P_R::onInit() {
 	h_onNewBlobs.setup(this, &KW_MAP_P_R::onNewBlobs);
 	registerHandler("onNewBlobs", &h_onNewBlobs);
 
+	h_calculate.setup(this, &KW_MAP_P_R::calculate);
+	registerHandler("calculate", &h_calculate);
+
 	registerStream("in_blobs", &in_blobs);
 	registerStream("in_img", &in_img);
 
@@ -87,7 +90,7 @@ bool KW_MAP_P_R::onFinish() {
     {
 		for(unsigned int j = 0; j <18; j++)
 		{
-			cout<<"nChar["<< i <<"]["<< j <<"] ="<< rMean[i] <<"\n";
+			cout<<"nChar["<< i <<"]["<< j <<"] ="<< nChar[i][j] <<"\n";
 		}
     }
 
@@ -95,7 +98,7 @@ bool KW_MAP_P_R::onFinish() {
     {
 		for(unsigned int j = 0; j <18; j++)
 		{
-			cout<<"nStates["<< i <<"]["<< j <<"] ="<< rMean[i] <<"\n";
+			cout<<"nStates["<< i <<"]["<< j <<"] ="<< nStates[i][j] <<"\n";
 		}
     }
 	return true;
@@ -410,8 +413,8 @@ void KW_MAP_P_R::charPointsToState() {
 		rMean[j+1] += charPoint[i].y;
 		cout<<rMean[j]<<"\n";
 		cout<<rMean[j+1]<<"\n";
-		nStates[j][ileObrazkow-1] =  charPoint[i].x;
-		nStates[j+1][ileObrazkow-1] =  charPoint[i].y;
+		nChar[j][ileObrazkow-1] =  charPoint[i].x;
+		nChar[j+1][ileObrazkow-1] =  charPoint[i].y;
 		j = j + 2;
 		cout << "charPoint size: " << charPoint.size() << endl;
 	}
@@ -419,7 +422,7 @@ void KW_MAP_P_R::charPointsToState() {
 	for(unsigned int i = 0; i < state.size(); i++)
 	{
 		pMean[i] += state[i];
-		nChar[i][ileObrazkow-1] =  state[i];
+		nStates[i][ileObrazkow-1] =  state[i];
 	//	cout<<pMean[i]<<"\n";
 		cout << "State size: " << state.size() << endl;
 	}
@@ -489,7 +492,58 @@ void KW_MAP_P_R::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 //	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y), cv::Point(statePoint.x, statePoint.y)));
 }
 
+void KW_MAP_P_R::calculate()
+{
+	cout<<"MAMAMA!\n";
+	for(unsigned i = 0; i < state.size(); i++)
+	{
+		meanStates.push_back(pMean[i]/ileObrazkow);
+	}
 
+	for(unsigned i = 0; i < charPoint.size(); i++)
+	{
+		meanChar.push_back(rMean[i]/ileObrazkow);
+	}
+
+	for(int i = 0; i<29; i++)
+	{
+	  for(int j = i; j<29 ; j++)
+	  {
+		  P[i][j] = 0;
+		  for(int k = 0; k < ileObrazkow; k++)
+		  {
+			  P[i][j] += (nStates[i][k]-meanStates[i])*(nStates[j][k]-meanStates[j]);
+		  }
+
+		  P[i][j] /= (ileObrazkow - 1);
+
+		  if (i!=j)
+			  P[j][i] = P[i][j];
+		  	  cout<<"P["<<j<<"]["<<i<<"]="<<P[j][i];
+	  }
+	  cout<<"\n";
+	}
+
+
+	for(int i = 0; i<20; i++)
+	{
+	  for(int j = i; j<20 ; j++)
+	  {
+		  R[i][j] = 0;
+		  for(int k = 0; k < ileObrazkow; k++)
+		  {
+			  R[i][j] += (nChar[i][k]-meanChar[i])*(nChar[j][k]-meanChar[j]);
+		  }
+
+		  R[i][j] /= (ileObrazkow - 1);
+
+		  if (i!=j)
+			  R[j][i] = R[i][j];
+		  	  cout<<"R["<<j<<"]["<<i<<"]="<<P[j][i];
+	  }
+	  cout<<"\n";
+	}
+}
 
 
 }//: namespace KW_MAP_P_R
