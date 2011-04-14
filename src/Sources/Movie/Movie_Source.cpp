@@ -67,12 +67,17 @@ bool Movie_Source::onStep() {
 	LOG(LTRACE) << "Movie_Source::step() start\n";
 	cap >> frame;
 	if (frame.empty()) {
+
 		if (props.loop) {
 			//frame = 0;
 			cap.release();
 			cap.open(props.filename);
 		}
 		return false;
+
+		cap.set(CV_CAP_PROP_POS_AVI_RATIO, 0);
+		cap >> frame;
+
 	}
 
 	cv::Mat img = frame.clone();
