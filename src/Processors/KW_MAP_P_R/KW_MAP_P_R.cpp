@@ -74,13 +74,29 @@ bool KW_MAP_P_R::onFinish() {
 	for (unsigned int i = 0; i < 29; i++)
     {
 		pMean[i] = pMean[i]/ileObrazkow;
-     //   cout<<pMean[i]<<"\n";
+		//cout<<"pMean["<< i <<"] = "<< pMean[i] <<"\n";
     }
 
 	for (unsigned int i = 0; i < 20; i++)
     {
 		rMean[i] = (int)(rMean[i]/ileObrazkow);
-       cout<<rMean[i]<<"\n";
+		//cout<<"rMean["<< i <<"] = "<< rMean[i] <<"\n";
+    }
+
+	for (unsigned int i = 0; i < 20; i++)
+    {
+		for(unsigned int j = 0; j <18; j++)
+		{
+			cout<<"nChar["<< i <<"]["<< j <<"] ="<< rMean[i] <<"\n";
+		}
+    }
+
+	for (unsigned int i = 0; i < 29; i++)
+    {
+		for(unsigned int j = 0; j <18; j++)
+		{
+			cout<<"nStates["<< i <<"]["<< j <<"] ="<< rMean[i] <<"\n";
+		}
     }
 	return true;
 }
@@ -394,15 +410,18 @@ void KW_MAP_P_R::charPointsToState() {
 		rMean[j+1] += charPoint[i].y;
 		cout<<rMean[j]<<"\n";
 		cout<<rMean[j+1]<<"\n";
+		nStates[j][ileObrazkow-1] =  charPoint[i].x;
+		nStates[j+1][ileObrazkow-1] =  charPoint[i].y;
 		j = j + 2;
-	//	cout << "charPoint size: " << charPoint.size() << endl;
+		cout << "charPoint size: " << charPoint.size() << endl;
 	}
 
 	for(unsigned int i = 0; i < state.size(); i++)
 	{
 		pMean[i] += state[i];
+		nChar[i][ileObrazkow-1] =  state[i];
 	//	cout<<pMean[i]<<"\n";
-	//	cout << "State size: " << state.size() << endl;
+		cout << "State size: " << state.size() << endl;
 	}
 
 }

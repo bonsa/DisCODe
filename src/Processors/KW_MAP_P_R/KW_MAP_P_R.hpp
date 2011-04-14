@@ -198,8 +198,14 @@ private:
 	// średni wektor stanu
 	double pMean[29];
 
+	//macierz przechowująca parametry stanu dla kilku obrazków
+	double nStates[29][18];
+
 	// średni wektor obserwacji
 	int rMean[20];
+
+	//macierz przechowująca punkty char dla kilku obrazków
+	int nChar[20][18];
 
 	// ile
 	int ileObrazkow;
