@@ -320,8 +320,17 @@ void KW_MAP::getCharPoints() {
 
 		//plik <<"Punkt środka cieżkosci: "<< CenterOfGravity_x <<" "<< CenterOfGravity_y;
 
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[0].x, charPoint[0].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[1].x, charPoint[1].y), Size2f(10,10)));
+		Types::Ellipse * el;
+
+
+		el = new Types::Ellipse(Point2f(charPoint[0].x, charPoint[0].y), Size2f(10,10));
+		el->setCol(CV_RGB(255,0,0));
+		drawcont.add(el);
+
+		el = new Types::Ellipse(Point2f(charPoint[1].x, charPoint[1].y), Size2f(10,10));
+		el->setCol(CV_RGB(0,0,255));
+		drawcont.add(el);
+
 		drawcont.add(new Types::Ellipse(Point2f(charPoint[2].x, charPoint[2].y), Size2f(10,10)));
 		drawcont.add(new Types::Ellipse(Point2f(charPoint[3].x, charPoint[3].y), Size2f(10,10)));
 		drawcont.add(new Types::Ellipse(Point2f(charPoint[4].x, charPoint[4].y), Size2f(10,10)));

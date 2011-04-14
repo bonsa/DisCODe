@@ -17,6 +17,7 @@
 		
 		
 		<Window4 type="CvWindow" thread="Exec2" group="s1">
+				<colorful>false</colorful>
 
 		</Window4>
 

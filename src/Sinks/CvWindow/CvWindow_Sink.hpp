@@ -15,6 +15,7 @@
 #include "Props.hpp"
 #include "Logger.hpp"
 
+
 #include "EventHandler2.hpp"
 #include "Property.hpp"
 
@@ -88,6 +89,26 @@ namespace Sinks {
 namespace CvWindow {
 
 using namespace cv;
+struct Props: public Base::Props
+{
+	bool colorful;
+
+	/*!
+	 * \copydoc Base::Props::load
+	 */
+	void load(const ptree & pt)
+	{
+		colorful = pt.get("colorful", false);
+	}
+
+	/*!
+	 * \copydoc Base::Props::save
+	 */
+	void save(ptree & pt)
+	{
+	}
+};
+
 
 /*!
  * \class CvWindow_Sink
@@ -106,7 +127,16 @@ public:
 	 */
 	virtual ~CvWindow_Sink();
 
+	Base::Props * getProperties()
+	{
+		return &props;
+	}
+
 protected:
+
+
+	/// Properties
+	Props props;
 
 	/*!
 	 * Connects source to given device.

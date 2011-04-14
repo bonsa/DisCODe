@@ -121,7 +121,7 @@ bool CvWindow_Sink::onStart()
 }
 
 void CvWindow_Sink::onNewImageN(int n) {
-	LOG(LTRACE) << name() << "::onNewImage(" << n << ")";
+	LOG(LERROR) << name() << "::onNewImage(" << n << ")";
 
 	try {
 		if(!in_img[n]->empty()){
@@ -133,7 +133,7 @@ void CvWindow_Sink::onNewImageN(int n) {
 		}
 
 		if (to_draw[n]) {
-			to_draw[n]->draw(img[n], CV_RGB(255,0,255));
+			to_draw[n]->draw(img[n], to_draw[n]->getCol());
 			to_draw[n] = boost::shared_ptr<Types::Drawable>();
 		}
 
