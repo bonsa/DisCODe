@@ -199,17 +199,17 @@ private:
 	double pMean[29];
 
 	// średni wektor obserwacji
-	double rMean[29];
+	double rMean[20];
 
 
-	// ile
-	int ileObrazkow;
 
 	//macierz H
 	double H[29][20];
 
 	double learnRate;
 
+	// ile
+	int ileObrazkow;
 };
 
 }//: namespace KW_MAP_P_R

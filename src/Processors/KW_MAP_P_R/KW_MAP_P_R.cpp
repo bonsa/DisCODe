@@ -50,13 +50,19 @@ bool KW_MAP_P_R::onInit() {
 	registerStream("out_draw", &out_draw);
 
 	learnRate = 0.01;
-/*
+
 	for( int i = 0; i < 29; i++)
 	{
 		pMean[i] = 0;
-		cout<<pMean[i]<<"\n";
+		//cout<<pMean[i]<<"\n";
 	}
-*/
+
+	for (int i = 0; i < 20; i++)
+	{
+		rMean[i] = 0;
+		//cout<<rMean[i]<<"\n";
+	}
+
 	first = true;
 
 	return true;
@@ -65,12 +71,17 @@ bool KW_MAP_P_R::onInit() {
 bool KW_MAP_P_R::onFinish() {
 	LOG(LTRACE) << "KW_MAP_P_R::finish\n";
 
-/*	for (unsigned int i = 0; i < state.size(); i++)
+	for (unsigned int i = 0; i < 29; i++)
     {
 		pMean[i] = pMean[i]/ileObrazkow;
         cout<<pMean[i]<<"\n";
     }
-*/
+
+	for (unsigned int i = 0; i < 20; i++)
+    {
+		rMean[i] = rMean[i]/ileObrazkow;
+    //    cout<<rMean[i]<<"\n";
+    }
 	return true;
 }
 
@@ -81,35 +92,18 @@ bool KW_MAP_P_R::onStep() {
 
 
 	try {
-		//ileObrazkow = ileObrazkow + 1;
-		//cout<<"ilosc obrazkow"<<ileObrazkow<<"\n" ;
+		ileObrazkow = ileObrazkow + 1;
+		cout<<"ilosc obrazkow"<<ileObrazkow<<"\n" ;
 
 		drawcont.clear();
 		z.clear();
 		charPoint.clear();
 		diff.clear();
-		//state.clear();
+		state.clear();
 
 		getCharPoints();
-
-		if(first == true)
-		{
-			cout<<first<<"!!!!!!!!!!!!!!!!!!!!\n";
-			 // z --> s, z pomiarów oblicza stan
-			charPointsToState();
-			stateToCharPoint();
-			first = false;
-		}
-		else
-		{
-			cout<<first<<"lalalallalalallalal!!!!!!!!!!!!!!!!!!\n";
-			cout<<"jestem tulalalallalalallalal!!!!!!!!!!!!!!!!!!\n";
-
-			// s --> z
-			stateToCharPoint();
-			calculateDiff();
-			updateState();
-		}
+		 // z --> s, z pomiarów oblicza stan
+		charPointsToState();
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -375,27 +369,37 @@ void KW_MAP_P_R::charPointsToState() {
 	fingerToState(charPoint[5], charPoint[6], 1);
 	fingerToState(charPoint[7], charPoint[6], -1);
 	fingerToState(charPoint[9], charPoint[8], -1);
-/*
+
+	for(unsigned int i = 0, j = 0; i < charPoint.size(); i++)
+	{
+		rMean[j] += charPoint[i].x;
+		rMean[j+1] += charPoint[i].y;
+//		cout<<rMean[j]<<"\n";
+//		cout<<rMean[j+1]<<"\n";
+		j = j + 2;
+		cout << "charPoint size: " << charPoint.size() << endl;
+	}
+
 	for(unsigned int i = 0; i < state.size(); i++)
 	{
 		pMean[i] += state[i];
-		//cout<<pMean[i]<<"\n";
+	//	cout<<pMean[i]<<"\n";
+		cout << "State size: " << state.size() << endl;
 	}
 
-*/
 }
 
 cv::Point KW_MAP_P_R::rot(cv::Point p, double angle, cv::Point p0) {
-	cv::Point t;
-	t.x = p0.x + (int) ((double) (p.x - p0.x) * cos(angle) - (double) (p.y - p0.y) * sin(angle));
-	t.y = p0.y + (int) ((double) (p.x - p0.x) * sin(angle) + (double) (p.y - p0.y) * cos(angle));
-	return t;
-}
+		cv::Point t;
+		t.x = p0.x + (int) ((double) (p.x - p0.x) * cos(angle) - (double) (p.y - p0.y) * sin(angle));
+		t.y = p0.y + (int) ((double) (p.x - p0.x) * sin(angle) + (double) (p.y - p0.y) * cos(angle));
+		return t;
+	}
 
 //p2 - czubek palca, p1 - punkt miedzy palcami
 void KW_MAP_P_R::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 
-	LOG(LTRACE) << "KW_MAP_P_R::fingerToState\n";
+	LOG(LTRACE) << "KW_MAP::fingerToState\n";
 
 	double uj = (double) (-p2.x + charPoint[0].x) / (-p2.y + charPoint[0].y);
 	double angle = atan(uj);
@@ -447,221 +451,6 @@ void KW_MAP_P_R::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 //	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y), cv::Point(statePoint4.x, statePoint4.y)));
 //	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y), cv::Point(statePoint.x, statePoint.y)));
 }
-
-//******************************************SPRAWDŹ CZY DZIALA***********************************************
-
-//funkcja obliczajaca punkty charakterystyczne trzech lewych palców
-void KW_MAP_P_R::stateToFinger(double s1, double s2, double s3, double s4, double angle, int sig)
-{
-	LOG(LTRACE) << "KW_MAP::stateToFinger\n";
-
-	cv::Point rotPoint;
-	cv::Point tempPoint;
-
-	if (sig == 1)
-	{
-		tempPoint.x = s1 + 0.5 * s3 * cos(angle);
-		tempPoint.y = s2 - 0.5 * s3 * sin(angle);
-		z.push_back(tempPoint);
-
-		tempPoint.x = s1 + s3 * cos(angle) + s4 * sin(angle);
-		tempPoint.y = s2 - s3 * sin(angle) + s4 * cos(angle);
-		z.push_back(tempPoint);
-	}
-	if (sig == 2)
-	{
-		tempPoint.x = s1 +  0.5 * s3 * cos(angle);
-		tempPoint.y = s2 -  0.5 * s3 * sin(angle);
-		z.push_back(tempPoint);
-	}
-	if (sig == 3)
-	{
-		tempPoint.x = s1 + s4 * sin(angle);
-		tempPoint.y = s2 + s4 * cos(angle);
-		z.push_back(tempPoint);
-
-		tempPoint.x = s1 +  0.5 * s3 * cos(angle);
-		tempPoint.y = s2 -  0.5 * s3 * sin(angle);
-		z.push_back(tempPoint);
-	}
-}
-
-void KW_MAP_P_R::stateToCharPoint()
-{
-	LOG(LTRACE) << "KW_MAP_P_R::stateToCharPoint\n";
-
-	cv::Point rotPoint;
-	cv::Point tempPoint;
-	// punkt dołu dłoni
-	z.push_back(cv::Point((state[0] + 0.5*state[2]), (state[1] + state[3])));
-
-	//punkty pierwszego palca od lewej
-	stateToFinger(state[4], state[5], state[6], state[7], state[8],1);
-	//punkty drugiego palca od lewej
-	stateToFinger(state[9], state[10], state[11], state[12], state[13],1);
-	//punkty środkowego palca
-	stateToFinger(state[14], state[15], state[16], state[17], state[18],1);
-	//punkty czwartego palca od lewej
-	stateToFinger(state[19], state[20], state[21], state[22], state[23],2);
-	//punkty kciuka
-	stateToFinger(state[24], state[25], state[26], state[27], state[28],3);
-
-	drawcont.add(new Types::Ellipse(Point2f(z[0].x, z[0].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[1].x, z[1].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[2].x, z[2].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[3].x, z[3].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[4].x, z[4].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[5].x, z[5].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[6].x, z[6].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[8].x, z[8].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[9].x, z[9].y), Size2f(20,20)));
-
-
-}
-
-void KW_MAP_P_R::derivatives(int indexR, int indexC, double a, double b, double c, double d, double e, int sig)
-{
-	double cosE = cos(e);
-	double sinE = sin(e);
-
-	if(sig==3)
-	{
-
-		H[indexR][indexC] = 1;
-		H[indexR + 3][indexC] = sinE;
-		H[indexR + 4][indexC] = cosE;
-	//	H[indexR + 4][indexC] = d * cosE;
-
-		indexC += 1;
-		H[indexR + 1][indexC] = 1;
-		H[indexR + 3][indexC] = cosE;
-		H[indexR + 4][indexC] = - sinE;
-	//	H[indexR + 4][indexC] = - d * sinE;
-
-		indexC += 1;
-
-	}
-
-	H[indexR][indexC] = 1;
-	H[indexR + 2][indexC] = 0.5 * cosE;
-	H[indexR + 4][indexC] = -0.5 * sinE;
-	//H[indexR + 4][indexC] = -0.5 * c * sinE;
-
-	indexC += 1;
-	H[indexR + 1][indexC] = 1;
-	H[indexR + 2][indexC] = -0.5 * sinE;
-	//H[indexR + 4][indexC] = -0.5 * c * cosE;
-	H[indexR + 4][indexC] = -0.5 * cosE;
-
-	if(sig == 1)
-	{
-		indexC += 1;
-		H[indexR][indexC] = 1;
-		H[indexR + 2][indexC] = cosE;
-		H[indexR + 3][indexC] = sinE;
-		H[indexR + 4][indexC] = - sinE + cosE;
-	//	H[indexR + 4][indexC] = - c * sinE + d * cosE;
-
-
-		indexC += 1;
-		H[indexR + 1][indexC] = 1;
-		H[indexR + 2][indexC] = - sinE;
-		H[indexR + 3][indexC] = cosE;
-		H[indexR + 4][indexC] = - cosE - sinE;
-	//	H[indexR + 4][indexC] = - c * cosE - d * sinE;
-
-	}
-
-}
-
-
-void KW_MAP_P_R::calculateH()
-{
-	for(int i = 0; i < 29; i++)
-	{
-		for(int j = 0; j < 20; j++)
-		{
-			H[i][j]=0;
-		}
-		//cout<<"\n";
-	}
-	H[0][0] = 1;
-	H[2][0] = 0.5;
-	H[1][1] = 1;
-	H[3][1] = 1;
-
-	derivatives(4,2, state[4], state[5], state[6], state[7], state[8],1);
-	derivatives(9,6, state[9], state[10], state[11], state[12], state[13],1);
-	derivatives(14,10,state[14], state[15], state[16], state[17], state[18],1);
-	derivatives(19,14,state[19], state[20], state[21], state[22], state[23],2);
-	derivatives(24,16,state[24], state[25], state[26], state[27], state[28],3);
-
-	for(int i = 0; i < 29; i++)
-	{
-		for(int j = 0; j < 20; j++)
-		{
-			//cout << setprecision(3)<<H[i][j]<<"\t";
-		}
-		//cout<<"\n";
-	}
-}
-
-void KW_MAP_P_R::calculateDiff()
-{
-	LOG(LTRACE) << "KW_MAP_P_R::calculateDiff\n";
-
-	cout<<"KW_MAP_P_R::calculateDiff\n";
-	//różnica
-	double D[20];
-	double error = 0;
-	unsigned int j = 0;
-
-    for (unsigned int i = 0 ; i < z.size() * 2; i = i + 2)
-    {
-        D[i] = - z[j].x + charPoint[j].x ;
-   //     cout<<"D:"<< D[i]<<"\n";
-        D[i + 1] = - z[j].y + charPoint[j].y;
-   //     cout<<"D:"<< D[i + 1]<<"\n";
-        j += 1;
-    }
-
-    calculateH();
-
-    double t[29];
-    for (unsigned int i = 0; i < state.size(); i++)
-    {
-        t[i] = 0;
-        for  (j = 0; j < z.size() * 2; j++)
-        {
-
-            //mnożenie macierzy H * roznica S
-            t[i] += H[i][j] * D[j];
-
-        }
-       // cout << "\n";
-        //wspolczynnik zapominania
-        learnRate = 0.01;
-        t[i] *= learnRate;
-        //obliczony blad
-        error += abs(t[i]);
-        cout<<"t "<<t[i]<<"\n";
-        diff.push_back(t[i]);
-    }
-}
-
-void KW_MAP_P_R::updateState()
- {
-	cout<<"KW_MAP_P_R::updateState\n";
-
-
-     for (unsigned int i = 0; i < state.size(); i++)
-     {
-
-         state[i] = state[i] + diff[i];
-       //  cout<<"nowy state"<<state[i]<<"\n";
-     }
- }
 
 
 
