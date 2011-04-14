@@ -172,7 +172,6 @@ void KW_MAP_P_R::getCharPoints() {
 		//numerElements - liczba punktów wchodzących w skład konturu
 		// i, ii - indeksy
 		unsigned int numerElements;
-		std::ofstream plik("/home/kasia/Test.txt");
 		Types::Blobs::Blob *currentBlob;
 		Types::Blobs::BlobResult result;
 		CvSeq * contour;
@@ -282,7 +281,7 @@ void KW_MAP_P_R::getCharPoints() {
 		indexPoint.push_back(0);
 
 		for (unsigned int i = 1; i < numerElements - 2; i++) {
-			plik << dist[i] << "\n";
+
 			derivative.push_back(dist[i + 1] - dist[i]);
 
 			if (dist[i + 1] > MINDIST && dist[i] > MINDIST) {
@@ -416,7 +415,7 @@ void KW_MAP_P_R::charPointsToState() {
 		nChar[j][ileObrazkow-1] =  charPoint[i].x;
 		nChar[j+1][ileObrazkow-1] =  charPoint[i].y;
 		j = j + 2;
-		cout << "charPoint size: " << charPoint.size() << endl;
+	//	cout << "charPoint size: " << charPoint.size() << endl;
 	}
 
 	for(unsigned int i = 0; i < state.size(); i++)
@@ -424,7 +423,7 @@ void KW_MAP_P_R::charPointsToState() {
 		pMean[i] += state[i];
 		nStates[i][ileObrazkow-1] =  state[i];
 	//	cout<<pMean[i]<<"\n";
-		cout << "State size: " << state.size() << endl;
+	//	cout << "State size: " << state.size() << endl;
 	}
 
 }
@@ -495,6 +494,7 @@ void KW_MAP_P_R::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 void KW_MAP_P_R::calculate()
 {
 	cout<<"MAMAMA!\n";
+	std::ofstream plik("/home/kasia/Test.txt");
 	for(unsigned i = 0; i < state.size(); i++)
 	{
 		meanStates.push_back(pMean[i]/ileObrazkow);
@@ -516,12 +516,15 @@ void KW_MAP_P_R::calculate()
 		  }
 
 		  P[i][j] /= (ileObrazkow - 1);
+		  plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<"\n";
 
 		  if (i!=j)
+		  {
+			  //macierz kowariancji jest macierza symetryczna
 			  P[j][i] = P[i][j];
-		  	  cout<<"P["<<j<<"]["<<i<<"]="<<P[j][i];
+		  	  plik<<"P["<<j<<"]["<<i<<"]="<<P[j][i]<<"\n";
+		  }
 	  }
-	  cout<<"\n";
 	}
 
 
@@ -536,13 +539,17 @@ void KW_MAP_P_R::calculate()
 		  }
 
 		  R[i][j] /= (ileObrazkow - 1);
-
+		  plik<<"R["<<i<<"]["<<j<<"]="<<R[i][j]<<"\n";
 		  if (i!=j)
+		  {
+			  //macierz kowariancji jest macierza symetryczna
 			  R[j][i] = R[i][j];
-		  	  cout<<"R["<<j<<"]["<<i<<"]="<<P[j][i];
+			  plik<<"R["<<j<<"]["<<i<<"]="<<R[j][i]<<"\n";
+		  }
 	  }
-	  cout<<"\n";
+
 	}
+	plik.close();
 }
 
 

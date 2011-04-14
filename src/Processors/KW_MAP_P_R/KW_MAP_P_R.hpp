@@ -179,7 +179,6 @@ private:
 	bool img_ready;
 	bool first;
 
-
 	Types::Blobs::BlobResult blobs;
 
 	double last_x, last_y;
