@@ -121,7 +121,7 @@ bool CvWindow_Sink::onStart()
 }
 
 void CvWindow_Sink::onNewImageN(int n) {
-	LOG(LERROR) << name() << "::onNewImage(" << n << ")";
+	LOG(LTRACE) << name() << "::onNewImage(" << n << ")";
 
 	try {
 		if(!in_img[n]->empty()){
