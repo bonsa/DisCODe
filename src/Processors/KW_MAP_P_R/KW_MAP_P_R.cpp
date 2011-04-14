@@ -74,13 +74,13 @@ bool KW_MAP_P_R::onFinish() {
 	for (unsigned int i = 0; i < 29; i++)
     {
 		pMean[i] = pMean[i]/ileObrazkow;
-        cout<<pMean[i]<<"\n";
+     //   cout<<pMean[i]<<"\n";
     }
 
 	for (unsigned int i = 0; i < 20; i++)
     {
-		rMean[i] = rMean[i]/ileObrazkow;
-    //    cout<<rMean[i]<<"\n";
+		rMean[i] = (int)(rMean[i]/ileObrazkow);
+       cout<<rMean[i]<<"\n";
     }
 	return true;
 }
@@ -177,6 +177,8 @@ void KW_MAP_P_R::getCharPoints() {
 		vector<int> indexPoint;
 		//powyzej tej odległości od środa cieżkosci moga znajdować sie ekstrema
 		int MINDIST;
+		//id ostatenio wyznaczonego ekstremum
+		int idLastExtreme;
 
 		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
 
@@ -246,9 +248,11 @@ void KW_MAP_P_R::getCharPoints() {
 				dist.push_back(MINDIST);
 		}
 
+
 		//******************************************************************
 		//obliczenie pochodnej, szukanie ekstremów
 		derivative.push_back(dist[1] - dist[0]);
+		idLastExtreme = 0;
 		if (derivative[0] > 0)
 			lastSign = 1;
 		else
@@ -269,13 +273,21 @@ void KW_MAP_P_R::getCharPoints() {
 				}
 				//maksiumum, funkcja rosła i zaczeła maleć
 				if (derivative[i] < 0 && lastSign == 1) {
-					indexPoint.push_back(i);
-					lastSign = -1;
+					if(((contourPoints[i].x - contourPoints[idLastExtreme].x)	* (contourPoints[i].x - contourPoints[idLastExtreme].x )	+ (contourPoints[i].y - contourPoints[idLastExtreme].y) * (contourPoints[i].y - contourPoints[idLastExtreme].y)) > 900)
+					{
+						indexPoint.push_back(i);
+						lastSign = -1;
+						idLastExtreme = i;
+					}
 				}
 				//minimum
 				else if (derivative[i] > 0 && lastSign == -1) {
-					indexPoint.push_back(i);
-					lastSign = 1;
+					if(((contourPoints[i].x - contourPoints[idLastExtreme].x)	* (contourPoints[i].x - contourPoints[idLastExtreme].x )	+ (contourPoints[i].y - contourPoints[idLastExtreme].y) * (contourPoints[i].y - contourPoints[idLastExtreme].y)) > 900)
+					{
+						indexPoint.push_back(i);
+						lastSign = 1;
+						idLastExtreme = i;
+					}
 				}
 			} else {
 				lastMinDist = 1;
@@ -313,7 +325,7 @@ void KW_MAP_P_R::getCharPoints() {
 		}
 
 		//plik <<"Punkt środka cieżkosci: "<< CenterOfGravity_x <<" "<< CenterOfGravity_y;
-
+/*
 		Types::Ellipse * el;
 
 
@@ -333,6 +345,12 @@ void KW_MAP_P_R::getCharPoints() {
 		drawcont.add(new Types::Ellipse(Point2f(charPoint[7].x, charPoint[7].y), Size2f(10,10)));
 		drawcont.add(new Types::Ellipse(Point2f(charPoint[8].x, charPoint[8].y), Size2f(10,10)));
 		drawcont.add(new Types::Ellipse(Point2f(charPoint[9].x, charPoint[9].y), Size2f(10,10)));
+
+	*/
+		for (unsigned i = 0; i < charPoint.size(); i++)
+		{
+			drawcont.add(new Types::Ellipse(Point2f(charPoint[i].x, charPoint[i].y), Size2f(10,10)));
+		}
 
 		result.AddBlob(blobs.GetBlob(id));
 		out_signs.write(result);
@@ -374,17 +392,17 @@ void KW_MAP_P_R::charPointsToState() {
 	{
 		rMean[j] += charPoint[i].x;
 		rMean[j+1] += charPoint[i].y;
-//		cout<<rMean[j]<<"\n";
-//		cout<<rMean[j+1]<<"\n";
+		cout<<rMean[j]<<"\n";
+		cout<<rMean[j+1]<<"\n";
 		j = j + 2;
-		cout << "charPoint size: " << charPoint.size() << endl;
+	//	cout << "charPoint size: " << charPoint.size() << endl;
 	}
 
 	for(unsigned int i = 0; i < state.size(); i++)
 	{
 		pMean[i] += state[i];
 	//	cout<<pMean[i]<<"\n";
-		cout << "State size: " << state.size() << endl;
+	//	cout << "State size: " << state.size() << endl;
 	}
 
 }
