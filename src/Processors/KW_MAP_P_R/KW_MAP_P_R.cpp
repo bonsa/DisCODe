@@ -528,6 +528,14 @@ void KW_MAP_P_R::calculate()
 	  }
 	}
 
+	for(int i = 0; i<29; i++)
+	{
+		for(int j = 0; j<29; j++)
+		{
+			 plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<";\n";
+		}
+	}
+
 
 	for(int i = 0; i<20; i++)
 	{
@@ -599,13 +607,21 @@ void KW_MAP_P_R::calculate()
 
 	//inv = invR.inv();
 	//odwracanie macierzy
-/*	cv::invert(invR, inv, DECOMP_LU);
+	cv::invert(invR, inv, DECOMP_LU);
 
 	cout <<"ok: "<<inv.at<float>(0,0)<<"\n";
 	cout <<"OK: "<<inv.at<float>(19,19)<<"\n";
 	cout <<"OK: "<<inv.at<float>(17,0)<<"\n";
 	cout <<"OK: "<<inv.at<float>(11,2)<<"\n";
-*/
+
+	for(int i = 0; i<20; i++)
+	{
+		for(int j = 0; j<20; j++)
+		{
+			 plik<<"invR["<<i<<"]["<<j<<"]="<<inv.at<float>(i,j)<<";\n";
+		}
+	}
+
 	//int row = invR.row();
 //	cout<<"ROzmiar"<<row;
 	//cout <<"OK: "<<invR.at<float>(13,19)<<"\n";
