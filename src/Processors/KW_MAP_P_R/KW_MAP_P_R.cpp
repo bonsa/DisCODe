@@ -85,7 +85,7 @@ bool KW_MAP_P_R::onFinish() {
 		rMean[i] = (int)(rMean[i]/ileObrazkow);
 		//cout<<"rMean["<< i <<"] = "<< rMean[i] <<"\n";
     }
-
+/*
 	for (unsigned int i = 0; i < 20; i++)
     {
 		for(unsigned int j = 0; j <18; j++)
@@ -101,6 +101,7 @@ bool KW_MAP_P_R::onFinish() {
 			cout<<"nStates["<< i <<"]["<< j <<"] ="<< nStates[i][j] <<"\n";
 		}
     }
+    */
 	return true;
 }
 
@@ -516,13 +517,13 @@ void KW_MAP_P_R::calculate()
 		  }
 
 		  P[i][j] /= (ileObrazkow - 1);
-		  plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<";\n";
+	//	  plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<";\n";
 
 		  if (i!=j)
 		  {
 			  //macierz kowariancji jest macierza symetryczna
 			  P[j][i] = P[i][j];
-		  	  plik<<"P["<<j<<"]["<<i<<"]="<<P[j][i]<<";\n";
+		//  	  plik<<"P["<<j<<"]["<<i<<"]="<<P[j][i]<<";\n";
 		  }
 	  }
 	}
@@ -539,21 +540,28 @@ void KW_MAP_P_R::calculate()
 		  }
 
 		  R[i][j] /= (ileObrazkow - 1);
-		  plik<<"R["<<i<<"]["<<j<<"]="<<R[i][j]<<";\n";
+		  //plik<<"R["<<i<<"]["<<j<<"]="<<R[i][j]<<";\n";
 		  if (i!=j)
 		  {
 			  //macierz kowariancji jest macierza symetryczna
 			  R[j][i] = R[i][j];
-			  plik<<"R["<<j<<"]["<<i<<"]="<<R[j][i]<<";\n";
+			//  plik<<"R["<<j<<"]["<<i<<"]="<<R[j][i]<<";\n";
 		  }
 	  }
 	}
 
+	for(int i = 0; i<20; i++)
+	{
+		for(int j = 0; j<20; j++)
+		{
+			 plik<<"R["<<i<<"]["<<j<<"]="<<R[i][j]<<";\n";
+		}
+	}
 	cout<<"MAMAMA2!\n";
 
-	cv::Size sizeR = Size(29,29);		//rozmiar obrazka
+	cv::Size sizeR = Size(20,20);		//rozmiar obrazka
 
-	invR.create(sizeR, CV_8UC1);		//8bitów, 0-255, 1 kanał
+	invR.create(sizeR, CV_32FC1);		//8bitów, 0-255, 1 kanał
 
 	if (invR.isContinuous())   {
 		sizeR.width *= sizeR.height;
@@ -567,25 +575,40 @@ void KW_MAP_P_R::calculate()
 			// if not - it's executed for each row
 
 			// get pointer to beggining of i-th row of input image
-			uchar* R_p = invR.ptr <uchar> (i);
+			float* R_p = invR.ptr <float> (i);
 
 			//oznacza, które wiersza jest aktualnie przepisywany
 			int row = 0;
 			int col = 0;
 			for(int j = 0 ; j < sizeR.width ; j++)
 			{
-				if(col == 29)
+				R_p[j] = R[row][col];
+				col += 1;
+				if(col == 20)
 				{
 					col = 0;
 					row = row + 1;
 				}
-				R_p[j] = R[row][col];
 			}
 	}
 	cv::Mat inv;
-	//odwracanie macierzy, ok zwraca czy macierz została odwrócona.
-//	cv::invert(invR, inv, DECOMP_LU);
-//	cout <<"ok: "<<invR.at<int>(0,0)<<"\n";
+	cout <<"ok: "<<invR.at<float>(0,0)<<"\n";
+	cout <<"OK: "<<invR.at<float>(19,19)<<"\n";
+	cout <<"OK: "<<invR.at<float>(17,0)<<"\n";
+	cout <<"OK: "<<invR.at<float>(11,2)<<"\n";
+
+	//inv = invR.inv();
+	//odwracanie macierzy
+/*	cv::invert(invR, inv, DECOMP_LU);
+
+	cout <<"ok: "<<inv.at<float>(0,0)<<"\n";
+	cout <<"OK: "<<inv.at<float>(19,19)<<"\n";
+	cout <<"OK: "<<inv.at<float>(17,0)<<"\n";
+	cout <<"OK: "<<inv.at<float>(11,2)<<"\n";
+*/
+	//int row = invR.row();
+//	cout<<"ROzmiar"<<row;
+	//cout <<"OK: "<<invR.at<float>(13,19)<<"\n";
 	plik.close();
 }
 
