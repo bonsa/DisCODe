@@ -227,6 +227,8 @@ private:
 
 	double learnRate;
 
+	//macierz odwrotna R
+	cv::Mat invR;
 };
 
 }//: namespace KW_MAP_P_R

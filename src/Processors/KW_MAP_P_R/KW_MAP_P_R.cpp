@@ -516,13 +516,13 @@ void KW_MAP_P_R::calculate()
 		  }
 
 		  P[i][j] /= (ileObrazkow - 1);
-		  plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<"\n";
+		  plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<";\n";
 
 		  if (i!=j)
 		  {
 			  //macierz kowariancji jest macierza symetryczna
 			  P[j][i] = P[i][j];
-		  	  plik<<"P["<<j<<"]["<<i<<"]="<<P[j][i]<<"\n";
+		  	  plik<<"P["<<j<<"]["<<i<<"]="<<P[j][i]<<";\n";
 		  }
 	  }
 	}
@@ -539,16 +539,53 @@ void KW_MAP_P_R::calculate()
 		  }
 
 		  R[i][j] /= (ileObrazkow - 1);
-		  plik<<"R["<<i<<"]["<<j<<"]="<<R[i][j]<<"\n";
+		  plik<<"R["<<i<<"]["<<j<<"]="<<R[i][j]<<";\n";
 		  if (i!=j)
 		  {
 			  //macierz kowariancji jest macierza symetryczna
 			  R[j][i] = R[i][j];
-			  plik<<"R["<<j<<"]["<<i<<"]="<<R[j][i]<<"\n";
+			  plik<<"R["<<j<<"]["<<i<<"]="<<R[j][i]<<";\n";
 		  }
 	  }
-
 	}
+
+	cout<<"MAMAMA2!\n";
+
+	cv::Size sizeR = Size(29,29);		//rozmiar obrazka
+
+	invR.create(sizeR, CV_8UC1);		//8bitów, 0-255, 1 kanał
+
+	if (invR.isContinuous())   {
+		sizeR.width *= sizeR.height;
+		sizeR.height = 1;
+	}
+
+	for (int i = 0; i < sizeR.height; i++) {
+
+			// when the arrays are continuous,
+			// the outer loop is executed only once
+			// if not - it's executed for each row
+
+			// get pointer to beggining of i-th row of input image
+			uchar* R_p = invR.ptr <uchar> (i);
+
+			//oznacza, które wiersza jest aktualnie przepisywany
+			int row = 0;
+			int col = 0;
+			for(int j = 0 ; j < sizeR.width ; j++)
+			{
+				if(col == 29)
+				{
+					col = 0;
+					row = row + 1;
+				}
+				R_p[j] = R[row][col];
+			}
+	}
+	cv::Mat inv;
+	//odwracanie macierzy, ok zwraca czy macierz została odwrócona.
+//	cv::invert(invR, inv, DECOMP_LU);
+//	cout <<"ok: "<<invR.at<int>(0,0)<<"\n";
 	plik.close();
 }
 
