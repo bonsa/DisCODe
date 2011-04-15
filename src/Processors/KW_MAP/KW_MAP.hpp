@@ -207,10 +207,15 @@ private:
 	//macierz kowariancji P
 	double P[29][29];
 
-	//macierz kowariancji R
-	double R[20][20];
+	//odwrotna macierz kowariancji R
+	double invR[20][20];
 
-	double learnRate;
+	//wspołczynnik zapominania
+	double factor;
+
+	unsigned int nrChar;
+
+	unsigned int nrStates;
 
 };
 
