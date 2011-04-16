@@ -175,7 +175,6 @@ protected:
 
 	void projectionEstimatedPoints();
 
-
 private:
 
 	cv::Mat tsl_img;
@@ -226,6 +225,9 @@ private:
 
 	// liczba elementów wetora stanu
 	unsigned int nrStates;
+
+	// funkcja warunek stopu, jesli STOP = true estymacja MAP jest zakończona
+	bool STOP;
 
 };
 

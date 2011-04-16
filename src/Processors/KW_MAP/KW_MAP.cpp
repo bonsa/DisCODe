@@ -47,6 +47,9 @@ bool KW_MAP::onInit() {
 	nrChar = 20;
 	nrStates = 29;
 
+	// czy warunek stopu jest spełniony
+	STOP = false;
+
 	//pierwsze uruchomienie komponentu
 	first = true;
 
@@ -68,26 +71,29 @@ bool KW_MAP::onStep() {
 		ileObrazkow = ileObrazkow + 1;
 
 		drawcont.clear();
-		z.clear();
-		charPoint.clear();
-		diff.clear();
-		state.clear();
 
-		getCharPoints();
-		projectionMeasurePoints();
+		if(STOP == false)
+		{
+			z.clear();
+			charPoint.clear();
+			diff.clear();
+			state.clear();
 
-		if (first == true) {
-			// char --> s, z pomiarów oblicza stan
-			charPointsToState();
-			first = false;
-		} else {
-			// s --> z
-			stateToCharPoint();
-			projectionEstimatedPoints();
-			calculateDiff();
-			updateState();
+			getCharPoints();
+			projectionMeasurePoints();
+
+			if (first == true) {
+				// char --> s, z pomiarów oblicza stan
+				charPointsToState();
+				first = false;
+			} else {
+				// s --> z
+				stateToCharPoint();
+				projectionEstimatedPoints();
+				calculateDiff();
+				updateState();
+			}
 		}
-
 		projectionStates();
 
 		out_draw.write(drawcont);
@@ -623,7 +629,7 @@ void KW_MAP::calculateDiff() {
 	cout << "KW_MAP::calculateDiff\n";
 	//różnica miedzy wektorami h(s) i z
 	double D[20];
-	//double error = 0;
+	double error = 0;
 	unsigned int j = 0;
 
 	for (unsigned int i = 0; i < z.size() * 2; i = i + 2) {
@@ -662,6 +668,18 @@ void KW_MAP::calculateDiff() {
 		}
 		//   cout<<i<<": "<<t2[i]<<"\n";
 		diff.push_back(t2[i]);
+	}
+
+	for (unsigned int i = 0; i < nrStates; i++)
+	{
+		error += abs(t2[i]);
+	}
+
+	//warunek końca estymacji MAP
+	cout<<"ERROR: "<<error<<"\n";
+	if(error < 5.0)
+	{
+		STOP = true;
 	}
 }
 
