@@ -31,7 +31,6 @@ public:
 
 	void setCol(CvScalar col) {
 		m_col = col;
-		std::cout << "Color set!\n";
 	}
 
 	CvScalar getCol() {

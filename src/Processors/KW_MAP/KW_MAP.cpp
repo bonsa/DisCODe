@@ -49,13 +49,7 @@ bool KW_MAP::onInit() {
 	nrChar = 20;
 	nrStates = 29;
 
-/*
-	for( int i = 0; i < 29; i++)
-	{
-		pMean[i] = 0;
-		cout<<pMean[i]<<"\n";
-	}
-*/
+	//pierwsze uruchomienie komponentu
 	first = true;
 
 	return true;
@@ -64,12 +58,6 @@ bool KW_MAP::onInit() {
 bool KW_MAP::onFinish() {
 	LOG(LTRACE) << "KW_MAP::finish\n";
 
-/*	for (unsigned int i = 0; i < state.size(); i++)
-    {
-		pMean[i] = pMean[i]/ileObrazkow;
-        cout<<pMean[i]<<"\n";
-    }
-*/
 	return true;
 }
 
@@ -78,32 +66,25 @@ bool KW_MAP::onStep() {
 
 	blobs_ready = img_ready = false;
 
-
 	try {
-		//ileObrazkow = ileObrazkow + 1;
-		//cout<<"ilosc obrazkow"<<ileObrazkow<<"\n" ;
+		ileObrazkow = ileObrazkow + 1;
 
 		drawcont.clear();
 		z.clear();
 		charPoint.clear();
 		diff.clear();
-		//state.clear();
+		state.clear();
 
 		getCharPoints();
 
 		if(first == true)
 		{
-			cout<<first<<"!!!!!!!!!!!!!!!!!!!!\n";
-			 // z --> s, z pomiarów oblicza stan
+			 // char --> s, z pomiarów oblicza stan
 			charPointsToState();
-			//stateToCharPoint();
 			first = false;
 		}
 		else
 		{
-			cout<<first<<"lalalallalalallalal!!!!!!!!!!!!!!!!!!\n";
-			cout<<"jestem tulalalallalalallalal!!!!!!!!!!!!!!!!!!\n";
-
 			// s --> z
 			stateToCharPoint();
 			calculateDiff();
@@ -154,15 +135,21 @@ void KW_MAP::getCharPoints() {
 
 	try {
 
+		// id największego bloba, czyli dłoni
 		int id = 0;
 		//numerElements - liczba punktów wchodzących w skład konturu
-		// i, ii - indeksy
 		unsigned int numerElements;
+		// plik do zapisu
 		std::ofstream plik("/home/kasia/Test.txt");
+		// aktualnie pobrany blob
 		Types::Blobs::Blob *currentBlob;
+		// wynikowy blob
 		Types::Blobs::BlobResult result;
+		// punkty znajdujace sie na konturze
 		CvSeq * contour;
+		// czyta elementy na konturu
 		CvSeqReader reader;
+		// punkt, na którym aktualnie jest wykonywana operacja
 		cv::Point actualPoint;
 		// wektor zawierający punkty konturu
 		vector<cv::Point> contourPoints;
@@ -172,16 +159,18 @@ void KW_MAP::getCharPoints() {
 		vector<float> meanDist;
 		//wektor czastowych pochodnych wektor odległości między punktami konturu a przesuniętym środkiem ciężkości
 		vector<float> derivative;
-
 		//zmienna pomocnicza
 		float TempDist;
 		//zapamietuje poprzedni znak różnicy miedzy punktami,
 		//1- funkcja jest rosnoca, -1 - funkcja malejąca
-		int lastSign, lastMinDist;
+		int lastSign;
+		int lastMinDist;
 		//idenksy punktów charakterystycznych;
 		vector<int> indexPoint;
 		//powyzej tej odległości od środa cieżkosci moga znajdować sie ekstrema
 		int MINDIST;
+		//id ostatenio wyznaczonego ekstremum
+		int idLastExtreme;
 
 		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
 
@@ -205,31 +194,31 @@ void KW_MAP::getCharPoints() {
 			}
 		}
 
-		//obliczenia tylko dla najwiekszego blobu, czyli dloni
+		//current Blob przychowuje największego bloba, czyli dłoni
 		currentBlob = blobs.GetBlob(id);
+		//kontur największego bloba
 		contour = currentBlob->GetExternalContour()->GetContourPoints();
 		cvStartReadSeq(contour, &reader);
 
-		int cnt = 0;
 		for (int j = 0; j < contour->total; j = j + 1) {
 			CV_READ_SEQ_ELEM( actualPoint, reader);
 
 			if (j % 10 == 1) {
-				//plik << actualPoint.x << " " << actualPoint.y << std::endl;
+				//wpisanie punktów z konturu do wektora
 				contourPoints.push_back(cv::Point(actualPoint.x, actualPoint.y));
+				//szukanie max wartoścy y
 				if (actualPoint.y > MaxY) {
 					MaxY = actualPoint.y;
 				}
-				cnt++;
 			}
 		}
 
-		//środek cięzkości
 		// calculate moments
 		m00 = currentBlob->Moment(0, 0);
 		m01 = currentBlob->Moment(0, 1);
 		m10 = currentBlob->Moment(1, 0);
 
+		//obliczenie środka cięzkości
 		CenterOfGravity_x = m10 / m00;
 		CenterOfGravity_y = m01 / m00;
 
@@ -237,17 +226,20 @@ void KW_MAP::getCharPoints() {
 		//przesuniety punkt środka ciężkości
 		charPoint.push_back(cv::Point(CenterOfGravity_x, CenterOfGravity_y + (MaxY - CenterOfGravity_y) * 4 / 5));
 
+		//środek cieżkości przesuwał troche w dół ekranu, aby ułatwić wyznaczanie punktóe charakterystycznych
 		CenterOfGravity_y += (MaxY - CenterOfGravity_y) * 2 / 3;
 
+		//liczba punktów wchodząca w skład konturu
 		numerElements = contourPoints.size();
 
 		//******************************************************************
-		//obliczenie roznicy miedzy punktami z odwodu a środkiem ciężkosci
+		//obliczenie roznicy miedzy punktami konturu a przesuniętym środkiem ciężkosci
 		for (unsigned int i = 0; i < numerElements; i++) {
 			TempDist = (contourPoints[i].x - CenterOfGravity_x)	* (contourPoints[i].x - CenterOfGravity_x)	+ (contourPoints[i].y - CenterOfGravity_y) * (contourPoints[i].y - CenterOfGravity_y);
 			if (TempDist > MINDIST)
 				dist.push_back(TempDist);
 			else
+				//jeśli odległość jest mniejsza niż MINDIST oznacza to, że jest to dolna cześć dłoni i nie znajdują się tam żadnego punkty charakterystyczne poza przesuniętym środkiem ciężkości, dlatego te punkty można ominąć
 				dist.push_back(MINDIST);
 		}
 
@@ -259,41 +251,46 @@ void KW_MAP::getCharPoints() {
 		else
 			lastSign = -1;
 
+		//1 -oznacza, że ostatni element z konturu należał do dolnej czesci dłoni
 		lastMinDist = 0;
+		idLastExtreme = 0;
 		//pierwszy punkt kontury to wierzchołek punktu środkowego.
 		indexPoint.push_back(0);
 
 		for (unsigned int i = 1; i < numerElements - 2; i++) {
-			plik << dist[i] << "\n";
+
+			//różnica miedzy sąsiedznimi punktami
 			derivative.push_back(dist[i + 1] - dist[i]);
 
 			if (dist[i + 1] > MINDIST && dist[i] > MINDIST) {
+				//jeżeli ostatnio był wykryta dolna cześci dłoni, następnym charakterystycznych punktem powinien być czubek palca, dlatego lastSign = 1;
 				if (lastMinDist == 1) {
 					lastSign = 1;
 					lastMinDist = 0;
 				}
-				//maksiumum, funkcja rosła i zaczeła maleć
+				//maksiumum - czubek palca, funkcja rosła i zaczeła maleć
 				if (derivative[i] < 0 && lastSign == 1) {
-					indexPoint.push_back(i);
-					lastSign = -1;
+					if(((contourPoints[i].x - contourPoints[idLastExtreme].x)	* (contourPoints[i].x - contourPoints[idLastExtreme].x )	+ (contourPoints[i].y - contourPoints[idLastExtreme].y) * (contourPoints[i].y - contourPoints[idLastExtreme].y)) > 900)
+					{
+						indexPoint.push_back(i);
+						lastSign = -1;
+						idLastExtreme = i;
+					}
 				}
-				//minimum
+				//minimum - punkt między palcami
 				else if (derivative[i] > 0 && lastSign == -1) {
-					indexPoint.push_back(i);
-					lastSign = 1;
+					if(((contourPoints[i].x - contourPoints[idLastExtreme].x)	* (contourPoints[i].x - contourPoints[idLastExtreme].x )	+ (contourPoints[i].y - contourPoints[idLastExtreme].y) * (contourPoints[i].y - contourPoints[idLastExtreme].y)) > 900)
+					{
+						indexPoint.push_back(i);
+						lastSign = 1;
+						idLastExtreme = i;
+					}
 				}
 			} else {
+				// element należący do dołu dłoni
 				lastMinDist = 1;
 			}
 		}
-
-		//	Types::Ellipse * el = new Types::Ellipse(Point2f(CenterOfGravity_x, CenterOfGravity_y), Size2f(20,20));
-		//	drawcont.add(el);
-		//	Types::Ellipse * el2 = new Types::Ellipse(Point2f(last_x, last_y), Size2f(7,7));
-		//	drawcont.add(el2);
-
-		last_x = CenterOfGravity_x;
-		last_y = CenterOfGravity_y;
 
 		int idLeftPoint = 0;
 		int xLeftPoint = 1000000;
@@ -303,41 +300,27 @@ void KW_MAP::getCharPoints() {
 				xLeftPoint = contourPoints[indexPoint[i]].x;
 				idLeftPoint = i;
 			}
-
 		}
 
 		for (int i = idLeftPoint; i >= 0; i--) {
+			//wpisanie do tablicy punktów charakterystycznych punktów opisujących trzy lewe palce
 			charPoint.push_back(cv::Point(contourPoints[indexPoint[i]].x,
 					contourPoints[indexPoint[i]].y));
-			//	drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
 		}
 
 		for (int i = indexPoint.size() - 1; i > idLeftPoint; i--) {
+			//wpisanie do tablicy punktów charakterystycznych punktów opisujących dwa prawe palce
 			charPoint.push_back(cv::Point(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y));
-			//	drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
 		}
 
-		//plik <<"Punkt środka cieżkosci: "<< CenterOfGravity_x <<" "<< CenterOfGravity_y;
-
+		//projekcja na obraz punktów charakterystycznych
 		Types::Ellipse * el;
-
-
-		el = new Types::Ellipse(Point2f(charPoint[0].x, charPoint[0].y), Size2f(10,10));
-		el->setCol(CV_RGB(255,0,0));
-		drawcont.add(el);
-
-		el = new Types::Ellipse(Point2f(charPoint[1].x, charPoint[1].y), Size2f(10,10));
-		el->setCol(CV_RGB(0,0,255));
-		drawcont.add(el);
-
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[2].x, charPoint[2].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[3].x, charPoint[3].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[4].x, charPoint[4].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[5].x, charPoint[5].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[6].x, charPoint[6].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[7].x, charPoint[7].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[8].x, charPoint[8].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[9].x, charPoint[9].y), Size2f(10,10)));
+		for (unsigned int i = 0; i < nrChar/2; i++)
+		{
+			el = new Types::Ellipse(Point2f(charPoint[i].x, charPoint[i].y), Size2f(10,10));
+			el->setCol(CV_RGB(0,0,255));
+			drawcont.add(el);
+		}
 
 		result.AddBlob(blobs.GetBlob(id));
 		out_signs.write(result);
@@ -351,7 +334,7 @@ void KW_MAP::getCharPoints() {
 void KW_MAP::charPointsToState() {
 	LOG(LTRACE) << "KW_MAP::charPointsToState\n";
 
-	//obliczanie parametrów prostokątaq opisującego wewnętrzą część dłoni
+	//obliczanie parametrów prostokąta opisującego wewnętrzą część dłoni
 	//wspolrzedna x lewego gornego punktu
 	state.push_back(charPoint[0].x - (charPoint[8].x - charPoint[0].x ));
 	//wspolrzedna y lewego gornego punktu
@@ -361,29 +344,30 @@ void KW_MAP::charPointsToState() {
 	//wysokosc
 	state.push_back(abs(charPoint[0].y - charPoint[6].y));
 
-
+	//projekcj prostokąta opisującego wewnęstrzną część dłoni
 //	drawcont.add(new Types::Rectangle(state[0], state[1], state[2], state[3]));
+
+	//projekcia linii między czubami paców na punktem charakterystycznym dolnej części dłoni
 //	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[1].x, charPoint[1].y)));
 //	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[3].x, charPoint[3].y)));
 //	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[5].x, charPoint[5].y)));
 //	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[7].x, charPoint[7].y)));
 //	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[9].x, charPoint[9].y)));
 
+	//tworzenie na podstawie punktów charekterystycznych parametrów stanu
 	fingerToState(charPoint[1], charPoint[2], 1);
 	fingerToState(charPoint[3], charPoint[4], 1);
 	fingerToState(charPoint[5], charPoint[6], 1);
 	fingerToState(charPoint[7], charPoint[6], -1);
 	fingerToState(charPoint[9], charPoint[8], -1);
-/*
-	for(unsigned int i = 0; i < state.size(); i++)
-	{
-		pMean[i] += state[i];
-		//cout<<pMean[i]<<"\n";
-	}
 
-*/
+	for (unsigned int i = 0; i < nrStates; i++)
+	{
+		cout<<i<<" states\t"<<state[i]<<"\n";
+	}
 }
 
+//punkcja obracająca punkt p o kąt angle według układu współrzędnych znajdującym się w punkcie p0
 cv::Point KW_MAP::rot(cv::Point p, double angle, cv::Point p0) {
 	cv::Point t;
 	t.x = p0.x + (int) ((double) (p.x - p0.x) * cos(angle) - (double) (p.y - p0.y) * sin(angle));
@@ -391,16 +375,21 @@ cv::Point KW_MAP::rot(cv::Point p, double angle, cv::Point p0) {
 	return t;
 }
 
+//funkcja obliczająca parametry stanu na podstawie punktów charakterystycznych
 //p2 - czubek palca, p1 - punkt miedzy palcami
 void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 
 	LOG(LTRACE) << "KW_MAP::fingerToState\n";
 
+	//tg kąta nachylenia
 	double uj = (double) (-p2.x + charPoint[0].x) / (-p2.y + charPoint[0].y);
+	//argument kąta nachylenia
 	double angle = atan(uj);
+	//obrót punktów charakterystycznych o kąt nachylenia względem układu współrzędnych znajdującym się w punkcie dołu dłoni
 	cv::Point pt1 = rot(p1, angle, charPoint[0]);
 	cv::Point pt2 = rot(p2, angle, charPoint[0]);
 
+	// 4 punkty stanu opisują palec według chłopaków
 	cv::Point statePoint;
 	cv::Point statePoint2;
 	cv::Point statePoint3;
@@ -415,6 +404,7 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	int width = abs(2 * (pt1.x - pt2.x));
 	int height = abs(pt1.y - pt2.y);
 
+	//punkty moga mi sie przydac;sposób chłopaków z ROSMów
 	statePoint2.x = statePoint.x;
 	statePoint2.y = statePoint.y + height;
 
@@ -439,8 +429,7 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	state.push_back(height);
 	state.push_back(-angle);
 
-
-
+//projekcia stanu według chłopaków
 //	drawcont.add(new Types::Line(cv::Point(statePoint.x, statePoint.y), cv::Point(statePoint2.x, statePoint2.y)));
 //	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y), cv::Point(statePoint3.x, statePoint3.y)));
 //	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y), cv::Point(statePoint4.x, statePoint4.y)));
@@ -449,7 +438,7 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 
 //******************************************SPRAWDŹ CZY DZIALA***********************************************
 
-//funkcja obliczajaca punkty charakterystyczne trzech lewych palców
+//funkcja obliczajaca punkty charakterystyczne na podstawie wektora stanu
 void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double angle, int sig)
 {
 	LOG(LTRACE) << "KW_MAP::stateToFinger\n";
@@ -505,18 +494,14 @@ void KW_MAP::stateToCharPoint()
 	//punkty kciuka
 	stateToFinger(state[24], state[25], state[26], state[27], state[28],3);
 
-	drawcont.add(new Types::Ellipse(Point2f(z[0].x, z[0].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[1].x, z[1].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[2].x, z[2].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[3].x, z[3].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[4].x, z[4].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[5].x, z[5].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[6].x, z[6].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[7].x, z[7].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[8].x, z[8].y), Size2f(20,20)));
-	drawcont.add(new Types::Ellipse(Point2f(z[9].x, z[9].y), Size2f(20,20)));
-
-
+	//projekcja na obraz punktów charakterystycznych
+	Types::Ellipse * el;
+	for (unsigned int i = 0; i < nrChar/2; i++)
+	{
+		el = new Types::Ellipse(Point2f(z[i].x, z[i].y), Size2f(20,20));
+		el->setCol(CV_RGB(0,255,0));
+		drawcont.add(el);
+	}
 }
 
 void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, double d, double e, int sig)
@@ -562,19 +547,16 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, d
 	//	H[indexR + 4][indexC] = - sinE + cosE;
 		H[indexR + 4][indexC] = - c * sinE + d * cosE;
 
-
 		indexC += 1;
 		H[indexR + 1][indexC] = 1;
 		H[indexR + 2][indexC] = - sinE;
 		H[indexR + 3][indexC] = cosE;
 	//	H[indexR + 4][indexC] = - cosE - sinE;
 		H[indexR + 4][indexC] = - c * cosE - d * sinE;
-
 	}
-
 }
 
-
+// funkcja obliczająca macierz jakobianu H
 void KW_MAP::calculateH()
 {
 	for(int i = 0; i < 29; i++)
@@ -596,6 +578,7 @@ void KW_MAP::calculateH()
 	derivatives(19,14,state[19], state[20], state[21], state[22], state[23],2);
 	derivatives(24,16,state[24], state[25], state[26], state[27], state[28],3);
 
+	//wyswietlanie macierzy H
 	for(int i = 0; i < 29; i++)
 	{
 		for(int j = 0; j < 20; j++)
@@ -606,6 +589,7 @@ void KW_MAP::calculateH()
 	}
 }
 
+//obliczenie o ile zmieni się wektor stanu
 void KW_MAP::calculateDiff()
 {
 	LOG(LTRACE) << "KW_MAP::calculateDiff\n";
@@ -613,21 +597,19 @@ void KW_MAP::calculateDiff()
 	cout<<"KW_MAP::calculateDiff\n";
 	//różnica miedzy wektorami h(s) i z
 	double D[20];
-	double error = 0;
+	//double error = 0;
 	unsigned int j = 0;
 
     for (unsigned int i = 0 ; i < z.size() * 2; i = i + 2)
     {
-        D[i] = - z[j].x + charPoint[j].x ;
-   //     cout<<"D:"<< D[i]<<"\n";
-        D[i + 1] = - z[j].y + charPoint[j].y;
-   //     cout<<"D:"<< D[i + 1]<<"\n";
+        D[i] =  z[j].x - charPoint[j].x ;
+        D[i + 1] =  z[j].y - charPoint[j].y;
         j += 1;
     }
 
     calculateH();
 
-    double t[20];
+    double t[nrChar];
     for (unsigned int i = 0; i < nrChar; i++)
     {
         t[i] = 0;
@@ -635,53 +617,51 @@ void KW_MAP::calculateDiff()
         {
             //mnożenie macierzy H * roznica S
             t[i] += invR[i][j] * D[j];
-
         }
     }
 
-    double t1[29];
+    double t1[nrStates];
     for (unsigned int i = 0; i < nrStates; i++)
     {
         t1[i] = 0;
         for  (unsigned int j = 0; j < nrChar; j++)
         {
-
             //mnożenie macierzy H * roznica S
             t1[i] += H[i][j] * t[j];
-
         }
     }
 
-    double t2[29];
+  //  cout<<"t:\n";
+    double t2[nrStates];
     for (unsigned int i = 0; i < nrStates; i++)
     {
         t2[i] = 0;
         for  (unsigned int j = 0; j < nrStates; j++)
         {
-
             //mnożenie macierzy H * roznica S
             t2[i] += P[i][j] * t1[j];
-
         }
+     //   cout<<i<<": "<<t2[i]<<"\n";
+        diff.push_back(t2[i]);
     }
-
-
-
-
-     //obliczony blad
-
- //    diff.push_back(t[i]);
 }
 
 void KW_MAP::updateState()
  {
 	cout<<"KW_MAP::updateState\n";
 
-
-     for (unsigned int i = 0; i < state.size(); i++)
+     for (unsigned int i = 0; i < nrStates; i++)
      {
+         state[i] = state[i] - diff[i];
+         cout<<i<<" states\t"<<state[i]<<"\n";
+     }
 
-         state[i] = state[i] + diff[i];
+     for (unsigned int i = 0; i < nrStates; i++)
+     {
+    	  for (unsigned int j = 0; j < nrStates; j++)
+    	  {
+    		  P[i][j] *= (1-factor);
+    	  }
      }
  }
 

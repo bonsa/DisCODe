@@ -176,19 +176,20 @@ private:
 
 	bool blobs_ready;
 	bool img_ready;
+
+	// czy funkcja jest pierwszy raz uruchomiana
 	bool first;
 
-
 	Types::Blobs::BlobResult blobs;
-
-	double last_x, last_y;
 
 	Types::DrawableContainer drawcont;
 
 	// wspołrzędne punktów charakterystycznych konturu
 	vector<cv::Point> charPoint;
+
 	// wektor obserwacji dłoni
 	vector<cv::Point> z;
+
 	// różnica stanów
 	vector<double> diff;
 
@@ -198,7 +199,7 @@ private:
 	// średni wektor stanu
 	double pMean[29];
 
-	// ile
+	// ile obrazków została już obranych przez DisCODe
 	int ileObrazkow;
 
 	//macierz H
@@ -213,8 +214,10 @@ private:
 	//wspołczynnik zapominania
 	double factor;
 
+	// liczba elementów wetora punktów charakterystycznych
 	unsigned int nrChar;
 
+	// liczba elementów wetora stanu
 	unsigned int nrStates;
 
 };
