@@ -173,6 +173,8 @@ protected:
 
 	void projectionStates();
 
+	void projectionEstimatedPoints();
+
 
 private:
 

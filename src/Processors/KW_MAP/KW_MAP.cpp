@@ -83,6 +83,7 @@ bool KW_MAP::onStep() {
 		} else {
 			// s --> z
 			stateToCharPoint();
+			projectionEstimatedPoints();
 			calculateDiff();
 			updateState();
 		}
@@ -513,6 +514,10 @@ void KW_MAP::stateToCharPoint() {
 	//punkty kciuka
 	stateToFinger(state[24], state[25], state[26], state[27], state[28], 3);
 
+}
+//projekcja na obraz estymowanych punktów charakterystycznych
+void KW_MAP::projectionEstimatedPoints()
+{
 	//projekcja na obraz punktów charakterystycznych
 	Types::Ellipse * elE;
 	for (unsigned int i = 0; i < nrChar / 2; i++) {
@@ -528,7 +533,6 @@ void KW_MAP::stateToCharPoint() {
 		elL->setCol(CV_RGB(255,0,0));
 		drawcont.add(elL);
 	}
-
 }
 
 void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c,
