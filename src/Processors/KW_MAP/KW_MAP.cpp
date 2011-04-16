@@ -443,8 +443,13 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double an
 {
 	LOG(LTRACE) << "KW_MAP::stateToFinger\n";
 
-	cv::Point rotPoint;
 	cv::Point tempPoint;
+
+	// 4 punkty do projekcji stanu paców
+	cv::Point statePoint1;
+	cv::Point statePoint2;
+	cv::Point statePoint3;
+	cv::Point statePoint4;
 
 	if (sig == 1)
 	{
@@ -455,12 +460,37 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double an
 		tempPoint.x = s1 + s3 * cos(angle) + s4 * sin(angle);
 		tempPoint.y = s2 - s3 * sin(angle) + s4 * cos(angle);
 		z.push_back(tempPoint);
-	}
+
+		statePoint1.x = s1;
+		statePoint1.y = s2;
+
+		statePoint2.x = s1 + s3 * cos(angle);
+		statePoint2.y = s2 - s3 * sin(angle);
+
+		statePoint3.x = tempPoint.x;
+		statePoint3.y = tempPoint.y;
+
+		statePoint4.x = tempPoint.x - s3 * cos(angle);
+		statePoint4.y = tempPoint.y + s3 * sin(angle);
+		}
 	if (sig == 2)
 	{
 		tempPoint.x = s1 +  0.5 * s3 * cos(angle);
 		tempPoint.y = s2 -  0.5 * s3 * sin(angle);
 		z.push_back(tempPoint);
+
+		statePoint1.x = s1;
+		statePoint1.y = s2;
+
+		statePoint4.x = s1 + s4 * sin(angle);
+		statePoint4.y = s2 + s4 * cos(angle);
+
+		statePoint2.x = s1 +  s3 * cos(angle) ;
+		statePoint2.y = s2 -  s3 * sin(angle) ;
+
+		statePoint3.x = statePoint4.x +  s3 * cos(angle);
+		statePoint3.y = statePoint4.y -  s3 * sin(angle);
+
 	}
 	if (sig == 3)
 	{
@@ -468,10 +498,30 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double an
 		tempPoint.y = s2 + s4 * cos(angle);
 		z.push_back(tempPoint);
 
+		statePoint1.x = s1;
+		statePoint1.y = s2;
+
+		statePoint4.x = tempPoint.x;
+		statePoint4.y = tempPoint.y;
+
 		tempPoint.x = s1 +  0.5 * s3 * cos(angle);
 		tempPoint.y = s2 -  0.5 * s3 * sin(angle);
 		z.push_back(tempPoint);
+
+
+		statePoint2.x = s1 +  s3 * cos(angle) ;
+		statePoint2.y = s2 -  s3 * sin(angle) ;
+
+		statePoint3.x = statePoint4.x +  s3 * cos(angle);
+		statePoint3.y = statePoint4.y -  s3 * sin(angle);
 	}
+
+	//projekcja palców na obraz
+	drawcont.add(new Types::Line(cv::Point(statePoint1.x, statePoint1.y), cv::Point(statePoint2.x, statePoint2.y)));
+	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y), cv::Point(statePoint3.x, statePoint3.y)));
+	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y), cv::Point(statePoint4.x, statePoint4.y)));
+	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y), cv::Point(statePoint1.x, statePoint1.y)));
+
 }
 
 void KW_MAP::stateToCharPoint()
@@ -482,6 +532,22 @@ void KW_MAP::stateToCharPoint()
 	cv::Point tempPoint;
 	// punkt dołu dłoni
 	z.push_back(cv::Point((state[0] + 0.5*state[2]), (state[1] + state[3])));
+
+	cv::Point statePoint1;
+	cv::Point statePoint2;
+	cv::Point statePoint3;
+	cv::Point statePoint4;
+
+	statePoint1.x = statePoint4.x = state[0];
+	statePoint1.y = statePoint2.y = state[1];
+	statePoint2.x = statePoint3.x = state[0] + state[2];
+	statePoint4.y = statePoint3.y = state[1] + state[3];
+
+	//projekcja środa dłoni na obraz
+	drawcont.add(new Types::Line(cv::Point(statePoint1.x, statePoint1.y), cv::Point(statePoint2.x, statePoint2.y)));
+	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y), cv::Point(statePoint3.x, statePoint3.y)));
+	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y), cv::Point(statePoint4.x, statePoint4.y)));
+	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y), cv::Point(statePoint1.x, statePoint1.y)));
 
 	//punkty pierwszego palca od lewej
 	stateToFinger(state[4], state[5], state[6], state[7], state[8],1);
@@ -495,13 +561,22 @@ void KW_MAP::stateToCharPoint()
 	stateToFinger(state[24], state[25], state[26], state[27], state[28],3);
 
 	//projekcja na obraz punktów charakterystycznych
-	Types::Ellipse * el;
+	Types::Ellipse * elE;
 	for (unsigned int i = 0; i < nrChar/2; i++)
 	{
-		el = new Types::Ellipse(Point2f(z[i].x, z[i].y), Size2f(20,20));
-		el->setCol(CV_RGB(0,255,0));
-		drawcont.add(el);
+		elE = new Types::Ellipse(Point2f(z[i].x, z[i].y), Size2f(20,20));
+		elE->setCol(CV_RGB(0,255,0));
+		drawcont.add(elE);
 	}
+
+	Types::Line * elL;
+	for (unsigned int i = 1; i < nrChar/2; i += 2)
+	{
+		elL = new Types::Line(cv::Point(z[0].x, z[0].y), cv::Point(z[i].x, z[i].y));
+		elL->setCol(CV_RGB(255,0,0));
+		drawcont.add(elL);
+	}
+
 }
 
 void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c, double d, double e, int sig)

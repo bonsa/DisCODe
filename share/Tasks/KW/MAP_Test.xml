@@ -43,7 +43,7 @@
 		<DecPalm type="KW_MAP" thread="Exec1" group="s1"> 
 		</DecPalm>
 		
-		<Sink type="CvVideoWriter" thread="Thread1" group="s1">
+		<Sink type="CvVideoWriter" thread="Exec1" group="s1">
 			<filename>/tmp/output.avi</filename>
 			<fourcc>XVID</fourcc>
 		</Sink>
@@ -84,9 +84,6 @@
 		<Event source="MorphClose1.newImage" destination="DecPalm.onNewImage"/>
 		<Event source="Blob.newBlobs"       destination="DecPalm.onNewBlobs"/>
 		<Event source="DecPalm.newImage"       destination="Window4.onNewImage"/>
-
-
-	
 	
 	</Events>
 
@@ -138,8 +135,6 @@
 			<in_draw type="in" group="Con10"/>	
 
 		</Window4>
-		
-
 		
 	</DataStreams>
 

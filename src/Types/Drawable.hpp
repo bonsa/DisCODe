@@ -18,7 +18,7 @@ namespace Types {
 class Drawable {
 public:
 	Drawable() {
-		m_col = CV_RGB(0,255,0);
+		m_col = CV_RGB(255,0,0);
 	}
 
 	virtual ~Drawable() {}
