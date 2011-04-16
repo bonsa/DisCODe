@@ -169,6 +169,11 @@ protected:
 
 	void updateState();
 
+	void projectionMeasurePoints();
+
+	void projectionStates();
+
+
 private:
 
 	cv::Mat tsl_img;

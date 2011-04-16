@@ -76,6 +76,7 @@ bool KW_MAP::onStep() {
 		state.clear();
 
 		getCharPoints();
+		projectionMeasurePoints();
 
 		if(first == true)
 		{
@@ -313,15 +314,6 @@ void KW_MAP::getCharPoints() {
 			charPoint.push_back(cv::Point(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y));
 		}
 
-		//projekcja na obraz punktów charakterystycznych
-		Types::Ellipse * el;
-		for (unsigned int i = 0; i < nrChar/2; i++)
-		{
-			el = new Types::Ellipse(Point2f(charPoint[i].x, charPoint[i].y), Size2f(10,10));
-			el->setCol(CV_RGB(0,0,255));
-			drawcont.add(el);
-		}
-
 		result.AddBlob(blobs.GetBlob(id));
 		out_signs.write(result);
 
@@ -331,7 +323,23 @@ void KW_MAP::getCharPoints() {
 	}
 }
 
-void KW_MAP::charPointsToState() {
+void KW_MAP::projectionMeasurePoints()
+{
+	LOG(LTRACE) << "KW_MAP::projectionMeasurePoints\n";
+
+	//projekcja na obraz punktów charakterystycznych
+	Types::Ellipse * el;
+	for (unsigned int i = 0; i < nrChar/2; i++)
+	{
+		el = new Types::Ellipse(Point2f(charPoint[i].x, charPoint[i].y), Size2f(10,10));
+		el->setCol(CV_RGB(0,0,255));
+		drawcont.add(el);
+	}
+
+}
+
+void KW_MAP::charPointsToState()
+{
 	LOG(LTRACE) << "KW_MAP::charPointsToState\n";
 
 	//obliczanie parametrów prostokąta opisującego wewnętrzą część dłoni
@@ -507,7 +515,6 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4, double an
 		tempPoint.x = s1 +  0.5 * s3 * cos(angle);
 		tempPoint.y = s2 -  0.5 * s3 * sin(angle);
 		z.push_back(tempPoint);
-
 
 		statePoint2.x = s1 +  s3 * cos(angle) ;
 		statePoint2.y = s2 -  s3 * sin(angle) ;
