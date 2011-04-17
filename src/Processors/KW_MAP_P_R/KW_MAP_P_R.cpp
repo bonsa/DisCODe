@@ -72,7 +72,7 @@ bool KW_MAP_P_R::onInit() {
 bool KW_MAP_P_R::onFinish() {
 	LOG(LTRACE) << "KW_MAP_P_R::finish\n";
 
-
+/*
 	for (unsigned int i = 0; i < 29; i++)
     {
 		pMean[i] = pMean[i]/ileObrazkow;
@@ -84,6 +84,7 @@ bool KW_MAP_P_R::onFinish() {
 		rMean[i] = (int)(rMean[i]/ileObrazkow);
 		//cout<<"rMean["<< i <<"] = "<< rMean[i] <<"\n";
     }
+    */
 /*
 	for (unsigned int i = 0; i < 20; i++)
     {
@@ -120,6 +121,7 @@ bool KW_MAP_P_R::onStep() {
 		diff.clear();
 		state.clear();
 		meanChar.clear();
+		meanStates.clear();
 
 		// wyznaczenie punktów charakterystycznych na aktualnym obrazku
 		getCharPoints();
@@ -459,6 +461,7 @@ void KW_MAP_P_R::calculate()
 	for(unsigned i = 0; i < nrStates; i++)
 	{
 		meanStates.push_back(pMean[i]/ileObrazkow);
+		plik<<"pMean["<< i <<"] = "<< meanStates[i] <<"\n";
 	}
 
 	//wyznaczenie średniej  dla dotychczasowych obrazków
@@ -496,7 +499,7 @@ void KW_MAP_P_R::calculate()
 	{
 		for(unsigned int j = 0; j < nrStates; j++)
 		{
-			// plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<";\n";
+			 plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<";\n";
 		}
 	}
 
@@ -540,6 +543,7 @@ void KW_MAP_P_R::calculate()
 		sizeR.height = 1;
 	}
 
+	//przepisanie macierzy R do macierzy invR
 	for (int i = 0; i < sizeR.height; i++) {
 
 			// when the arrays are continuous,
@@ -567,12 +571,12 @@ void KW_MAP_P_R::calculate()
 
 	cv::Mat inv;
 	//odwracanie macierzy
-	cv::invert(invR, inv, DECOMP_LU);
+	cv::invert(invR, inv, DECOMP_CHOLESKY );
 	for(unsigned int i = 0; i < nrChar; i++)
 	{
 		for(unsigned int j = 0; j < nrChar; j++)
 		{
-		//	 plik<<"invR["<<i<<"]["<<j<<"]="<<inv.at<float>(i,j)<<";\n";
+			 plik<<"invR["<<i<<"]["<<j<<"]="<<inv.at<float>(i,j)<<";\n";
 		}
 	}
 
@@ -611,7 +615,7 @@ void KW_MAP_P_R::calculate()
 
 	cv::Mat inv2;
 	//odwracanie macierzy
-	cv::invert(invP, inv2, DECOMP_LU);
+	cv::invert(invP, inv2,  DECOMP_CHOLESKY);
 	for(unsigned int i = 0; i<nrStates; i++)
 	{
 		for(unsigned int j = 0; j<nrStates; j++)
