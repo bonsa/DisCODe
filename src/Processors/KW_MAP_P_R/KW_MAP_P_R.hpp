@@ -1,6 +1,6 @@
 /*!
  * \file KW_MAP.hpp
- * \brief  Estymacja MAP, obliczanie macierzy kowariancji P i R
+ * \brief  Estymacja MAP, obliczanie macierzy kowariancji P i R oraz macierze odwrotne  P i R
  * \author kwasak
  * \date 2011-04-14
  */
@@ -104,8 +104,6 @@ protected:
 	 */
 	bool onStop();
 
-	
-	
 	/*!
 	 * Event handler function.
 	 */
@@ -113,7 +111,6 @@ protected:
 
 	/// New image is waiting
 	Base::EventHandler <KW_MAP_P_R> h_onNewImage;
-
 
 	/*!
 	 * Event handler function.
@@ -123,9 +120,8 @@ protected:
 	/// New set of blobs is waiting
 	Base::EventHandler <KW_MAP_P_R> h_onNewBlobs;
 
-
 	/*!
-	 * Event handler function.
+	 * Event handler function. wywołuje akcję obliczania P, invP, R, invR
 	 */
 	void calculate();
 
@@ -162,11 +158,13 @@ protected:
 	 */
 	cv::Point rot(cv::Point p, double angle, cv::Point p0);
 
-
+	// Funkcja wyznaczająca wektor stanu na podstawie punktów charakterystycznych
 	void charPointsToState();
 
+	// Funkcja obliczająca parametry stanu dotyczące palców
 	void fingerToState(cv::Point p2, cv::Point p1, int sig);
 
+	// Funkcja wyznaczająca punkty charakterystyczne na podstawie parametrów stanu dotyczących plców
 	void stateToFinger(double s1, double s2, double s3, double s4, double angle, int sig);
 
 
@@ -177,18 +175,22 @@ private:
 
 	bool blobs_ready;
 	bool img_ready;
+
+	// informacja czy jest to pierwsze wywołanie funkcji step
 	bool first;
 
+	// blob o największej powierzchni czyli dłoń
 	Types::Blobs::BlobResult blobs;
 
-	double last_x, last_y;
-
+	// kontener elementów do narysowania
 	Types::DrawableContainer drawcont;
 
 	// wspołrzędne punktów charakterystycznych konturu
 	vector<cv::Point> charPoint;
+
 	// wektor obserwacji dłoni
 	vector<cv::Point> z;
+
 	// różnica stanów
 	vector<double> diff;
 
@@ -224,8 +226,6 @@ private:
 
 	//macierz kowariancji R
 	double R[20][20];
-
-	double learnRate;
 
 	//macierz odwrotna R
 	cv::Mat invR;

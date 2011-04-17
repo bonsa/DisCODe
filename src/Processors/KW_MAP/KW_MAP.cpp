@@ -413,11 +413,7 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	cv::Point pt1 = rot(p1, angle, charPoint[0]);
 	cv::Point pt2 = rot(p2, angle, charPoint[0]);
 
-	// 4 punkty stanu opisują palec według chłopaków
 	cv::Point statePoint;
-	cv::Point statePoint2;
-	cv::Point statePoint3;
-	cv::Point statePoint4;
 
 	if (sig == 1)
 		statePoint.x = pt2.x - (pt1.x - pt2.x);
@@ -428,7 +424,7 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	int width = abs(2 * (pt1.x - pt2.x));
 	int height = abs(pt1.y - pt2.y);
 
-	//obór to poprzedniej pozycji
+	//obrót to poprzedniej pozycji
 	angle = -angle;
 	statePoint = rot(statePoint, angle, charPoint[0]);
 

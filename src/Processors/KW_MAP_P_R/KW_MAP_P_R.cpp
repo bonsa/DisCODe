@@ -54,18 +54,14 @@ bool KW_MAP_P_R::onInit() {
 	registerStream("out_signs", &out_signs);
 	registerStream("out_draw", &out_draw);
 
-	learnRate = 0.01;
-
 	for( int i = 0; i < 29; i++)
 	{
 		pMean[i] = 0;
-		//cout<<pMean[i]<<"\n";
 	}
 
 	for (int i = 0; i < 20; i++)
 	{
 		rMean[i] = 0;
-		//cout<<rMean[i]<<"\n";
 	}
 
 	first = true;
@@ -75,6 +71,7 @@ bool KW_MAP_P_R::onInit() {
 
 bool KW_MAP_P_R::onFinish() {
 	LOG(LTRACE) << "KW_MAP_P_R::finish\n";
+
 
 	for (unsigned int i = 0; i < 29; i++)
     {
@@ -122,7 +119,9 @@ bool KW_MAP_P_R::onStep() {
 		charPoint.clear();
 		diff.clear();
 		state.clear();
+		meanChar.clear();
 
+		// wyznaczenie punktów charakterystycznych na aktualnym obrazku
 		getCharPoints();
 		 // z --> s, z pomiarów oblicza stan
 		charPointsToState();
@@ -171,14 +170,19 @@ void KW_MAP_P_R::getCharPoints() {
 
 	try {
 
+		// id największego bloba czyli dłoni
 		int id = 0;
 		//numerElements - liczba punktów wchodzących w skład konturu
-		// i, ii - indeksy
 		unsigned int numerElements;
+		//aktualny blob
 		Types::Blobs::Blob *currentBlob;
+		//blob o największej powierzchni czyli dłoń
 		Types::Blobs::BlobResult result;
+		//kontur bloba
 		CvSeq * contour;
+		//reader bloba
 		CvSeqReader reader;
+		//punkt, na którym akltualnie jest przeprowadzana operacja
 		cv::Point actualPoint;
 		// wektor zawierający punkty konturu
 		vector<cv::Point> contourPoints;
@@ -188,7 +192,6 @@ void KW_MAP_P_R::getCharPoints() {
 		vector<float> meanDist;
 		//wektor czastowych pochodnych wektor odległości między punktami konturu a przesuniętym środkiem ciężkości
 		vector<float> derivative;
-
 		//zmienna pomocnicza
 		float TempDist;
 		//zapamietuje poprzedni znak różnicy miedzy punktami,
@@ -200,12 +203,11 @@ void KW_MAP_P_R::getCharPoints() {
 		int MINDIST;
 		//id ostatenio wyznaczonego ekstremum
 		int idLastExtreme;
-
-		Types::DrawableContainer signs; //kontener przechowujący elementy, które mozna narysować
-
-		// iterate through all found blobs
-
+		//kontener przechowujący elementy, które mozna narysować
+		Types::DrawableContainer signs;
+		// momenty służace do obliczenia środka ciężkości
 		double m00, m10, m01;
+		//powierzchnia bloba, powierzchnia największego bloba, współrzedne punktu środka ciezkości, największa wartośc współrzędnej Y
 		double Area, MaxArea, CenterOfGravity_x, CenterOfGravity_y, MaxY;
 
 		MaxArea = 0;
@@ -216,6 +218,7 @@ void KW_MAP_P_R::getCharPoints() {
 			currentBlob = blobs.GetBlob(i);
 
 			Area = currentBlob->Area();
+			// szukanie bloba o najwiekszej powierzchni
 			if (Area > MaxArea) {
 				MaxArea = Area;
 				// id największego bloba, czyli dłoni
@@ -225,47 +228,51 @@ void KW_MAP_P_R::getCharPoints() {
 
 		//obliczenia tylko dla najwiekszego blobu, czyli dloni
 		currentBlob = blobs.GetBlob(id);
+		//wyznaczenie punktów znajdujących się na konturze bloba
 		contour = currentBlob->GetExternalContour()->GetContourPoints();
 		cvStartReadSeq(contour, &reader);
 
-		int cnt = 0;
 		for (int j = 0; j < contour->total; j = j + 1) {
 			CV_READ_SEQ_ELEM( actualPoint, reader);
 
 			if (j % 10 == 1) {
 				//plik << actualPoint.x << " " << actualPoint.y << std::endl;
 				contourPoints.push_back(cv::Point(actualPoint.x, actualPoint.y));
+				//wyznaczenie największej wartości współrzędnej Y
 				if (actualPoint.y > MaxY) {
 					MaxY = actualPoint.y;
 				}
-				cnt++;
 			}
 		}
 
-		//środek cięzkości
 		// calculate moments
 		m00 = currentBlob->Moment(0, 0);
 		m01 = currentBlob->Moment(0, 1);
 		m10 = currentBlob->Moment(1, 0);
 
+		//środek cięzkości
 		CenterOfGravity_x = m10 / m00;
 		CenterOfGravity_y = m01 / m00;
 
+		// obliczenie wartości minimalej odległości pomiedzy środkiem ciezkości a punktem na konturze, która bedzie określać czy dany punkt bedzie brany pod uwagę podczas szukania ekstremów (punktów charakterystycznych)
 		MINDIST = (MaxY - CenterOfGravity_y) * (MaxY - CenterOfGravity_y) * 4/ 9;
-		//przesuniety punkt środka ciężkości
+		//przesuniety punkt środka ciężkości, pierwszy punkt charakterystyczny
 		charPoint.push_back(cv::Point(CenterOfGravity_x, CenterOfGravity_y + (MaxY - CenterOfGravity_y) * 4 / 5));
 
+		// przesunięcie punktu ciezkości w celu ułatwienia wyznaczenie punktów charakterystycznych
 		CenterOfGravity_y += (MaxY - CenterOfGravity_y) * 2 / 3;
 
+		// określenie liczny punktów wchodzących w skład konturu
 		numerElements = contourPoints.size();
 
 		//******************************************************************
-		//obliczenie roznicy miedzy punktami z odwodu a środkiem ciężkosci
+		//obliczenie roznicy miedzy punktami z obwodu a środkiem ciężkosci
 		for (unsigned int i = 0; i < numerElements; i++) {
 			TempDist = (contourPoints[i].x - CenterOfGravity_x)	* (contourPoints[i].x - CenterOfGravity_x)	+ (contourPoints[i].y - CenterOfGravity_y) * (contourPoints[i].y - CenterOfGravity_y);
 			if (TempDist > MINDIST)
 				dist.push_back(TempDist);
 			else
+				//jeśli odległość jest mniejsza niż MINDIST oznacza to, że jest to dolna cześć dłoni i nie znajdują się tam żadnego punkty charakterystyczne poza przesuniętym środkiem ciężkości, dlatego te punkty można ominąć
 				dist.push_back(MINDIST);
 		}
 
@@ -279,16 +286,19 @@ void KW_MAP_P_R::getCharPoints() {
 		else
 			lastSign = -1;
 
+		//1 -oznacza, że ostatni element z konturu należał do dolnej czesci dłoni
 		lastMinDist = 0;
 		//pierwszy punkt kontury to wierzchołek punktu środkowego.
 		indexPoint.push_back(0);
 
 		for (unsigned int i = 1; i < numerElements - 2; i++) {
 
+			//różnica miedzy sąsiedznimi punktami
 			derivative.push_back(dist[i + 1] - dist[i]);
 
 			if (dist[i + 1] > MINDIST && dist[i] > MINDIST) {
-				if (lastMinDist == 1) {
+				//jeżeli ostatnio był wykryta dolna cześci dłoni, następnym charakterystycznych punktem powinien być czubek palca, dlatego lastSign = 1;
+					if (lastMinDist == 1) {
 					lastSign = 1;
 					lastMinDist = 0;
 				}
@@ -315,14 +325,6 @@ void KW_MAP_P_R::getCharPoints() {
 			}
 		}
 
-		//	Types::Ellipse * el = new Types::Ellipse(Point2f(CenterOfGravity_x, CenterOfGravity_y), Size2f(20,20));
-		//	drawcont.add(el);
-		//	Types::Ellipse * el2 = new Types::Ellipse(Point2f(last_x, last_y), Size2f(7,7));
-		//	drawcont.add(el2);
-
-		last_x = CenterOfGravity_x;
-		last_y = CenterOfGravity_y;
-
 		int idLeftPoint = 0;
 		int xLeftPoint = 1000000;
 		for (unsigned int i = 0; i < indexPoint.size(); i++) {
@@ -335,42 +337,14 @@ void KW_MAP_P_R::getCharPoints() {
 		}
 
 		for (int i = idLeftPoint; i >= 0; i--) {
+			//wpisanie do tablicy punktów charakterystycznych punktów opisujących trzy lewe palce
 			charPoint.push_back(cv::Point(contourPoints[indexPoint[i]].x,
 					contourPoints[indexPoint[i]].y));
-			//	drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
 		}
 
 		for (int i = indexPoint.size() - 1; i > idLeftPoint; i--) {
+			//wpisanie do tablicy punktów charakterystycznych punktów opisujących dwa prawe palce
 			charPoint.push_back(cv::Point(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y));
-			//	drawcont.add(new Types::Ellipse(Point2f(contourPoints[indexPoint[i]].x, contourPoints[indexPoint[i]].y), Size2f(10,10)));
-		}
-
-		//plik <<"Punkt środka cieżkosci: "<< CenterOfGravity_x <<" "<< CenterOfGravity_y;
-/*
-		Types::Ellipse * el;
-
-
-		el = new Types::Ellipse(Point2f(charPoint[0].x, charPoint[0].y), Size2f(10,10));
-		el->setCol(CV_RGB(255,0,0));
-		drawcont.add(el);
-
-		el = new Types::Ellipse(Point2f(charPoint[1].x, charPoint[1].y), Size2f(10,10));
-		el->setCol(CV_RGB(0,0,255));
-		drawcont.add(el);
-
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[2].x, charPoint[2].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[3].x, charPoint[3].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[4].x, charPoint[4].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[5].x, charPoint[5].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[6].x, charPoint[6].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[7].x, charPoint[7].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[8].x, charPoint[8].y), Size2f(10,10)));
-		drawcont.add(new Types::Ellipse(Point2f(charPoint[9].x, charPoint[9].y), Size2f(10,10)));
-
-	*/
-		for (unsigned i = 0; i < charPoint.size(); i++)
-		{
-			drawcont.add(new Types::Ellipse(Point2f(charPoint[i].x, charPoint[i].y), Size2f(10,10)));
 		}
 
 		result.AddBlob(blobs.GetBlob(id));
@@ -395,35 +369,33 @@ void KW_MAP_P_R::charPointsToState() {
 	//wysokosc
 	state.push_back(abs(charPoint[0].y - charPoint[6].y));
 
-
-//	drawcont.add(new Types::Rectangle(state[0], state[1], state[2], state[3]));
-//	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[1].x, charPoint[1].y)));
-//	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[3].x, charPoint[3].y)));
-//	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[5].x, charPoint[5].y)));
-//	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[7].x, charPoint[7].y)));
-//	drawcont.add(new Types::Line(cv::Point(charPoint[0].x, charPoint[0].y),cv::Point(charPoint[9].x, charPoint[9].y)));
-
 	fingerToState(charPoint[1], charPoint[2], 1);
 	fingerToState(charPoint[3], charPoint[4], 1);
 	fingerToState(charPoint[5], charPoint[6], 1);
 	fingerToState(charPoint[7], charPoint[6], -1);
 	fingerToState(charPoint[9], charPoint[8], -1);
 
+	//zapamiętanie kolejnych wyznaczonych punktów charakterystycznych w tablicy nChar, sumowanie aktualnych punktów charakterystycznych w wektorze rMean
 	for(unsigned int i = 0, j = 0; i < charPoint.size(); i++)
 	{
+		//dodanie wartości aktualnych punktów charakterystycznych do tablicy rMean
 		rMean[j] += charPoint[i].x;
 		rMean[j+1] += charPoint[i].y;
-		cout<<rMean[j]<<"\n";
-		cout<<rMean[j+1]<<"\n";
+	//	cout<<rMean[j]<<"\n";
+	//	cout<<rMean[j+1]<<"\n";
+
+		//zapamiętanie kolejnych wyznaczonych punktów charakterystycznych w tablicy nChar
 		nChar[j][ileObrazkow-1] =  charPoint[i].x;
 		nChar[j+1][ileObrazkow-1] =  charPoint[i].y;
 		j = j + 2;
 	//	cout << "charPoint size: " << charPoint.size() << endl;
 	}
-
+	//zapamiętanie kolejnych wyznaczonych parametrów wektora stanu w tablicy nStates, sumowanie dotychczasownych wartości wektora stanu w wektorze pMean
 	for(unsigned int i = 0; i < state.size(); i++)
 	{
+		//dodanie aktualnych wartości parametrów wektra stanu do tablicy pMean
 		pMean[i] += state[i];
+		//zapamiętanie kolejnych wyznaczonych parametrów wektora stanu w tablicy nStates
 		nStates[i][ileObrazkow-1] =  state[i];
 	//	cout<<pMean[i]<<"\n";
 	//	cout << "State size: " << state.size() << endl;
@@ -431,6 +403,7 @@ void KW_MAP_P_R::charPointsToState() {
 
 }
 
+//punkcja obracająca punkt p o kąt angle według układu współrzędnych znajdującym się w punkcie p0
 cv::Point KW_MAP_P_R::rot(cv::Point p, double angle, cv::Point p0) {
 		cv::Point t;
 		t.x = p0.x + (int) ((double) (p.x - p0.x) * cos(angle) - (double) (p.y - p0.y) * sin(angle));
@@ -438,6 +411,7 @@ cv::Point KW_MAP_P_R::rot(cv::Point p, double angle, cv::Point p0) {
 		return t;
 	}
 
+//funkcja obliczająca parametry stanu na podstawie punktów charakterystycznych
 //p2 - czubek palca, p1 - punkt miedzy palcami
 void KW_MAP_P_R::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 
@@ -449,9 +423,6 @@ void KW_MAP_P_R::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	cv::Point pt2 = rot(p2, angle, charPoint[0]);
 
 	cv::Point statePoint;
-	cv::Point statePoint2;
-	cv::Point statePoint3;
-	cv::Point statePoint4;
 
 	if(sig == 1)
 		statePoint.x = pt2.x - (pt1.x - pt2.x);
@@ -462,20 +433,9 @@ void KW_MAP_P_R::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	int width = abs(2 * (pt1.x - pt2.x));
 	int height = abs(pt1.y - pt2.y);
 
-	statePoint2.x = statePoint.x;
-	statePoint2.y = statePoint.y + height;
-
-	statePoint3.x = statePoint.x + width;
-	statePoint3.y = statePoint.y + height;
-
-	statePoint4.x = statePoint.x + width;
-	statePoint4.y = statePoint.y;
-
+	//obrót to poprzedniej pozycji
 	angle = -angle;
 	statePoint = rot(statePoint, angle, charPoint[0]);
-	statePoint2 = rot(statePoint2, angle, charPoint[0]);
-	statePoint3 = rot(statePoint3, angle, charPoint[0]);
-	statePoint4 = rot(statePoint4, angle, charPoint[0]);
 
 	//górny lewy wierzchołek
 	state.push_back(statePoint.x);
@@ -485,32 +445,34 @@ void KW_MAP_P_R::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	//wysokosc
 	state.push_back(height);
 	state.push_back(-angle);
-
-
-
-//	drawcont.add(new Types::Line(cv::Point(statePoint.x, statePoint.y), cv::Point(statePoint2.x, statePoint2.y)));
-//	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y), cv::Point(statePoint3.x, statePoint3.y)));
-//	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y), cv::Point(statePoint4.x, statePoint4.y)));
-//	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y), cv::Point(statePoint.x, statePoint.y)));
 }
 
+/*!
+ * Event handler function. wywołuje akcję obliczania P, invP, R, invR
+ */
 void KW_MAP_P_R::calculate()
 {
-	cout<<"MAMAMA!\n";
+	//zapisywanie macierzy P, invP, R, invR do pliku, tworzenie pliku
 	std::ofstream plik("/home/kasia/Test.txt");
-	for(unsigned i = 0; i < state.size(); i++)
+
+	//wyznaczenie średniej wartości parametrów stan dla dotychczasowych obrazków
+	for(unsigned i = 0; i < nrStates; i++)
 	{
 		meanStates.push_back(pMean[i]/ileObrazkow);
 	}
 
-	for(unsigned i = 0; i < charPoint.size(); i++)
+	//wyznaczenie średniej  dla dotychczasowych obrazków
+	for(unsigned i = 0; i < nrChar; i++)
 	{
 		meanChar.push_back(rMean[i]/ileObrazkow);
+
+		cout<<"SIZE"<<charPoint.size()<<"\n";
+		cout<<"meanChar"<<meanChar[i]<<"\n";
 	}
 
-	for(int i = 0; i<29; i++)
+	for(unsigned int i = 0; i< nrStates; i++)
 	{
-	  for(int j = i; j<29 ; j++)
+	  for(unsigned int j = i; j < nrStates ; j++)
 	  {
 		  P[i][j] = 0;
 		  for(int k = 0; k < ileObrazkow; k++)
@@ -530,18 +492,18 @@ void KW_MAP_P_R::calculate()
 	  }
 	}
 
-	for(int i = 0; i<29; i++)
+	for(unsigned int i = 0; i < nrStates; i++)
 	{
-		for(int j = 0; j<29; j++)
+		for(unsigned int j = 0; j < nrStates; j++)
 		{
 			// plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<";\n";
 		}
 	}
 
 
-	for(int i = 0; i<20; i++)
+	for(unsigned int i = 0; i < nrChar; i++)
 	{
-	  for(int j = i; j<20 ; j++)
+	  for(unsigned int j = i; j < nrChar ; j++)
 	  {
 		  R[i][j] = 0;
 		  for(int k = 0; k < ileObrazkow; k++)
@@ -560,16 +522,16 @@ void KW_MAP_P_R::calculate()
 	  }
 	}
 
-	for(int i = 0; i<20; i++)
+	for(unsigned int i = 0; i < nrChar; i++)
 	{
-		for(int j = 0; j<20; j++)
+		for(unsigned int j = 0; j < nrChar; j++)
 		{
 			// plik<<"R["<<i<<"]["<<j<<"]="<<R[i][j]<<";\n";
 		}
 	}
 	cout<<"MAMAMA2!\n";
 
-	cv::Size sizeR = Size(20,20);		//rozmiar obrazka
+	cv::Size sizeR = Size(nrChar,nrChar);		//rozmiar obrazka
 
 	invR.create(sizeR, CV_32FC1);		//8bitów, 0-255, 1 kanał
 
@@ -606,9 +568,9 @@ void KW_MAP_P_R::calculate()
 	cv::Mat inv;
 	//odwracanie macierzy
 	cv::invert(invR, inv, DECOMP_LU);
-	for(int i = 0; i<20; i++)
+	for(unsigned int i = 0; i < nrChar; i++)
 	{
-		for(int j = 0; j<20; j++)
+		for(unsigned int j = 0; j < nrChar; j++)
 		{
 		//	 plik<<"invR["<<i<<"]["<<j<<"]="<<inv.at<float>(i,j)<<";\n";
 		}
@@ -655,7 +617,7 @@ void KW_MAP_P_R::calculate()
 		for(unsigned int j = 0; j<nrStates; j++)
 		{
 			 plik<<"invP["<<i<<"]["<<j<<"]="<<inv2.at<float>(i,j)<<";\n";
-			 cout<<"invP["<<i<<"]["<<j<<"]="<<inv2.at<float>(i,j)<<";\n";
+	//		 cout<<"invP["<<i<<"]["<<j<<"]="<<inv2.at<float>(i,j)<<";\n";
 		}
 	}
 
