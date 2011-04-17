@@ -175,6 +175,8 @@ protected:
 
 	void projectionEstimatedPoints();
 
+	void stopCondition();
+
 private:
 
 	cv::Mat tsl_img;
@@ -196,8 +198,11 @@ private:
 	// wektor obserwacji dłoni
 	vector<cv::Point> z;
 
-	// różnica stanów
+	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
 	vector<double> diff;
+
+	// różnica stanów estymacji i średniego wektora cech stanu
+	vector<double> diffStates;
 
 	// wektor stanu dłoni
 	vector<double> state;
@@ -217,6 +222,9 @@ private:
 	//odwrotna macierz kowariancji R
 	double invR[20][20];
 
+	//odwrotna macierz kowariancji P
+	double invP[29][29];
+
 	//wspołczynnik zapominania
 	double factor;
 
@@ -228,6 +236,12 @@ private:
 
 	// funkcja warunek stopu, jesli STOP = true estymacja MAP jest zakończona
 	bool STOP;
+
+	//przechowuje czesc obliczen podczas aktualizacji stanu i obliczania warunku stopu
+	double t1[29];
+
+	//wektor błędu, jeśli suma jego elementów jest mniejsza niż określony warunek stopu nastepuje koniec estymacji
+	vector<double> T;
 
 };
 

@@ -26,6 +26,8 @@ KW_MAP_P_R::KW_MAP_P_R(const std::string & name) :
 	Base::Component(name) {
 	LOG(LTRACE) << "Hello KW_MAP\n";
 	ileObrazkow = 0;
+	nrStates = 29;
+	nrChar = 20;
 }
 
 KW_MAP_P_R::~KW_MAP_P_R() {
@@ -77,7 +79,7 @@ bool KW_MAP_P_R::onFinish() {
 	for (unsigned int i = 0; i < 29; i++)
     {
 		pMean[i] = pMean[i]/ileObrazkow;
-		//cout<<"pMean["<< i <<"] = "<< pMean[i] <<"\n";
+		cout<<"pMean["<< i <<"] = "<< pMean[i] <<"\n";
     }
 
 	for (unsigned int i = 0; i < 20; i++)
@@ -532,7 +534,7 @@ void KW_MAP_P_R::calculate()
 	{
 		for(int j = 0; j<29; j++)
 		{
-			 plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<";\n";
+			// plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<";\n";
 		}
 	}
 
@@ -587,18 +589,19 @@ void KW_MAP_P_R::calculate()
 
 			//oznacza, które wiersza jest aktualnie przepisywany
 			int row = 0;
-			int col = 0;
+			unsigned int  col = 0;
 			for(int j = 0 ; j < sizeR.width ; j++)
 			{
 				R_p[j] = R[row][col];
 				col += 1;
-				if(col == 20)
+				if(col == nrChar)
 				{
 					col = 0;
 					row = row + 1;
 				}
 			}
 	}
+
 
 	cv::Mat inv;
 	//odwracanie macierzy
@@ -607,7 +610,52 @@ void KW_MAP_P_R::calculate()
 	{
 		for(int j = 0; j<20; j++)
 		{
-			 plik<<"invR["<<i<<"]["<<j<<"]="<<inv.at<float>(i,j)<<";\n";
+		//	 plik<<"invR["<<i<<"]["<<j<<"]="<<inv.at<float>(i,j)<<";\n";
+		}
+	}
+
+	cv::Size sizeP = Size(nrStates,nrStates);		//rozmiar obrazka
+
+	invP.create(sizeP, CV_32FC1);		//8bitów, 0-255, 1 kanał
+
+	if (invP.isContinuous())   {
+		sizeP.width *= sizeP.height;
+		sizeP.height = 1;
+	}
+
+	for (int i = 0; i < sizeP.height; i++) {
+
+			// when the arrays are continuous,
+			// the outer loop is executed only once
+			// if not - it's executed for each row
+
+			// get pointer to beggining of i-th row of input image
+			float* P_p = invP.ptr <float> (i);
+
+			//oznacza, które wiersza jest aktualnie przepisywany
+			int row = 0;
+			unsigned int  col = 0;
+			for(int j = 0 ; j < sizeP.width ; j++)
+			{
+				P_p[j] = P[row][col];
+				col += 1;
+				if(col == nrStates)
+				{
+					col = 0;
+					row = row + 1;
+				}
+			}
+	}
+
+	cv::Mat inv2;
+	//odwracanie macierzy
+	cv::invert(invP, inv2, DECOMP_LU);
+	for(unsigned int i = 0; i<nrStates; i++)
+	{
+		for(unsigned int j = 0; j<nrStates; j++)
+		{
+			 plik<<"invP["<<i<<"]["<<j<<"]="<<inv2.at<float>(i,j)<<";\n";
+			 cout<<"invP["<<i<<"]["<<j<<"]="<<inv2.at<float>(i,j)<<";\n";
 		}
 	}
 

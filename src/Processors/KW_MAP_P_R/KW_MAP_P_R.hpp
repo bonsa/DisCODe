@@ -229,6 +229,15 @@ private:
 
 	//macierz odwrotna R
 	cv::Mat invR;
+
+	//macierz odwrotna P
+	cv::Mat invP;
+
+	// liczba elementów wetora punktów charakterystycznych
+	unsigned int nrChar;
+
+	// liczba elementów wetora stanu
+	unsigned int nrStates;
 };
 
 }//: namespace KW_MAP_P_R
