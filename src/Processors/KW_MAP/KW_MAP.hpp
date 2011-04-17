@@ -152,29 +152,40 @@ protected:
 	 */
 	cv::Point rot(cv::Point p, double angle, cv::Point p0);
 
-
+	// Funkcja wyznaczająca stan na podstawie wektora punktów charakterystycznych
 	void charPointsToState();
 
+	// Funkcja wyznaczająca elementy stanu dotyczące palców
 	void fingerToState(cv::Point p2, cv::Point p1, int sig);
 
+	// Funkcja wyznaczająca punkty charakterystyczne na podstawie elementów stanu dotyczących palców
 	void stateToFinger(double s1, double s2, double s3, double s4, double angle, int sig);
 
+	// Funkcja wyznaczająca punkty charakterystyczne na podstawie wektora stanu
 	void stateToCharPoint();
 
+	// Funkcja wspomagająca obliczaje jakobianu H
 	void derivatives(int indexR, int indexC, double a, double b, double c, double d, double e, int sig);
 
+	// Funkcja obliczająca jakobian H
 	void calculateH();
 
+	// Funkcja obliczająca o jaki wektor nalezy zaktualizowac wektor stan
 	void calculateDiff();
 
+	// Funckja aktualizująca wektor stanu i macierz kowariancji P
 	void updateState();
 
+	// Funckja odpowiedzialna za projekcie punktów charakterystycznych danego obrazka
 	void projectionMeasurePoints();
 
+	// FUnckja odpowiedzialna za projekcie estymowanych parametrów stanu na obraz
 	void projectionStates();
 
+	// Funkcja odpowiedzialna za projekcię estymowanych punktów charakterystycznych
 	void projectionEstimatedPoints();
 
+	// Funkcja sprawdzająca czy warunek końcowy jest sprawdzony
 	void stopCondition();
 
 private:
@@ -188,8 +199,10 @@ private:
 	// czy funkcja jest pierwszy raz uruchomiana
 	bool first;
 
+	// największy blob czyli dłoń
 	Types::Blobs::BlobResult blobs;
 
+	// kontener przechowujący elementy do rysowania
 	Types::DrawableContainer drawcont;
 
 	// wspołrzędne punktów charakterystycznych konturu
