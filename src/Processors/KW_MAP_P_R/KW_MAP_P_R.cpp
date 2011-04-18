@@ -515,38 +515,80 @@ void KW_MAP_P_R::calculate()
 
 //przepisanie średnich wartości stanów do macierzy
 
+/*
+	cv::Size sizePSamples = Size(nrStates,18);		//rozmiar obrazka
+	cv:: Mat PSamples;
+	PSamples.create(sizePSamples, CV_32FC1);		//8bitów, 0-255, 1 kanał
 
-	cv::Size sizePMean = Size(nrStates,18);		//rozmiar obrazka
-	cv:: Mat mPMean;
-	mPMean.create(sizePMean, CV_32FC1);		//8bitów, 0-255, 1 kanał
-
-	if (mPMean.isContinuous())   {
-		sizePMea.width *= sizePMea.height;
-		sizePMea.height = 1;
+	if (PSamples.isContinuous())   {
+		sizePSamples.width *= sizePSamples.height;
+		sizePSamples.height = 1;
 	}
-	for (int i = 0; i < sizeR.height; i++) {
+	for (int i = 0; i < sizePSamples.height; i++) {
 
 			// when the arrays are continuous,
 			// the outer loop is executed only once
 			// if not - it's executed for each row
 
 			// get pointer to beggining of i-th row of input image
-			float* PMean_p = .ptr <float> (i);
+			float* PSamples_p = PSamples.ptr <float> (i);
 
 			//oznacza, które wiersza jest aktualnie przepisywany
 			int row = 0;
-			unsigned int  col = 0;
-			for(int j = 0 ; j < sizeR.width ; j++)
+			int  col = 0;
+			for(int j = 0 ; j < sizePSamples.width ; j++)
 			{
-				R_p[j] = R[row][col];
+				PSamples_p[j] = nStates[row][col];
 				col += 1;
-				if(col == nrChar)
+				if(col == ileObrazkow)
 				{
 					col = 0;
 					row = row + 1;
 				}
 			}
 	}
+
+	cv:: Mat P;
+	cv:: Mat mean;
+
+	calcCovarMatrix(PSamples, P, mean, CV_COVAR_ROWS);
+*/
+	cv:: Mat mean;
+	//najpierw ilosc kolumna potem wierszy
+	cv::Size Test = Size(3,5);		//rozmiar obrazka
+	cv:: Mat MatTest;
+	MatTest.create(Test, CV_64FC1);		//8bitów, 0-255, 1 kanał
+
+	MatTest.at<double>(0,0) = 4;
+	MatTest.at<double>(0,1) = 2;
+	MatTest.at<double>(0,2) = 0.6;
+	MatTest.at<double>(1,0) = 4.2;
+	MatTest.at<double>(1,1) = 2.1;
+	MatTest.at<double>(1,2) = 0.59;
+	MatTest.at<double>(2,0) = 3.9;
+	MatTest.at<double>(2,1) = 2.0;
+	MatTest.at<double>(2,2) = 0.58;
+	MatTest.at<double>(3,0) = 4.3;
+	MatTest.at<double>(3,1) = 2.1;
+	MatTest.at<double>(3,2) = 0.62;
+	MatTest.at<double>(4,0) = 4.1;
+	MatTest.at<double>(4,1) = 2.2;
+	MatTest.at<double>(4,2) = 0.63;
+
+	cv:: Mat TestCov;
+	calcCovarMatrix(MatTest,TestCov, mean, CV_COVAR_ROWS| CV_COVAR_NORMAL );
+	cout<<"rows"<<TestCov.rows<<"\n";
+	cout<<"cols"<<TestCov.cols<<"\n";
+
+	for(unsigned int i = 0; i<3; i++)
+	{
+		for(unsigned int j = 0; j<3; j++)
+		{
+			cout<<i<<","<<j<<": "<<TestCov.at<double>(i,j)/4<<"\n";
+		}
+	}
+
+
 	/*
 	for(unsigned int i = 0; i< nrStates; i++)
 	{
@@ -571,7 +613,7 @@ void KW_MAP_P_R::calculate()
 	}
 
 	*/
-
+/*
 	for(unsigned int i = 0; i < nrStates; i++)
 	{
 		for(unsigned int j = 0; j < nrStates; j++)
@@ -706,6 +748,7 @@ void KW_MAP_P_R::calculate()
 	plik << "d=" << d << "\n";
 
 	plik.close();
+*/
 }
 
 
