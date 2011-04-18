@@ -95,11 +95,12 @@ bool KW_MAP::onStep() {
 				// s --> z
 				stateToCharPoint();
 				projectionEstimatedPoints();
-				calculateDiff();
-				updateState();
+				//calculateDiff();
+				//updateState();
 			}
+
 			projectionStates();
-			stopCondition();
+			//stopCondition();
 		}
 		else
 		{
@@ -413,27 +414,32 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	LOG(LTRACE) << "KW_MAP::fingerToState\n";
 
 	//tg kąta nachylenia
-	double uj = (double) (-p2.x + charPoint[0].x) / (-p2.y + charPoint[0].y);
+	double dx = p2.x - charPoint[0].x;
+	double dy = p2.y - charPoint[0].y;
 	//argument kąta nachylenia
-	double angle = atan(uj);
+	double angle = atan2(dy, dx);
+	double rotangle = angle + M_PI_2;
+
 	//obrót punktów charakterystycznych o kąt nachylenia względem układu współrzędnych znajdującym się w punkcie dołu dłoni
-	cv::Point pt1 = rot(p1, angle, charPoint[0]);
-	cv::Point pt2 = rot(p2, angle, charPoint[0]);
+	cv::Point pt1 = rot(p1, -rotangle, charPoint[0]);
+	cv::Point pt2 = rot(p2, -rotangle, charPoint[0]);
 
 	cv::Point statePoint;
+//
+//	if (sig == 1)
+//		statePoint.x = pt2.x - (pt1.x - pt2.x);
+//	else if (sig == -1)
+//		statePoint.x = pt1.x;
 
-	if (sig == 1)
-		statePoint.x = pt2.x - (pt1.x - pt2.x);
-	else if (sig == -1)
-		statePoint.x = pt1.x;
 
-	statePoint.y = pt2.y;
 	int width = abs(2 * (pt1.x - pt2.x));
 	int height = abs(pt1.y - pt2.y);
 
+	statePoint.x = pt2.x;
+	statePoint.y = pt2.y + 0.5 * height;
+
 	//obrót to poprzedniej pozycji
-	angle = -angle;
-	statePoint = rot(statePoint, angle, charPoint[0]);
+	statePoint = rot(statePoint, rotangle, charPoint[0]);
 
 	//górny lewy wierzchołek
 	state.push_back(statePoint.x);
@@ -442,7 +448,7 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	state.push_back(width);
 	//wysokosc
 	state.push_back(height);
-	state.push_back(-angle);
+	state.push_back(angle);
 }
 
 //******************************************SPRAWDŹ CZY DZIALA***********************************************
@@ -455,26 +461,26 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4,
 	cv::Point tempPoint;
 
 	if (sig == 1) {
-		tempPoint.x = s1 + 0.5 * s3 * cos(angle);
-		tempPoint.y = s2 - 0.5 * s3 * sin(angle);
+		tempPoint.x = s1 + 0.5 * s4 * cos(angle);
+		tempPoint.y = s2 + 0.5 * s4 * sin(angle);
 		z.push_back(tempPoint);
 
-		tempPoint.x = s1 + s3 * cos(angle) + s4 * sin(angle);
-		tempPoint.y = s2 - s3 * sin(angle) + s4 * cos(angle);
+		tempPoint.x = s1 + 0.5 * s3 * cos(angle + M_PI_2) - 0.5 * s4 * cos(angle);
+		tempPoint.y = s2 + 0.5 * s3 * sin(angle + M_PI_2) - 0.5 * s4 * sin(angle);
 		z.push_back(tempPoint);
 	}
 	if (sig == 2) {
-		tempPoint.x = s1 + 0.5 * s3 * cos(angle);
-		tempPoint.y = s2 - 0.5 * s3 * sin(angle);
+		tempPoint.x = s1 + 0.5 * s4 * cos(angle);
+		tempPoint.y = s2 + 0.5 * s4 * sin(angle);
 		z.push_back(tempPoint);
 	}
 	if (sig == 3) {
-		tempPoint.x = s1 + s4 * sin(angle);
-		tempPoint.y = s2 + s4 * cos(angle);
+		tempPoint.x = s1 - 0.5 * s3 * cos(angle + M_PI_2) - 0.5 * s4 * cos(angle);
+		tempPoint.y = s2 - 0.5 * s3 * sin(angle + M_PI_2) - 0.5 * s4 * sin(angle);
 		z.push_back(tempPoint);
 
-		tempPoint.x = s1 + 0.5 * s3 * cos(angle);
-		tempPoint.y = s2 - 0.5 * s3 * sin(angle);
+		tempPoint.x = s1 + 0.5 * s4 * cos(angle);
+		tempPoint.y = s2 + 0.5 * s4 * sin(angle);
 		z.push_back(tempPoint);
 	}
 }
@@ -730,121 +736,22 @@ void KW_MAP::projectionStates() {
 	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y),
 			cv::Point(statePoint1.x, statePoint1.y)));
 
-	statePoint1.x = state[4];
-	statePoint1.y = state[5];
+	for (int i = 0; i < 5; ++i) {
+		statePoint1.x = state[4 + i * 5];
+		statePoint1.y = state[5 + i * 5];
+		cv::Size2f size;
+		size.width = 0.5 * state[6 + i * 5];
+		size.height = 0.5 * state[7 + i * 5];
+		double angle = state[8 + i * 5];
 
-	statePoint2.x = state[4] + state[6] * cos(state[8]);
-	statePoint2.y = state[5] - state[6] * sin(state[8]);
+		//std::cout << angle / M_PI * 180 << std::endl;
 
-	statePoint3.x = state[4] + state[6] * cos(state[8]) + state[7] * sin(
-			state[8]);
-	statePoint3.y = state[5] - state[6] * sin(state[8]) + state[7] * cos(
-			state[8]);
+		Types::Ellipse * elE;
+		elE = new Types::Ellipse(statePoint1, size, angle / M_PI * 180 - 90);
+		elE->setCol(CV_RGB(255,255,255));
+		drawcont.add(elE);
+	}
 
-	statePoint4.x = statePoint3.x - state[6] * cos(state[8]);
-	statePoint4.y = statePoint3.y + state[6] * sin(state[8]);
-
-	//projekcja lewego (małego) palca na obraz
-	drawcont.add(new Types::Line(cv::Point(statePoint1.x, statePoint1.y),
-			cv::Point(statePoint2.x, statePoint2.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y),
-			cv::Point(statePoint3.x, statePoint3.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y),
-			cv::Point(statePoint4.x, statePoint4.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y),
-			cv::Point(statePoint1.x, statePoint1.y)));
-
-	statePoint1.x = state[9];
-	statePoint1.y = state[10];
-
-	statePoint2.x = state[9] + state[11] * cos(state[13]);
-	statePoint2.y = state[10] - state[11] * sin(state[13]);
-
-	statePoint3.x = state[9] + state[11] * cos(state[13]) + state[12] * sin(
-			state[13]);
-	statePoint3.y = state[10] - state[11] * sin(state[13]) + state[12] * cos(
-			state[13]);
-
-	statePoint4.x = statePoint3.x - state[11] * cos(state[13]);
-	statePoint4.y = statePoint3.y + state[11] * sin(state[13]);
-
-	//projekcja drugiego palca (wskazującego) od lewej na obraz
-	drawcont.add(new Types::Line(cv::Point(statePoint1.x, statePoint1.y),
-			cv::Point(statePoint2.x, statePoint2.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y),
-			cv::Point(statePoint3.x, statePoint3.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y),
-			cv::Point(statePoint4.x, statePoint4.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y),
-			cv::Point(statePoint1.x, statePoint1.y)));
-
-	statePoint1.x = state[14];
-	statePoint1.y = state[15];
-
-	statePoint2.x = state[14] + state[16] * cos(state[18]);
-	statePoint2.y = state[15] - state[16] * sin(state[18]);
-
-	statePoint3.x = state[14] + state[16] * cos(state[18]) + state[17] * sin(
-			state[18]);
-	statePoint3.y = state[15] - state[16] * sin(state[18]) + state[17] * cos(
-			state[18]);
-
-	statePoint4.x = statePoint3.x - state[16] * cos(state[18]);
-	statePoint4.y = statePoint3.y + state[16] * sin(state[18]);
-
-	//projekcja środkowego palca od lewej na obraz
-	drawcont.add(new Types::Line(cv::Point(statePoint1.x, statePoint1.y),
-			cv::Point(statePoint2.x, statePoint2.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y),
-			cv::Point(statePoint3.x, statePoint3.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y),
-			cv::Point(statePoint4.x, statePoint4.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y),
-			cv::Point(statePoint1.x, statePoint1.y)));
-
-	statePoint1.x = state[19];
-	statePoint1.y = state[20];
-
-	statePoint4.x = state[19] + state[22] * sin(state[23]);
-	statePoint4.y = state[20] + state[22] * cos(state[23]);
-
-	statePoint2.x = state[19] + state[21] * cos(state[23]);
-	statePoint2.y = state[20] - state[21] * sin(state[23]);
-
-	statePoint3.x = statePoint4.x + state[21] * cos(state[23]);
-	statePoint3.y = statePoint4.y - state[21] * sin(state[23]);
-
-	//projekcja drugiego palca od prawej
-	drawcont.add(new Types::Line(cv::Point(statePoint1.x, statePoint1.y),
-			cv::Point(statePoint2.x, statePoint2.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y),
-			cv::Point(statePoint3.x, statePoint3.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y),
-			cv::Point(statePoint4.x, statePoint4.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y),
-			cv::Point(statePoint1.x, statePoint1.y)));
-
-	statePoint1.x = state[24];
-	statePoint1.y = state[25];
-
-	statePoint4.x = state[24] + state[27] * sin(state[28]);
-	statePoint4.y = state[25] + state[27] * cos(state[28]);
-
-	statePoint2.x = state[24] + state[26] * cos(state[28]);
-	statePoint2.y = state[25] - state[26] * sin(state[28]);
-
-	statePoint3.x = statePoint4.x + state[26] * cos(state[28]);
-	statePoint3.y = statePoint4.y - state[26] * sin(state[28]);
-
-	//projekcja pierwszego palca (kciuka) od prawej
-	drawcont.add(new Types::Line(cv::Point(statePoint1.x, statePoint1.y),
-			cv::Point(statePoint2.x, statePoint2.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint2.x, statePoint2.y),
-			cv::Point(statePoint3.x, statePoint3.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint3.x, statePoint3.y),
-			cv::Point(statePoint4.x, statePoint4.y)));
-	drawcont.add(new Types::Line(cv::Point(statePoint4.x, statePoint4.y),
-			cv::Point(statePoint1.x, statePoint1.y)));
 }
 
 //konstruktor
