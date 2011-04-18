@@ -95,12 +95,12 @@ bool KW_MAP::onStep() {
 				// s --> z
 				stateToCharPoint();
 				projectionEstimatedPoints();
-				//calculateDiff();
-				//updateState();
+				calculateDiff();
+				updateState();
 			}
 
 			projectionStates();
-			//stopCondition();
+			stopCondition();
 		}
 		else
 		{
@@ -465,8 +465,10 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4,
 		tempPoint.y = s2 + 0.5 * s4 * sin(angle);
 		z.push_back(tempPoint);
 
-		tempPoint.x = s1 + 0.5 * s3 * cos(angle + M_PI_2) - 0.5 * s4 * cos(angle);
-		tempPoint.y = s2 + 0.5 * s3 * sin(angle + M_PI_2) - 0.5 * s4 * sin(angle);
+		tempPoint.x = s1 - 0.5 * s3 * sin(angle) - 0.5 * s4 * cos(angle);
+		tempPoint.y = s2 + 0.5 * s3 * cos(angle) - 0.5 * s4 * sin(angle);
+		//tempPoint.x = s1 + 0.5 * s3 * cos(angle + M_PI_2) - 0.5 * s4 * cos(angle);
+		//tempPoint.y = s2 + 0.5 * s3 * sin(angle + M_PI_2) - 0.5 * s4 * sin(angle);
 		z.push_back(tempPoint);
 	}
 	if (sig == 2) {
@@ -475,8 +477,11 @@ void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4,
 		z.push_back(tempPoint);
 	}
 	if (sig == 3) {
-		tempPoint.x = s1 - 0.5 * s3 * cos(angle + M_PI_2) - 0.5 * s4 * cos(angle);
-		tempPoint.y = s2 - 0.5 * s3 * sin(angle + M_PI_2) - 0.5 * s4 * sin(angle);
+
+		tempPoint.x = s1 + 0.5 * s3 * sin(angle) - 0.5 * s4 * cos(angle);
+		tempPoint.y = s2 - 0.5 * s3 * cos(angle) - 0.5 * s4 * sin(angle);
+		//tempPoint.x = s1 - 0.5 * s3 * cos(angle + M_PI_2) - 0.5 * s4 * cos(angle);
+		//tempPoint.y = s2 - 0.5 * s3 * sin(angle + M_PI_2) - 0.5 * s4 * sin(angle);
 		z.push_back(tempPoint);
 
 		tempPoint.x = s1 + 0.5 * s4 * cos(angle);
@@ -535,6 +540,45 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c,
 	if (sig == 3) {
 
 		H[indexR][indexC] = 1;
+		H[indexR + 2][indexC] = 0.5 * sinE;
+		H[indexR + 3][indexC] = -0.5 * cosE;
+		H[indexR + 4][indexC] = 0.5 * c * cosE + 0.5 * d * sinE;
+
+		indexC += 1;
+		H[indexR + 1][indexC] = 1;
+		H[indexR + 2][indexC] = -0.5 * cosE;
+		H[indexR + 3][indexC] = -0.5 * sinE;
+		H[indexR + 4][indexC] = 0.5 * c * sinE - 0.5 * d * cosE;
+
+		indexC += 1;
+	}
+
+	H[indexR][indexC] = 1;
+	H[indexR + 2][indexC] = 0.5 * cosE;
+	H[indexR + 4][indexC] = -0.5 * c * sinE;
+
+	indexC += 1;
+	H[indexR + 1][indexC] = 1;
+	H[indexR + 2][indexC] = 0.5 * sinE;
+	H[indexR + 4][indexC] = 0.5 * c * cosE;
+
+	if (sig == 1) {
+		indexC += 1;
+		H[indexR][indexC] = 1;
+		H[indexR + 2][indexC] = -0.5 * sinE;
+		H[indexR + 3][indexC] = -0.5 * cosE;
+		H[indexR + 4][indexC] = -0.5 * c * cosE + 0.5 * d * sinE;
+
+		indexC += 1;
+		H[indexR + 1][indexC] = 1;
+		H[indexR + 2][indexC] = 0.5 * cosE;
+		H[indexR + 3][indexC] = - 0.5 * sinE;
+		H[indexR + 4][indexC] = - 0.5 * c * sinE - 0.5 * d * cosE;
+	}
+	/*
+	if (sig == 3) {
+
+		H[indexR][indexC] = 1;
 		H[indexR + 3][indexC] = sinE;
 		H[indexR + 4][indexC] = d * cosE;
 
@@ -569,6 +613,8 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c,
 		H[indexR + 4][indexC] = -c * cosE - d * sinE;
 
 	}
+
+	*/
 }
 
 // funkcja obliczająca macierz jakobianu H
@@ -615,8 +661,8 @@ void KW_MAP::calculateDiff() {
 	for (unsigned int i = 0; i < nrChar; i = i + 2)
 	{
 		//różnica miedzy punktami charakterystycznymi aktualnego obraz
-		D[i] = z[j].x - charPoint[j].x;
-		D[i + 1] = z[j].y - charPoint[j].y;
+		D[i] = - z[j].x + charPoint[j].x;
+		D[i + 1] =  - z[j].y + charPoint[j].y;
 		j += 1;
 	}
 

@@ -416,7 +416,46 @@ cv::Point KW_MAP_P_R::rot(cv::Point p, double angle, cv::Point p0) {
 //funkcja obliczająca parametry stanu na podstawie punktów charakterystycznych
 //p2 - czubek palca, p1 - punkt miedzy palcami
 void KW_MAP_P_R::fingerToState(cv::Point p2, cv::Point p1, int sig) {
+	LOG(LTRACE) << "KW_MAP::fingerToState\n";
 
+	//tg kąta nachylenia
+	double dx = p2.x - charPoint[0].x;
+	double dy = p2.y - charPoint[0].y;
+	//argument kąta nachylenia
+	double angle = atan2(dy, dx);
+	double rotangle = angle + M_PI_2;
+
+	//obrót punktów charakterystycznych o kąt nachylenia względem układu współrzędnych znajdującym się w punkcie dołu dłoni
+	cv::Point pt1 = rot(p1, -rotangle, charPoint[0]);
+	cv::Point pt2 = rot(p2, -rotangle, charPoint[0]);
+
+	cv::Point statePoint;
+//
+//	if (sig == 1)
+//		statePoint.x = pt2.x - (pt1.x - pt2.x);
+//	else if (sig == -1)
+//		statePoint.x = pt1.x;
+
+
+	int width = abs(2 * (pt1.x - pt2.x));
+	int height = abs(pt1.y - pt2.y);
+
+	statePoint.x = pt2.x;
+	statePoint.y = pt2.y + 0.5 * height;
+
+	//obrót to poprzedniej pozycji
+	statePoint = rot(statePoint, rotangle, charPoint[0]);
+
+	//górny lewy wierzchołek
+	state.push_back(statePoint.x);
+	state.push_back(statePoint.y);
+	//szerokosc
+	state.push_back(width);
+	//wysokosc
+	state.push_back(height);
+	state.push_back(angle);
+
+	/*
 	LOG(LTRACE) << "KW_MAP::fingerToState\n";
 
 	double uj = (double) (-p2.x + charPoint[0].x) / (-p2.y + charPoint[0].y);
@@ -447,6 +486,7 @@ void KW_MAP_P_R::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	//wysokosc
 	state.push_back(height);
 	state.push_back(-angle);
+	*/
 }
 
 /*!
@@ -473,6 +513,41 @@ void KW_MAP_P_R::calculate()
 		cout<<"meanChar"<<meanChar[i]<<"\n";
 	}
 
+//przepisanie średnich wartości stanów do macierzy
+
+
+	cv::Size sizePMean = Size(nrStates,18);		//rozmiar obrazka
+	cv:: Mat mPMean;
+	mPMean.create(sizePMean, CV_32FC1);		//8bitów, 0-255, 1 kanał
+
+	if (mPMean.isContinuous())   {
+		sizePMea.width *= sizePMea.height;
+		sizePMea.height = 1;
+	}
+	for (int i = 0; i < sizeR.height; i++) {
+
+			// when the arrays are continuous,
+			// the outer loop is executed only once
+			// if not - it's executed for each row
+
+			// get pointer to beggining of i-th row of input image
+			float* PMean_p = .ptr <float> (i);
+
+			//oznacza, które wiersza jest aktualnie przepisywany
+			int row = 0;
+			unsigned int  col = 0;
+			for(int j = 0 ; j < sizeR.width ; j++)
+			{
+				R_p[j] = R[row][col];
+				col += 1;
+				if(col == nrChar)
+				{
+					col = 0;
+					row = row + 1;
+				}
+			}
+	}
+	/*
 	for(unsigned int i = 0; i< nrStates; i++)
 	{
 	  for(unsigned int j = i; j < nrStates ; j++)
@@ -495,11 +570,13 @@ void KW_MAP_P_R::calculate()
 	  }
 	}
 
+	*/
+
 	for(unsigned int i = 0; i < nrStates; i++)
 	{
 		for(unsigned int j = 0; j < nrStates; j++)
 		{
-			 plik<<"P["<<i<<"]["<<j<<"]="<<P[i][j]<<";\n";
+			 plik<<"P("<<i+1<<","<<j+1<<")="<<P[i][j]<<";\n";
 		}
 	}
 
@@ -529,7 +606,7 @@ void KW_MAP_P_R::calculate()
 	{
 		for(unsigned int j = 0; j < nrChar; j++)
 		{
-			// plik<<"R["<<i<<"]["<<j<<"]="<<R[i][j]<<";\n";
+			 plik<<"R["<<i<<"]["<<j<<"]="<<R[i][j]<<";\n";
 		}
 	}
 	cout<<"MAMAMA2!\n";
@@ -571,7 +648,7 @@ void KW_MAP_P_R::calculate()
 
 	cv::Mat inv;
 	//odwracanie macierzy
-	cv::invert(invR, inv, DECOMP_CHOLESKY );
+	double d = cv::invert(invR, inv, DECOMP_LU);
 	for(unsigned int i = 0; i < nrChar; i++)
 	{
 		for(unsigned int j = 0; j < nrChar; j++)
@@ -579,6 +656,7 @@ void KW_MAP_P_R::calculate()
 			 plik<<"invR["<<i<<"]["<<j<<"]="<<inv.at<float>(i,j)<<";\n";
 		}
 	}
+	plik << "d=" << d << "\n";
 
 	cv::Size sizeP = Size(nrStates,nrStates);		//rozmiar obrazka
 
@@ -615,7 +693,7 @@ void KW_MAP_P_R::calculate()
 
 	cv::Mat inv2;
 	//odwracanie macierzy
-	cv::invert(invP, inv2,  DECOMP_CHOLESKY);
+	d = cv::invert(invP, inv2,  DECOMP_SVD);
 	for(unsigned int i = 0; i<nrStates; i++)
 	{
 		for(unsigned int j = 0; j<nrStates; j++)
@@ -624,6 +702,8 @@ void KW_MAP_P_R::calculate()
 	//		 cout<<"invP["<<i<<"]["<<j<<"]="<<inv2.at<float>(i,j)<<";\n";
 		}
 	}
+
+	plik << "d=" << d << "\n";
 
 	plik.close();
 }
