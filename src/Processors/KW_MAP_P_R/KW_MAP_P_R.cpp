@@ -395,12 +395,15 @@ void KW_MAP_P_R::charPointsToState() {
 	//zapamiętanie kolejnych wyznaczonych parametrów wektora stanu w tablicy nStates, sumowanie dotychczasownych wartości wektora stanu w wektorze pMean
 	for(unsigned int i = 0; i < state.size(); i++)
 	{
-		//dodanie aktualnych wartości parametrów wektra stanu do tablicy pMean
-		pMean[i] += state[i];
-		//zapamiętanie kolejnych wyznaczonych parametrów wektora stanu w tablicy nStates
-		nStates[i][ileObrazkow-1] =  state[i];
-	//	cout<<pMean[i]<<"\n";
-	//	cout << "State size: " << state.size() << endl;
+		if (ileObrazkow < 18)
+		{
+			//dodanie aktualnych wartości parametrów wektra stanu do tablicy pMean
+			pMean[i] += state[i];
+			//zapamiętanie kolejnych wyznaczonych parametrów wektora stanu w tablicy nStates
+			nStates[i][ileObrazkow-1] =  state[i];
+		//	cout<<pMean[i]<<"\n";
+		//	cout << "State size: " << state.size() << endl;
+		}
 	}
 
 }
@@ -509,14 +512,13 @@ void KW_MAP_P_R::calculate()
 	{
 		meanChar.push_back(rMean[i]/ileObrazkow);
 
-		cout<<"SIZE"<<charPoint.size()<<"\n";
-		cout<<"meanChar"<<meanChar[i]<<"\n";
+	//	cout<<"SIZE"<<charPoint.size()<<"\n";
+	//	cout<<"meanChar"<<meanChar[i]<<"\n";
 	}
 
-//przepisanie średnich wartości stanów do macierzy
-
-/*
-	cv::Size sizePSamples = Size(nrStates,18);		//rozmiar obrazka
+	//*************Wyliczenie macierzy P i macierzy odwrotnej P
+	//przepisanie średnich wartości stanów do macierzy
+	cv::Size sizePSamples = Size(ileObrazkow, nrStates);		//parametry w rozmiarze podaje sie odwrotnie (ilosc kolumn, ilosc wierszy)
 	cv:: Mat PSamples;
 	PSamples.create(sizePSamples, CV_32FC1);		//8bitów, 0-255, 1 kanał
 
@@ -536,6 +538,7 @@ void KW_MAP_P_R::calculate()
 			//oznacza, które wiersza jest aktualnie przepisywany
 			int row = 0;
 			int  col = 0;
+
 			for(int j = 0 ; j < sizePSamples.width ; j++)
 			{
 				PSamples_p[j] = nStates[row][col];
@@ -548,17 +551,112 @@ void KW_MAP_P_R::calculate()
 			}
 	}
 
-	cv:: Mat P;
 	cv:: Mat mean;
 
-	calcCovarMatrix(PSamples, P, mean, CV_COVAR_ROWS);
-*/
-	cv:: Mat mean;
+	// obliczenie macierzy kowariancji P
+	calcCovarMatrix(PSamples, P, mean, CV_COVAR_COLS| CV_COVAR_NORMAL);
+
+	// podzial elementow macierzy P przez liczbe próbek - 1, w wyniku otrzymujemy macierz kowariancji
+	for (int i = 0; i< P.rows; i++)
+	{
+		for(int j = 0; j< P.cols; j++)
+			{
+				P.at<double>(i,j) /= (ileObrazkow - 1);
+				//plik<<"P["<<i<<"]["<<j<<"]="<<P.at<double>(i,j)<<";\n";
+				plik<<"P("<<i+1<<","<<j+1<<")="<<P.at<double>(i,j)<<";\n";
+		}
+	}
+
+	for (int i = 0; i< P.rows; i++)
+	{
+		for(int j = 0; j< P.cols; j++)
+			{
+				//plik<<"P["<<i<<"]["<<j<<"]="<<P.at<double>(i,j)<<";\n";
+				plik<<"MATP("<<j+1<<","<<i+1<<")="<<P.at<double>(i,j)<<";\n";
+		}
+	}
+	cv::invert(P, invP, DECOMP_LU);
+	for (int i = 0; i< invP.rows; i++)
+	{
+		for(int j = 0; j< invP.cols; j++)
+			{
+				plik<<"invP["<<i<<"]["<<j<<"]="<<invP.at<double>(i,j)<<";\n";
+		}
+	}
+
+	//*************Wyliczenie macierzy R i macierzy odwrotnej R**************************************/
+
+	cv::Size sizeRSamples = Size(ileObrazkow, nrChar);		//parametry w rozmiarze podaje sie odwrotnie (ilosc kolumn, ilosc wierszy)
+	cv:: Mat RSamples;
+	RSamples.create(sizeRSamples, CV_32FC1);		//8bitów, 0-255, 1 kanał
+
+	if (RSamples.isContinuous())   {
+		sizeRSamples.width *= sizeRSamples.height;
+		sizeRSamples.height = 1;
+	}
+	for (int i = 0; i < sizeRSamples.height; i++)
+	{
+
+			// when the arrays are continuous,
+			// the outer loop is executed only once
+			// if not - it's executed for each row
+
+			// get pointer to beggining of i-th row of input image
+			float* RSamples_p = RSamples.ptr <float> (i);
+
+			//oznacza, które wiersza jest aktualnie przepisywany
+			int row = 0;
+			int  col = 0;
+
+			for(int j = 0 ; j < sizeRSamples.width ; j++)
+			{
+				RSamples_p[j] =(float) nChar[row][col];
+				col += 1;
+				if(col == ileObrazkow)
+				{
+					col = 0;
+					row = row + 1;
+				}
+			}
+	}
+
+	cout<<"row"<<RSamples.rows<<"\n";
+	cout<<"col"<<RSamples.cols<<"\n";
+cout<<nChar[0][0]<<"\n";
+cout<<RSamples.at<double>(0,0)<<"\n";
+cout<<nChar[1][0]<<"\n";
+cout<<RSamples.at<double>(1,0)<<"\n";
+cout<<nChar[0][3]<<"\n";
+cout<<RSamples.at<double>(0,3)<<"\n";
+cout<<nChar[19][13]<<"\n";
+cout<<RSamples.at<double>(19,13)<<"\n";
+
+
+
+/*
+	cout<<"rows"<<PSamples.rows<<"\n";
+	cout<<"cols"<<PSamples.cols<<"\n";
+
+	cout<<"rows"<<P.rows<<"\n";
+	cout<<"cols"<<P.cols<<"\n";
+
+	cout<<"P"<<P.at<double>(0,0)<<"\n";
+
+	for (int i = 0; i< P.rows; i++)
+	{
+		for(int j = 0; j< P.cols; j++)
+		{
+			P.at<double>(i,j) /= (ileObrazkow - 1);
+		}
+	}
+	cout<<"P"<<P.at<double>(0,0)<<"\n";
+
 	//najpierw ilosc kolumna potem wierszy
 	cv::Size Test = Size(3,5);		//rozmiar obrazka
 	cv:: Mat MatTest;
 	MatTest.create(Test, CV_64FC1);		//8bitów, 0-255, 1 kanał
-
+*/
+/*
 	MatTest.at<double>(0,0) = 4;
 	MatTest.at<double>(0,1) = 2;
 	MatTest.at<double>(0,2) = 0.6;
@@ -584,10 +682,10 @@ void KW_MAP_P_R::calculate()
 	{
 		for(unsigned int j = 0; j<3; j++)
 		{
-			cout<<i<<","<<j<<": "<<TestCov.at<double>(i,j)/4<<"\n";
+			//cout<<i<<","<<j<<": "<<TestCov.at<double>(i,j)/4<<"\n";
 		}
 	}
-
+*/
 
 	/*
 	for(unsigned int i = 0; i< nrStates; i++)

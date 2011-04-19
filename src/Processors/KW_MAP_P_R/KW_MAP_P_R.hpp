@@ -222,7 +222,7 @@ private:
 	double H[29][20];
 
 	//macierz kowariancji P
-	double P[29][29];
+	cv:: Mat P;
 
 	//macierz kowariancji R
 	double R[20][20];
