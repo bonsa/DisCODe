@@ -5,10 +5,10 @@
 
 		
 		<Seq type="Sequence" thread="Exec1" group="s1">
-			<directory>/home/kasia/Filmy/</directory> 
+			<directory>/home/kasia/Filmy/zdjecia/MAP/</directory> 
 			<loop>true</loop>
 			<triggered>true</triggered>	
-			<pattern>.*\.png</pattern>
+			<pattern>.*\.jpg</pattern>
 		
 		</Seq>
 		 

@@ -380,11 +380,14 @@ void KW_MAP_P_R::charPointsToState() {
 	//zapamiętanie kolejnych wyznaczonych punktów charakterystycznych w tablicy nChar, sumowanie aktualnych punktów charakterystycznych w wektorze rMean
 	for(unsigned int i = 0, j = 0; i < charPoint.size(); i++)
 	{
-		//dodanie wartości aktualnych punktów charakterystycznych do tablicy rMean
-		rMean[j] += charPoint[i].x;
-		rMean[j+1] += charPoint[i].y;
-	//	cout<<rMean[j]<<"\n";
-	//	cout<<rMean[j+1]<<"\n";
+		if (ileObrazkow <= 18)
+		{
+			//dodanie wartości aktualnych punktów charakterystycznych do tablicy rMean
+			rMean[j] += charPoint[i].x;
+			rMean[j+1] += charPoint[i].y;
+		//	cout<<rMean[j]<<"\n";
+		//	cout<<rMean[j+1]<<"\n";
+		}
 
 		//zapamiętanie kolejnych wyznaczonych punktów charakterystycznych w tablicy nChar
 		nChar[j][ileObrazkow-1] =  charPoint[i].x;
@@ -395,7 +398,7 @@ void KW_MAP_P_R::charPointsToState() {
 	//zapamiętanie kolejnych wyznaczonych parametrów wektora stanu w tablicy nStates, sumowanie dotychczasownych wartości wektora stanu w wektorze pMean
 	for(unsigned int i = 0; i < state.size(); i++)
 	{
-		if (ileObrazkow < 18)
+		if (ileObrazkow <= 18)
 		{
 			//dodanie aktualnych wartości parametrów wektra stanu do tablicy pMean
 			pMean[i] += state[i];
@@ -521,13 +524,17 @@ void KW_MAP_P_R::calculate()
 
 	cv::Mat PSamples(cv::Size(ileObrazkow, nrStates), CV_64FC1);
 
+	plik<< "P = [";
 	for (unsigned int i = 0; i< nrStates; i++)
 	{
 		for(int j = 0; j< ileObrazkow; j++)
 		{
 			PSamples.at<float>(i,j) = nStates[i][j];
+			plik<<nStates[i][j]<<" ";
 		}
+		plik<<"; ";
 	}
+	plik<<"]";
 
 	cout<<"row"<<PSamples.rows<<"\n";
 	cout<<"col"<<PSamples.cols<<"\n";
@@ -583,13 +590,17 @@ void KW_MAP_P_R::calculate()
 
 	cv::Mat RSamples(cv::Size(ileObrazkow, nrChar), CV_64FC1);
 
+	plik<< "R = [";
 	for (unsigned int i = 0; i<  nrChar; i++)
 	{
 		for(int j = 0; j< ileObrazkow; j++)
 		{
 			RSamples.at<float>(i,j) = nChar[i][j];
+			plik<<nChar[i][j]<<" ";
 		}
+		plik<<"; ";
 	}
+	plik<<"]";
 
 	cout<<"row"<<RSamples.rows<<"\n";
 	cout<<"col"<<RSamples.cols<<"\n";

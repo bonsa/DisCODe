@@ -229,6 +229,9 @@ private:
 	//macierz H
 	double H[29][20];
 
+	//macierz kowariancji R
+	double R[20][20];
+
 	//macierz kowariancji P
 	double P[29][29];
 
