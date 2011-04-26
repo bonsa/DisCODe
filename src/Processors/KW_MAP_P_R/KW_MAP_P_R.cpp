@@ -518,39 +518,30 @@ void KW_MAP_P_R::calculate()
 
 	//*************Wyliczenie macierzy P i macierzy odwrotnej P
 	//przepisanie średnich wartości stanów do macierzy
-	cv::Size sizePSamples = Size(ileObrazkow, nrStates);		//parametry w rozmiarze podaje sie odwrotnie (ilosc kolumn, ilosc wierszy)
-	cv:: Mat PSamples;
-	PSamples.create(sizePSamples, CV_32FC1);		//8bitów, 0-255, 1 kanał
 
-	if (PSamples.isContinuous())   {
-		sizePSamples.width *= sizePSamples.height;
-		sizePSamples.height = 1;
-	}
-	for (int i = 0; i < sizePSamples.height; i++) {
+	cv::Mat PSamples(cv::Size(ileObrazkow, nrStates), CV_64FC1);
 
-			// when the arrays are continuous,
-			// the outer loop is executed only once
-			// if not - it's executed for each row
-
-			// get pointer to beggining of i-th row of input image
-			float* PSamples_p = PSamples.ptr <float> (i);
-
-			//oznacza, które wiersza jest aktualnie przepisywany
-			int row = 0;
-			int  col = 0;
-
-			for(int j = 0 ; j < sizePSamples.width ; j++)
-			{
-				PSamples_p[j] = nStates[row][col];
-				col += 1;
-				if(col == ileObrazkow)
-				{
-					col = 0;
-					row = row + 1;
-				}
-			}
+	for (unsigned int i = 0; i< nrStates; i++)
+	{
+		for(int j = 0; j< ileObrazkow; j++)
+		{
+			PSamples.at<float>(i,j) = nStates[i][j];
+		}
 	}
 
+	cout<<"row"<<PSamples.rows<<"\n";
+	cout<<"col"<<PSamples.cols<<"\n";
+
+	cout<<nStates[0][0]<<"\n";
+	cout<<PSamples.at<float>(0,0)<<"\n";
+	cout<<nStates[1][0]<<"\n";
+	cout<<PSamples.at<float>(1,0)<<"\n";
+	cout<<nStates[0][3]<<"\n";
+	cout<<PSamples.at<float>(0,3)<<"\n";
+	cout<<nStates[19][13]<<"\n";
+	cout<<PSamples.at<float>(19,13)<<"\n";
+
+/*
 	cv:: Mat mean;
 
 	// obliczenie macierzy kowariancji P
@@ -563,8 +554,10 @@ void KW_MAP_P_R::calculate()
 			{
 				P.at<double>(i,j) /= (ileObrazkow - 1);
 				//plik<<"P["<<i<<"]["<<j<<"]="<<P.at<double>(i,j)<<";\n";
-				plik<<"P("<<i+1<<","<<j+1<<")="<<P.at<double>(i,j)<<";\n";
+				//plik<<"P("<<i+1<<","<<j+1<<")="<<P.at<double>(i,j)<<";\t";
+				//plik<<P.at<double>(i,j)<<";\t";
 		}
+		plik << "\n";
 	}
 
 	for (int i = 0; i< P.rows; i++)
@@ -572,7 +565,7 @@ void KW_MAP_P_R::calculate()
 		for(int j = 0; j< P.cols; j++)
 			{
 				//plik<<"P["<<i<<"]["<<j<<"]="<<P.at<double>(i,j)<<";\n";
-				plik<<"MATP("<<j+1<<","<<i+1<<")="<<P.at<double>(i,j)<<";\n";
+				//plik<<"MATP("<<j+1<<","<<i+1<<")="<<P.at<double>(i,j)<<";\n";
 		}
 	}
 	cv::invert(P, invP, DECOMP_LU);
@@ -580,56 +573,34 @@ void KW_MAP_P_R::calculate()
 	{
 		for(int j = 0; j< invP.cols; j++)
 			{
-				plik<<"invP["<<i<<"]["<<j<<"]="<<invP.at<double>(i,j)<<";\n";
+				//plik<<"invP["<<i<<"]["<<j<<"]="<<invP.at<double>(i,j)<<";\n";
+			//plik<<invP.at<double>(i,j)<<";\t";
 		}
+		plik << "\n";
 	}
-
+*/
 	//*************Wyliczenie macierzy R i macierzy odwrotnej R**************************************/
 
-	cv::Size sizeRSamples = Size(ileObrazkow, nrChar);		//parametry w rozmiarze podaje sie odwrotnie (ilosc kolumn, ilosc wierszy)
-	cv:: Mat RSamples;
-	RSamples.create(sizeRSamples, CV_32FC1);		//8bitów, 0-255, 1 kanał
+	cv::Mat RSamples(cv::Size(ileObrazkow, nrChar), CV_64FC1);
 
-	if (RSamples.isContinuous())   {
-		sizeRSamples.width *= sizeRSamples.height;
-		sizeRSamples.height = 1;
-	}
-	for (int i = 0; i < sizeRSamples.height; i++)
+	for (unsigned int i = 0; i<  nrChar; i++)
 	{
-
-			// when the arrays are continuous,
-			// the outer loop is executed only once
-			// if not - it's executed for each row
-
-			// get pointer to beggining of i-th row of input image
-			float* RSamples_p = RSamples.ptr <float> (i);
-
-			//oznacza, które wiersza jest aktualnie przepisywany
-			int row = 0;
-			int  col = 0;
-
-			for(int j = 0 ; j < sizeRSamples.width ; j++)
-			{
-				RSamples_p[j] =(float) nChar[row][col];
-				col += 1;
-				if(col == ileObrazkow)
-				{
-					col = 0;
-					row = row + 1;
-				}
-			}
+		for(int j = 0; j< ileObrazkow; j++)
+		{
+			RSamples.at<float>(i,j) = nChar[i][j];
+		}
 	}
 
 	cout<<"row"<<RSamples.rows<<"\n";
 	cout<<"col"<<RSamples.cols<<"\n";
 cout<<nChar[0][0]<<"\n";
-cout<<RSamples.at<double>(0,0)<<"\n";
+cout<<RSamples.at<float>(0,0)<<"\n";
 cout<<nChar[1][0]<<"\n";
-cout<<RSamples.at<double>(1,0)<<"\n";
+cout<<RSamples.at<float>(1,0)<<"\n";
 cout<<nChar[0][3]<<"\n";
-cout<<RSamples.at<double>(0,3)<<"\n";
+cout<<RSamples.at<float>(0,3)<<"\n";
 cout<<nChar[19][13]<<"\n";
-cout<<RSamples.at<double>(19,13)<<"\n";
+cout<<RSamples.at<float>(19,13)<<"\n";
 
 
 
