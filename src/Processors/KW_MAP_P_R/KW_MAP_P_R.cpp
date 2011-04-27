@@ -524,17 +524,21 @@ void KW_MAP_P_R::calculate()
 
 	cv::Mat PSamples(cv::Size(ileObrazkow, nrStates), CV_64FC1);
 
-	plik<< "P = [";
+	plik<<"\n ";
+	plik<<"PSamples\n ";
 	for (unsigned int i = 0; i< nrStates; i++)
 	{
 		for(int j = 0; j< ileObrazkow; j++)
 		{
 			PSamples.at<float>(i,j) = nStates[i][j];
-			plik<<nStates[i][j]<<" ";
+			plik<<setprecision(3)<<nStates[i][j]<<" \t";
+			// plik do zapisu
+			//std::ofstream plik("/home/kasia/Test.txt");
+
 		}
-		plik<<"; ";
+		plik<<"\n";
 	}
-	plik<<"]";
+
 
 	cout<<"row"<<PSamples.rows<<"\n";
 	cout<<"col"<<PSamples.cols<<"\n";
@@ -590,17 +594,17 @@ void KW_MAP_P_R::calculate()
 
 	cv::Mat RSamples(cv::Size(ileObrazkow, nrChar), CV_64FC1);
 
-	plik<< "R = [";
+	plik<<"\n ";
+	plik<<"RSamples\n ";
 	for (unsigned int i = 0; i<  nrChar; i++)
 	{
 		for(int j = 0; j< ileObrazkow; j++)
 		{
 			RSamples.at<float>(i,j) = nChar[i][j];
-			plik<<nChar[i][j]<<" ";
+			plik<<nChar[i][j]<<"\t ";
 		}
-		plik<<"; ";
+		plik<<"\n ";
 	}
-	plik<<"]";
 
 	cout<<"row"<<RSamples.rows<<"\n";
 	cout<<"col"<<RSamples.cols<<"\n";

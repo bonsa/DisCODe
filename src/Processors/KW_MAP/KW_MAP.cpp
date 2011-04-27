@@ -69,7 +69,6 @@ bool KW_MAP::onStep() {
 
 	try {
 		ileObrazkow = ileObrazkow + 1;
-
 		drawcont.clear();
 
 		if(STOP == false)
@@ -155,8 +154,6 @@ void KW_MAP::getCharPoints() {
 		int id = 0;
 		//numerElements - liczba punktów wchodzących w skład konturu
 		unsigned int numerElements;
-		// plik do zapisu
-		std::ofstream plik("/home/kasia/Test.txt");
 		// aktualnie pobrany blob
 		Types::Blobs::Blob *currentBlob;
 		// wynikowy blob
@@ -451,7 +448,6 @@ void KW_MAP::fingerToState(cv::Point p2, cv::Point p1, int sig) {
 	state.push_back(angle);
 }
 
-//******************************************SPRAWDŹ CZY DZIALA***********************************************
 
 //funkcja obliczajaca punkty charakterystyczne na podstawie wektora stanu
 void KW_MAP::stateToFinger(double s1, double s2, double s3, double s4,
@@ -521,7 +517,7 @@ void KW_MAP::projectionEstimatedPoints()
 		drawcont.add(elE);
 	}
 
-	//projekcia linii miedzy dołem dłoni a czubami palców
+	//projekcia linii miedzy dołem dłoni a czubkami palców
 	Types::Line * elL;
 	for (unsigned int i = 1; i < nrChar / 2; i += 2) {
 		elL = new Types::Line(cv::Point(z[0].x, z[0].y), cv::Point(z[i].x,
@@ -582,6 +578,7 @@ void KW_MAP::derivatives(int indexR, int indexC, double a, double b, double c,
 	//	H[indexR + 4][indexC] = - 0.5 * sinE - 0.5 *  cosE;
 		H[indexR + 4][indexC] = - 0.5 * c * sinE - 0.5 * d * cosE;
 	}
+
 	/*
 	if (sig == 3) {
 
@@ -632,6 +629,7 @@ void KW_MAP::calculateH() {
 		}
 		//cout<<"\n";
 	}
+
 	H[0][0] = 1;
 	H[2][0] = 0.5;
 	H[1][1] = 1;
@@ -646,12 +644,15 @@ void KW_MAP::calculateH() {
 	derivatives(24, 16, state[24], state[25], state[26], state[27], state[28],
 			3);
 
+	// plik do zapisu
+	//std::ofstream plik("/home/kasia/Test.txt");
+
 	//wyswietlanie macierzy H
 	for (int i = 0; i < 29; i++) {
 		for (int j = 0; j < 20; j++) {
-			//cout << setprecision(3)<<H[i][j]<<"\t";
+			//plik<< setprecision(3)<<H[i][j]<<"\t";
 		}
-		//cout<<"\n";
+		//plik<<"\n";
 	}
 }
 

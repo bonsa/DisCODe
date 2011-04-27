@@ -3,6 +3,7 @@
 	<!-- List of components -->
 	<Components>
 		<Source type="CameraOpenCV" thread="Thread1" group="s1">
+			<device>1</device>
 		</Source>
 
 		<Window type="CvWindow" thread="Thread1" group="s1">
