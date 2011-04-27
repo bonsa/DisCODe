@@ -146,6 +146,7 @@ protected:
 	 * Otrzymanie obserwacji dłoni
 	 */
 	void getObservation();
+	cv::Point rot(cv::Point p, double angle, cv::Point p0);
 
 	/*!
 	 * Funkcja obracająca punkt p o kąt angle względem układu współrzędnych znajdującego się w punkcie pO

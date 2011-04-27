@@ -153,8 +153,6 @@ void KW_MAP2::getObservation(){
 
 		// id największego bloba, czyli dłoni
 		int id = 0;
-		//numerElements - liczba punktów wchodzących w skład konturu
-		unsigned int numerElements;
 		// aktualnie pobrany blob
 		Types::Blobs::Blob *currentBlob;
 		// wynikowy blob
@@ -165,27 +163,13 @@ void KW_MAP2::getObservation(){
 		CvSeqReader reader;
 		// punkt, na którym aktualnie jest wykonywana operacja
 		cv::Point actualPoint;
+		// obrocony actualPoint o kat nachylania dłoni wzgledem układu wspolrzędnych w punkcie środa masy
+		cv::Point tempPoint;
 		// wektor zawierający punkty konturu
 		vector<cv::Point> contourPoints;
 		// wektor odległości między punktami konturu a przesuniętym środkiem ciężkości
-		vector<float> dist;
-		//usredniony (wygładzony) wektor odległości między punktami konturu a przesuniętym środkiem ciężkości
-		vector<float> meanDist;
-		//wektor czastowych pochodnych wektor odległości między punktami konturu a przesuniętym środkiem ciężkości
-		vector<float> derivative;
-		//zmienna pomocnicza
-		float TempDist;
-		//zapamietuje poprzedni znak różnicy miedzy punktami,
-		//1- funkcja jest rosnoca, -1 - funkcja malejąca
-		int lastSign;
-		int lastMinDist;
-		//idenksy punktów charakterystycznych;
-		vector<int> indexPoint;
-		//powyzej tej odległości od środa cieżkosci moga znajdować sie ekstrema
-		int MINDIST;
-		//id ostatenio wyznaczonego ekstremum
-		int idLastExtreme;
-		//kontener przechowujący elementy, które mozna narysować
+
+
 		Types::DrawableContainer signs;
 
 		//momenty goemetryczne potrzebne do obliczenia środka ciężkości
@@ -197,8 +181,8 @@ void KW_MAP2::getObservation(){
 		MaxArea = 0;
 		MaxY = 0;
 		MaxX = 0;
-		MinY = 100000000000000;
-		MinX = 100000000000000;
+		MinY = 1000000000.0;
+		MinX = 1000000000.0;
 
 		//największy blob to dłoń
 		for (int i = 0; i < blobs.GetNumBlobs(); i++) {
@@ -212,6 +196,8 @@ void KW_MAP2::getObservation(){
 				id = i;
 			}
 		}
+		//current Blob przychowuje największego bloba, czyli dłoni
+		currentBlob = blobs.GetBlob(id);
 
 
 		// calculate moments
@@ -230,13 +216,13 @@ void KW_MAP2::getObservation(){
 		m02 = currentBlob->Moment(0, 2);
 		m20 = currentBlob->Moment(2, 0);
 
-		double alfa = atan2(2*m11,(m20 - m02));
+		//nalezy zmodyfikować kat. dodać 90 czy jakos tak
+		double alfa = atan(2*m11/(m20 - m02));
 		alfa /= 2;
+		alfa += M_PI_2;
 
 		z.push_back(alfa);
 
-		//current Blob przychowuje największego bloba, czyli dłoni
-		currentBlob = blobs.GetBlob(id);
 		//kontur największego bloba
 		contour = currentBlob->GetExternalContour()->GetContourPoints();
 		cvStartReadSeq(contour, &reader);
@@ -250,6 +236,7 @@ void KW_MAP2::getObservation(){
 				//wpisanie punktów z konturu do wektora
 				contourPoints.push_back(cv::Point(actualPoint.x, actualPoint.y));
 				//szukanie max i min wartości y
+
 				if (actualPoint.y > MaxY)
 				{
 					MaxY = actualPoint.y;
@@ -270,7 +257,6 @@ void KW_MAP2::getObservation(){
 			}
 		}
 
-		//najpierw nalezy wyprostowac, Potem odejmujemy
 		length = MaxY - MinY;
 		width = MaxX - MinX;
 
@@ -399,6 +385,15 @@ void KW_MAP2::getObservation(){
 	}
 }
 
+//punkcja obracająca punkt p o kąt angle według układu współrzędnych znajdującym się w punkcie p0
+cv::Point KW_MAP2::rot(cv::Point p, double angle, cv::Point p0) {
+	cv::Point t;
+	t.x = p0.x + (int) ((double) (p.x - p0.x) * cos(angle) - (double) (p.y
+			- p0.y) * sin(angle));
+	t.y = p0.y + (int) ((double) (p.x - p0.x) * sin(angle) + (double) (p.y
+			- p0.y) * cos(angle));
+	return t;
+}
 
 //konstruktor
 KW_MAP2::KW_MAP2(const std::string & name) :
