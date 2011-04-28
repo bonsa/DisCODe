@@ -33,8 +33,6 @@
 			<type>MORPH_CLOSE</type>
 			<iterations>4</iterations>
 		</MorphClose1>
-
-		
 		
 		<Blob type="BlobExtractor" thread="Exec1" group="s1">
 			<min_size>7000</min_size>
@@ -54,7 +52,7 @@
 	<!-- Threads of execution -->
 	<Executors>
 		  
-				
+<!--			
 		<Exec1 type="periodic">
 			<main_component>Movie</main_component>
 			<period>1.0</period>
@@ -65,14 +63,22 @@
 			<main_component>Window4</main_component>
 			<interval>0.2</interval>
 		</Exec2>
+	-->
+	
+		<Exec1 type="continuous">
+			<main_component>Movie</main_component>
+		</Exec1>
+
 		
+		<Exec2 type="continuous">
+			<main_component>Window4</main_component>
+		</Exec2>
 
 
 	</Executors>
 
 	<!-- Event connections -->
 	<Events>
-
 		
 		<Event source="Movie.newImage" destination="Filtr.onNewImage"/>
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>

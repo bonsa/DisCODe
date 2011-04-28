@@ -158,6 +158,11 @@ protected:
 	// Funkcja wyliczajaca wartosci parametru stanu na podstawie wartosci obserwacji
 	void observationToState();
 
+	// Funckja odpowiedzialna za projekcie stanu
+	void projectionState();
+
+
+
 private:
 
 	cv::Mat tsl_img;
@@ -180,6 +185,9 @@ private:
 
 	//czubek srodkowego palca
 	cv::Point topPoint;
+
+	// wektor stanu dłoni
+	vector<double> s;
 
 
 

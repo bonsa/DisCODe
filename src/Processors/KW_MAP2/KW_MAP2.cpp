@@ -66,9 +66,13 @@ bool KW_MAP2::onStep() {
 		drawcont.clear();
 
 		z.clear();
+		s.clear();
 
 		getObservation();
 		projectionObservation();
+		observationToState();
+		projectionState();
+
 
 
 
@@ -141,7 +145,7 @@ void KW_MAP2::getObservation(){
 		//powierzchnia bloba, powiedzchnia największego bloba, współrzędne środka ciężkości, maksymalna wartośc współrzędnej Y
 		double Area, MaxArea, CenterOfGravity_x, CenterOfGravity_y, MaxY, MinY,  MaxX, MinX;
 
-		double length, width;
+		double height, width;
 		MaxArea = 0;
 		MaxY = 0;
 		MaxX = 0;
@@ -190,6 +194,7 @@ void KW_MAP2::getObservation(){
 
 		double dx = - z[0] + topPoint.x;
 		double dy = - z[1] + topPoint.y;
+
 		Types::Ellipse * el;
 		el = new Types::Ellipse(Point2f(topPoint.x, topPoint.y), Size2f(10, 10));
 		el->setCol(CV_RGB(0,0,0));
@@ -204,10 +209,10 @@ void KW_MAP2::getObservation(){
 		MinY = currentBlob->MinY();
 		MaxY = currentBlob->MaxY();
 
-		length = MaxY - MinY;
+		height = MaxY - MinY;
 		width = MaxX - MinX;
 
-		z.push_back(length);
+		z.push_back(height);
 		z.push_back(width);
 
 		cout<<z[0]<<"\n";
@@ -224,6 +229,14 @@ void KW_MAP2::getObservation(){
 		LOG(LERROR) << "KW_MAP::getCharPoints failed\n";
 
 	}
+}
+
+//punkcja obracająca punkt p o kąt angle według układu współrzędnych znajdującym się w punkcie p0
+cv::Point KW_MAP2::rot(cv::Point p, double angle, cv::Point p0) {
+	cv::Point t;
+	t.x = p0.x + (int) ((double) (p.x - p0.x) * cos(angle) - (double) (p.y - p0.y) * sin(angle));
+	t.y = p0.y + (int) ((double) (p.x - p0.x) * sin(angle) + (double) (p.y - p0.y) * cos(angle));
+	return t;
 }
 
 void KW_MAP2::projectionObservation()
@@ -341,17 +354,136 @@ void KW_MAP2::projectionObservation()
 
 }
 
-//punkcja obracająca punkt p o kąt angle według układu współrzędnych znajdującym się w punkcie p0
-cv::Point KW_MAP2::rot(cv::Point p, double angle, cv::Point p0) {
-	cv::Point t;
-	t.x = p0.x + (int) ((double) (p.x - p0.x) * cos(angle) - (double) (p.y - p0.y) * sin(angle));
-	t.y = p0.y + (int) ((double) (p.x - p0.x) * sin(angle) + (double) (p.y - p0.y) * cos(angle));
-	return t;
-}
 
 // Funkcja wyliczajaca wartosci parametru stanu na podstawie wartosci obserwacji
 void KW_MAP2::observationToState()
 {
+	float s_mx, s_my, s_angle, s_heigth, s_width;
+
+	s_mx = z[0] - 0.025 * z[4];
+	s_my = z[1] + 2.0/14.0 * z[3];
+
+	Types::Ellipse * el;
+
+	el = new Types::Ellipse(cv::Point(s_mx, s_my), Size2f(10, 10));
+	el->setCol(CV_RGB(255,0,0));
+	drawcont.add(el);
+
+	s_angle = z[2];
+	s_heigth = 0.4 * z[3];
+	s_width = 0.5 * z[4];
+
+	s.push_back(s_mx);
+	s.push_back(s_my);
+	s.push_back(s_angle);
+	s.push_back(s_heigth);
+	s.push_back(s_width);
+
+
+}
+
+void KW_MAP2::projectionState()
+{
+	cv::Point obsPointA;
+	cv::Point obsPointB;
+	cv::Point obsPointC;
+	cv::Point obsPointD;
+
+	double rotAngle = 0;
+
+	if(z[2]> M_PI_2)
+	{
+		rotAngle = (z[2] - M_PI_2);
+	}
+	else if (z[2]< M_PI_2)
+	{
+		rotAngle = - (M_PI_2 - z[2]);
+	}
+
+	obsPointA.x = s[0] - 0.5 * s[4];
+	obsPointA.y = s[1] - 0.5 * s[3];
+
+	obsPointB.x = s[0] + 0.5 * s[4];
+	obsPointB.y = s[1] - 0.5 *s[3];
+
+	obsPointC.x = s[0] + 0.5 * s[4];
+	obsPointC.y = s[1] + 0.5 *s[3];
+
+	obsPointD.x = s[0] - 0.5 * s[4];
+	obsPointD.y = s[1] + 0.5 *s[3];
+
+	Types::Ellipse * el;
+
+	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,0,255));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,0,255));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,0,255));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,0,255));
+	drawcont.add(el);
+
+	Types::Line * elL;
+	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
+	elL->setCol(CV_RGB(0,0,255));
+	drawcont.add(elL);
+
+	elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
+	elL->setCol(CV_RGB(0,0,255));
+	drawcont.add(elL);
+
+	elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
+	elL->setCol(CV_RGB(0,0,255));
+
+	drawcont.add(elL);
+	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
+	elL->setCol(CV_RGB(0,0,255));
+	drawcont.add(elL);
+
+	obsPointA = rot(obsPointA, - rotAngle, cv::Point(z[0], z[1]));
+	obsPointB = rot(obsPointB, - rotAngle, cv::Point(z[0], z[1]));
+	obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
+	obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
+
+	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,255,255));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,255,255));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,255,255));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,255,255));
+	drawcont.add(el);
+
+	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
+	elL->setCol(CV_RGB(0,255,255));
+	drawcont.add(elL);
+
+	elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
+	elL->setCol(CV_RGB(0,255,255));
+	drawcont.add(elL);
+
+	elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
+	elL->setCol(CV_RGB(0,255,255));
+
+	drawcont.add(elL);
+	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
+	elL->setCol(CV_RGB(0,255,255));
+	drawcont.add(elL);
+
 
 }
 
