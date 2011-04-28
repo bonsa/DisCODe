@@ -117,6 +117,7 @@ bool KW_MAP2::onStep() {
 	}
 }
 
+
 bool KW_MAP2::onStop() {
 	return true;
 }
@@ -167,8 +168,8 @@ void KW_MAP2::getObservation(){
 		cv::Point tempPoint;
 		// wektor zawierający punkty konturu
 		vector<cv::Point> contourPoints;
-		// wektor odległości między punktami konturu a przesuniętym środkiem ciężkości
 
+		cv::Point topPoint;
 
 		Types::DrawableContainer signs;
 
@@ -210,18 +211,13 @@ void KW_MAP2::getObservation(){
 		CenterOfGravity_y = m01 / m00;
 
 		z.push_back(CenterOfGravity_x);
-		z.push_back(CenterOfGravity_x);
+		z.push_back(CenterOfGravity_y);
 
-		m11 = currentBlob->Moment(1, 1);
-		m02 = currentBlob->Moment(0, 2);
-		m20 = currentBlob->Moment(2, 0);
+		Types::Ellipse * elE;
+		elE = new Types::Ellipse(Point2f(CenterOfGravity_x, CenterOfGravity_y), Size2f(10, 10));
+		elE->setCol(CV_RGB(0,255,0));
+		drawcont.add(elE);
 
-		//nalezy zmodyfikować kat. dodać 90 czy jakos tak
-		double alfa = atan(2*m11/(m20 - m02));
-		alfa /= 2;
-		alfa += M_PI_2;
-
-		z.push_back(alfa);
 
 		//kontur największego bloba
 		contour = currentBlob->GetExternalContour()->GetContourPoints();
@@ -230,6 +226,11 @@ void KW_MAP2::getObservation(){
 		for (int j = 0; j < contour->total; j = j + 1)
 		{
 			CV_READ_SEQ_ELEM( actualPoint, reader);
+
+			if(j == 0)
+			{
+				topPoint = actualPoint;
+			}
 
 			if (j % 10 == 1)
 			{
@@ -257,124 +258,29 @@ void KW_MAP2::getObservation(){
 			}
 		}
 
+		double dx = - z[0] + topPoint.x;
+		double dy = - z[1] + topPoint.y;
+		Types::Ellipse * el;
+		el = new Types::Ellipse(Point2f(topPoint.x, topPoint.y), Size2f(10, 10));
+		el->setCol(CV_RGB(0,0,0));
+		drawcont.add(el);
+		//argument kąta nachylenia
+		double angle = abs(atan2(dy, dx));
+
+		z.push_back(angle);
+
 		length = MaxY - MinY;
 		width = MaxX - MinX;
 
 		z.push_back(length);
 		z.push_back(width);
 
-		/******
-
-
-		MINDIST = (MaxY - CenterOfGravity_y) * (MaxY - CenterOfGravity_y) * 4
-				/ 9;
-		//przesuniety punkt środka ciężkości
-		charPoint.push_back(cv::Point(CenterOfGravity_x, CenterOfGravity_y
-				+ (MaxY - CenterOfGravity_y) * 4 / 5));
-
-		//środek cieżkości przesuwał troche w dół ekranu, aby ułatwić wyznaczanie punktóe charakterystycznych
-		CenterOfGravity_y += (MaxY - CenterOfGravity_y) * 2 / 3;
-
-		//liczba punktów wchodząca w skład konturu
-		numerElements = contourPoints.size();
-
-		//******************************************************************
-		//obliczenie roznicy miedzy punktami konturu a przesuniętym środkiem ciężkosci
-		for (unsigned int i = 0; i < numerElements; i++) {
-			TempDist = (contourPoints[i].x - CenterOfGravity_x)
-					* (contourPoints[i].x - CenterOfGravity_x)
-					+ (contourPoints[i].y - CenterOfGravity_y)
-							* (contourPoints[i].y - CenterOfGravity_y);
-			if (TempDist > MINDIST)
-				dist.push_back(TempDist);
-			else
-				//jeśli odległość jest mniejsza niż MINDIST oznacza to, że jest to dolna cześć dłoni i nie znajdują się tam żadnego punkty charakterystyczne poza przesuniętym środkiem ciężkości, dlatego te punkty można ominąć
-				dist.push_back(MINDIST);
-		}
-
-		//******************************************************************
-		//obliczenie pochodnej, szukanie ekstremów
-		derivative.push_back(dist[1] - dist[0]);
-		if (derivative[0] > 0)
-			lastSign = 1;
-		else
-			lastSign = -1;
-
-		//1 -oznacza, że ostatni element z konturu należał do dolnej czesci dłoni
-		lastMinDist = 0;
-		idLastExtreme = 0;
-		//pierwszy punkt kontury to wierzchołek punktu środkowego.
-		indexPoint.push_back(0);
-
-		for (unsigned int i = 1; i < numerElements - 2; i++) {
-
-			//różnica miedzy sąsiedznimi punktami
-			derivative.push_back(dist[i + 1] - dist[i]);
-
-			if (dist[i + 1] > MINDIST && dist[i] > MINDIST) {
-				//jeżeli ostatnio był wykryta dolna cześci dłoni, następnym charakterystycznych punktem powinien być czubek palca, dlatego lastSign = 1;
-				if (lastMinDist == 1) {
-					lastSign = 1;
-					lastMinDist = 0;
-				}
-				//maksiumum - czubek palca, funkcja rosła i zaczeła maleć
-				if (derivative[i] < 0 && lastSign == 1) {
-					if (((contourPoints[i].x - contourPoints[idLastExtreme].x)
-							* (contourPoints[i].x
-									- contourPoints[idLastExtreme].x)
-							+ (contourPoints[i].y
-									- contourPoints[idLastExtreme].y)
-									* (contourPoints[i].y
-											- contourPoints[idLastExtreme].y))
-							> 900) {
-						indexPoint.push_back(i);
-						lastSign = -1;
-						idLastExtreme = i;
-					}
-				}
-				//minimum - punkt między palcami
-				else if (derivative[i] > 0 && lastSign == -1) {
-					if (((contourPoints[i].x - contourPoints[idLastExtreme].x)
-							* (contourPoints[i].x
-									- contourPoints[idLastExtreme].x)
-							+ (contourPoints[i].y
-									- contourPoints[idLastExtreme].y)
-									* (contourPoints[i].y
-											- contourPoints[idLastExtreme].y))
-							> 900) {
-						indexPoint.push_back(i);
-						lastSign = 1;
-						idLastExtreme = i;
-					}
-				}
-			} else {
-				// element należący do dołu dłoni
-				lastMinDist = 1;
-			}
-		}
-
-		int idLeftPoint = 0;
-		int xLeftPoint = 1000000;
-		for (unsigned int i = 0; i < indexPoint.size(); i++) {
-			//znajdujemy punkt najbardziej wysynięty na lewo, czyli wierzchołek małego palca
-			if (xLeftPoint > contourPoints[indexPoint[i]].x) {
-				xLeftPoint = contourPoints[indexPoint[i]].x;
-				idLeftPoint = i;
-			}
-		}
-
-		for (int i = idLeftPoint; i >= 0; i--) {
-			//wpisanie do tablicy punktów charakterystycznych punktów opisujących trzy lewe palce
-			charPoint.push_back(cv::Point(contourPoints[indexPoint[i]].x,
-					contourPoints[indexPoint[i]].y));
-		}
-
-		for (int i = indexPoint.size() - 1; i > idLeftPoint; i--) {
-			//wpisanie do tablicy punktów charakterystycznych punktów opisujących dwa prawe palce
-			charPoint.push_back(cv::Point(contourPoints[indexPoint[i]].x,
-					contourPoints[indexPoint[i]].y));
-		}
-		*/
+		cout<<z[0]<<"\n";
+		cout<<z[1]<<"\n";
+		cout<<z[2]<<"\n";
+		cout<<z[2]*180/M_PI<<"\n";
+		cout<<z[3]<<"\n";
+		cout<<z[4]<<"\n";
 
 		result.AddBlob(blobs.GetBlob(id));
 		out_signs.write(result);
@@ -383,6 +289,26 @@ void KW_MAP2::getObservation(){
 		LOG(LERROR) << "KW_MAP::getCharPoints failed\n";
 
 	}
+}
+
+void KW_MAP2::projectionObservation()
+{
+	cv::Point obsPointA;
+	cv::Point obsPointB;
+	cv::Point obsPointC;
+	cv::Point obsPointD;
+
+	// zmienne pomocnicze, uzywane do obliczenia połozenia punktów
+	float dx1, dx2, dy1, dy2;
+
+	dx1 = 0.5 * z[3] * cos(z[2]);
+	dy1 = 0.5 * z[3] * sin(z[2]);
+
+
+
+
+
+
 }
 
 //punkcja obracająca punkt p o kąt angle według układu współrzędnych znajdującym się w punkcie p0
