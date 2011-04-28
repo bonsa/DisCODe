@@ -155,6 +155,9 @@ protected:
 	// Funckja odpowiedzialna za projekcie obserwacji
 	void projectionObservation();
 
+	// Funkcja wyliczajaca wartosci parametru stanu na podstawie wartosci obserwacji
+	void observationToState();
+
 private:
 
 	cv::Mat tsl_img;

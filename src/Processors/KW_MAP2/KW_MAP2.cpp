@@ -256,10 +256,10 @@ void KW_MAP2::projectionObservation()
 	obsPointD.x = z[0] - 0.5 * z[4];
 	obsPointD.y = z[1] + 3/7.0 *z[3];
 
-	cv::Point pt1 = rot(topPoint, rotAngle, cv::Point(z[0], z[1]));
 
 	Types::Ellipse * el;
-	el = new Types::Ellipse(cv::Point(pt1.x, pt1.y), Size2f(10, 10));
+
+	el = new Types::Ellipse(cv::Point(topPoint.x, topPoint.y), Size2f(10, 10));
 	el->setCol(CV_RGB(255,255,255));
 	drawcont.add(el);
 
@@ -296,28 +296,29 @@ void KW_MAP2::projectionObservation()
 	elL->setCol(CV_RGB(0,0,0));
 	drawcont.add(elL);
 
+	cv::Point pt1 = rot(topPoint, rotAngle, cv::Point(z[0], z[1]));
 	obsPointA = rot(obsPointA, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointB = rot(obsPointB, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
 
-	el = new Types::Ellipse(Point2f(pt1.x, pt1.y), Size2f(10, 10));
+	el = new Types::Ellipse(cv::Point(pt1.x, pt1.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,0,0));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
 	el->setCol(CV_RGB(255,255,255));
 	drawcont.add(el);
 
-	el = new Types::Ellipse(Point2f(obsPointA.x, obsPointA.y), Size2f(10, 10));
+	el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
 	el->setCol(CV_RGB(255,255,255));
 	drawcont.add(el);
 
-	el = new Types::Ellipse(Point2f(obsPointB.x, obsPointB.y), Size2f(10, 10));
+	el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
 	el->setCol(CV_RGB(255,255,255));
 	drawcont.add(el);
 
-	el = new Types::Ellipse(Point2f(obsPointC.x, obsPointC.y), Size2f(10, 10));
-	el->setCol(CV_RGB(255,255,255));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(Point2f(obsPointD.x, obsPointD.y), Size2f(10, 10));
+	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
 	el->setCol(CV_RGB(255,255,255));
 	drawcont.add(el);
 
@@ -343,11 +344,15 @@ void KW_MAP2::projectionObservation()
 //punkcja obracająca punkt p o kąt angle według układu współrzędnych znajdującym się w punkcie p0
 cv::Point KW_MAP2::rot(cv::Point p, double angle, cv::Point p0) {
 	cv::Point t;
-	t.x = p0.x + (int) ((double) (p.x - p0.x) * cos(angle) - (double) (p.y
-			- p0.y) * sin(angle));
-	t.y = p0.y + (int) ((double) (p.x - p0.x) * sin(angle) + (double) (p.y
-			- p0.y) * cos(angle));
+	t.x = p0.x + (int) ((double) (p.x - p0.x) * cos(angle) - (double) (p.y - p0.y) * sin(angle));
+	t.y = p0.y + (int) ((double) (p.x - p0.x) * sin(angle) + (double) (p.y - p0.y) * cos(angle));
 	return t;
+}
+
+// Funkcja wyliczajaca wartosci parametru stanu na podstawie wartosci obserwacji
+void KW_MAP2::observationToState()
+{
+
 }
 
 //konstruktor
