@@ -164,6 +164,12 @@ protected:
 	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
 	void stateToObservation();
 
+	// Funkcja obliczająca jakobian H
+	void calculateH();
+
+	// Funkcja obliczająca o jaki wektor nalezy zaktualizowac wektor stan
+	void calculateDiff();
+
 
 
 private:
@@ -194,6 +200,9 @@ private:
 
 	// wektor obserwacji dłoni
 	vector<double> h_z;
+
+	//macierz H
+	double H[5][5];
 
 
 

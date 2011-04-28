@@ -510,6 +510,41 @@ void KW_MAP2:: stateToObservation()
 
 }
 
+// Funkcja obliczająca jakobian H
+void KW_MAP2::calculateH()
+{
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			H[i][j] = 0;
+		}
+	}
+
+	H[0][0] = 1;
+	H[4][0] = 0.05;
+	H[1][1] = 1;
+	H[3][1] = -5.0/14.0;
+	H[2][2] = 1;
+	H[3][3] = 5.0/3.0;
+	H[4][4] = 2;
+
+}
+
+// Funkcja obliczająca o jaki wektor nalezy zaktualizowac wektor stan
+void KW_MAP2::calculateDiff()
+{
+	//różnicaiedzy wektorami h(s) i z
+	double D[5];
+	unsigned j = 0;
+	float error2 = 0;
+
+	for (unsigned int i = 0; i < 5; i ++)
+	{
+		//różnica miedzy punktami charakterystycznymi aktualnego obraz
+		D[i] =  h_z[j] - z[j];
+		D[i + 1] = h_z[j] - z[j];
+	}
+}
+
 //konstruktor
 KW_MAP2::KW_MAP2(const std::string & name) :
 	Base::Component(name) {
