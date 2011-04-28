@@ -43,12 +43,6 @@ bool KW_MAP2::onInit() {
 	registerStream("out_signs", &out_signs);
 	registerStream("out_draw", &out_draw);
 
-	factor = 0.01;
-	nrChar = 20;
-	nrStates = 29;
-
-	// czy warunek stopu jest spełniony
-	STOP = false;
 
 	//pierwsze uruchomienie komponentu
 	first = true;
@@ -68,44 +62,15 @@ bool KW_MAP2::onStep() {
 	blobs_ready = img_ready = false;
 
 	try {
-		ileObrazkow = ileObrazkow + 1;
+
 		drawcont.clear();
 
-		if(STOP == false)
-		{
-			z.clear();
-			charPoint.clear();
-			diff.clear();
-			state.clear();
-			T.clear();
-			diffStates.clear();
+		z.clear();
 
-			getObservation();
-		//	projectionMeasurePoints();
-/*
-			if (first == true)
-			{
-				// char --> s, z pomiarów oblicza stan
-				charPointsToState();
-				first = false;
-			}
-			else
-			{
-				// s --> z
-				stateToCharPoint();
-				projectionEstimatedPoints();
-				calculateDiff();
-				updateState();
-			}
+		getObservation();
+		projectionObservation();
 
-			projectionStates();
-			stopCondition();
-*/
-		}
-		else
-		{
-	//		projectionStates();
-		}
+
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -169,12 +134,10 @@ void KW_MAP2::getObservation(){
 		// wektor zawierający punkty konturu
 		vector<cv::Point> contourPoints;
 
-		cv::Point topPoint;
-
 		Types::DrawableContainer signs;
 
 		//momenty goemetryczne potrzebne do obliczenia środka ciężkości
-		double m00, m10, m01, m11, m20, m02;
+		double m00, m10, m01;
 		//powierzchnia bloba, powiedzchnia największego bloba, współrzędne środka ciężkości, maksymalna wartośc współrzędnej Y
 		double Area, MaxArea, CenterOfGravity_x, CenterOfGravity_y, MaxY, MinY,  MaxX, MinX;
 
@@ -298,14 +261,23 @@ void KW_MAP2::projectionObservation()
 	cv::Point obsPointC;
 	cv::Point obsPointD;
 
-	// zmienne pomocnicze, uzywane do obliczenia połozenia punktów
-	float dx1, dx2, dy1, dy2;
+	double rotAngle = 0;
 
-	dx1 = 0.5 * z[3] * cos(z[2]);
-	dy1 = 0.5 * z[3] * sin(z[2]);
+	if(z[2]> M_PI_2)
+	{
+		rotAngle = (z[2] - M_PI_2);
+	}
+	else if (z[2]< M_PI_2)
+	{
+		rotAngle = - (M_PI_2 - z[2]);
+	}
 
+	cv::Point pt1 = rot(topPoint, rotAngle, cv::Point(z[0], z[1]));
 
-
+	Types::Ellipse * el;
+	el = new Types::Ellipse(Point2f(pt1.x, pt1.y), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,255));
+	drawcont.add(el);
 
 
 
@@ -325,7 +297,6 @@ cv::Point KW_MAP2::rot(cv::Point p, double angle, cv::Point p0) {
 KW_MAP2::KW_MAP2(const std::string & name) :
 	Base::Component(name) {
 	LOG(LTRACE) << "Hello KW_MAP\n";
-	ileObrazkow = 0;
 	
 	
 }

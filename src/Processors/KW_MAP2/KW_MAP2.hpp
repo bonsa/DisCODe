@@ -147,52 +147,14 @@ protected:
 	 */
 	void getObservation();
 
+	/*!
+	 * Funkcja obracająca punkt p o kąt angle względem układu współrzędnych znajdującego się w punkcie pO
+	 */
 	cv::Point rot(cv::Point p, double angle, cv::Point p0);
 
 	// Funckja odpowiedzialna za projekcie obserwacji
 	void projectionObservation();
 
-	/*!
-	 * Funkcja obracająca punkt p o kąt angle względem układu współrzędnych znajdującego się w punkcie pO
-	 */
-/*	cv::Point rot(cv::Point p, double angle, cv::Point p0);
-
-	// Funkcja wyznaczająca stan na podstawie wektora punktów charakterystycznych
-	void charPointsToState();
-
-	// Funkcja wyznaczająca elementy stanu dotyczące palców
-	void fingerToState(cv::Point p2, cv::Point p1, int sig);
-
-	// Funkcja wyznaczająca punkty charakterystyczne na podstawie elementów stanu dotyczących palców
-	void stateToFinger(double s1, double s2, double s3, double s4, double angle, int sig);
-
-	// Funkcja wyznaczająca punkty charakterystyczne na podstawie wektora stanu
-	void stateToCharPoint();
-
-	// Funkcja wspomagająca obliczaje jakobianu H
-	void derivatives(int indexR, int indexC, double a, double b, double c, double d, double e, int sig);
-
-	// Funkcja obliczająca jakobian H
-	void calculateH();
-
-	// Funkcja obliczająca o jaki wektor nalezy zaktualizowac wektor stan
-	void calculateDiff();
-
-	// Funckja aktualizująca wektor stanu i macierz kowariancji P
-	void updateState();
-
-	// Funckja odpowiedzialna za projekcie punktów charakterystycznych danego obrazka
-	void projectionMeasurePoints();
-
-	// FUnckja odpowiedzialna za projekcie estymowanych parametrów stanu na obraz
-	void projectionStates();
-
-	// Funkcja odpowiedzialna za projekcię estymowanych punktów charakterystycznych
-	void projectionEstimatedPoints();
-
-	// Funkcja sprawdzająca czy warunek końcowy jest sprawdzony
-	void stopCondition();
-*/
 private:
 
 	cv::Mat tsl_img;
@@ -210,62 +172,14 @@ private:
 	// kontener przechowujący elementy do rysowania
 	Types::DrawableContainer drawcont;
 
-	// wspołrzędne punktów charakterystycznych konturu
-	vector<cv::Point> charPoint;
-
-	// wektor obserwacji dłoni, zamiana
-	//vector<cv::Point> z;
-
 	// wektor obserwacji dłoni
 	vector<double> z;
 
-	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
-	vector<double> diff;
+	//czubek srodkowego palca
+	cv::Point topPoint;
 
-	// różnica stanów estymacji i średniego wektora cech stanu
-	vector<double> diffStates;
 
-	// wektor stanu dłoni
-	vector<double> state;
 
-	// średni wektor stanu
-	double pMean[29];
-
-	// ile obrazków została już obranych przez DisCODe
-	int ileObrazkow;
-
-	//macierz H
-	double H[29][20];
-
-	//macierz kowariancji R
-	double R[20][20];
-
-	//macierz kowariancji P
-	double P[29][29];
-
-	//odwrotna macierz kowariancji R
-	double invR[20][20];
-
-	//odwrotna macierz kowariancji P
-	double invP[29][29];
-
-	//wspołczynnik zapominania
-	double factor;
-
-	// liczba elementów wetora punktów charakterystycznych
-	unsigned int nrChar;
-
-	// liczba elementów wetora stanu
-	unsigned int nrStates;
-
-	// funkcja warunek stopu, jesli STOP = true estymacja MAP jest zakończona
-	bool STOP;
-
-	//przechowuje czesc obliczen podczas aktualizacji stanu i obliczania warunku stopu
-	double t1[29];
-
-	//wektor błędu, jeśli suma jego elementów jest mniejsza niż określony warunek stopu nastepuje koniec estymacji
-	vector<double> T;
 
 };
 
