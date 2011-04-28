@@ -185,41 +185,8 @@ void KW_MAP2::getObservation(){
 		//kontur największego bloba
 		contour = currentBlob->GetExternalContour()->GetContourPoints();
 		cvStartReadSeq(contour, &reader);
-
-		for (int j = 0; j < contour->total; j = j + 1)
-		{
-			CV_READ_SEQ_ELEM( actualPoint, reader);
-
-			if(j == 0)
-			{
-				topPoint = actualPoint;
-			}
-
-			if (j % 10 == 1)
-			{
-				//wpisanie punktów z konturu do wektora
-				contourPoints.push_back(cv::Point(actualPoint.x, actualPoint.y));
-				//szukanie max i min wartości y
-
-				if (actualPoint.y > MaxY)
-				{
-					MaxY = actualPoint.y;
-				}
-				else if (actualPoint.y < MaxY)
-				{
-					MinY = actualPoint.y;
-				}
-				//szukanie max i min wartości x
-				if (actualPoint.x > MaxX)
-				{
-					MaxX = actualPoint.x;
-				}
-				else if (actualPoint.x < MaxX)
-				{
-					MinX = actualPoint.x;
-				}
-			}
-		}
+		CV_READ_SEQ_ELEM( actualPoint, reader);
+		topPoint = actualPoint;
 
 		double dx = - z[0] + topPoint.x;
 		double dy = - z[1] + topPoint.y;
@@ -231,6 +198,11 @@ void KW_MAP2::getObservation(){
 		double angle = abs(atan2(dy, dx));
 
 		z.push_back(angle);
+
+		MinX = currentBlob->MinX();
+		MaxX = currentBlob->MaxX();
+		MinY = currentBlob->MinY();
+		MaxY = currentBlob->MaxY();
 
 		length = MaxY - MinY;
 		width = MaxX - MinX;
@@ -272,13 +244,98 @@ void KW_MAP2::projectionObservation()
 		rotAngle = - (M_PI_2 - z[2]);
 	}
 
+	obsPointA.x = z[0] - 0.5 * z[4];
+	obsPointA.y = z[1] - 4/7.0 *z[3];
+
+	obsPointB.x = z[0] + 0.5 * z[4];
+	obsPointB.y = z[1] - 4/7.0 *z[3];
+
+	obsPointC.x = z[0] + 0.5 * z[4];
+	obsPointC.y = z[1] + 3/7.0 *z[3];
+
+	obsPointD.x = z[0] - 0.5 * z[4];
+	obsPointD.y = z[1] + 3/7.0 *z[3];
+
 	cv::Point pt1 = rot(topPoint, rotAngle, cv::Point(z[0], z[1]));
 
 	Types::Ellipse * el;
+	el = new Types::Ellipse(cv::Point(pt1.x, pt1.y), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,255));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,0,0));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,0,0));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,0,0));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,0,0));
+	drawcont.add(el);
+
+	Types::Line * elL;
+	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
+	elL->setCol(CV_RGB(0,0,0));
+	drawcont.add(elL);
+
+	elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
+	elL->setCol(CV_RGB(0,0,0));
+	drawcont.add(elL);
+
+	elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
+	elL->setCol(CV_RGB(0,0,0));
+
+	drawcont.add(elL);
+	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
+	elL->setCol(CV_RGB(0,0,0));
+	drawcont.add(elL);
+
+	obsPointA = rot(obsPointA, - rotAngle, cv::Point(z[0], z[1]));
+	obsPointB = rot(obsPointB, - rotAngle, cv::Point(z[0], z[1]));
+	obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
+	obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
+
 	el = new Types::Ellipse(Point2f(pt1.x, pt1.y), Size2f(10, 10));
 	el->setCol(CV_RGB(255,255,255));
 	drawcont.add(el);
 
+	el = new Types::Ellipse(Point2f(obsPointA.x, obsPointA.y), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,255));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(Point2f(obsPointB.x, obsPointB.y), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,255));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(Point2f(obsPointC.x, obsPointC.y), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,255));
+	drawcont.add(el);
+
+	el = new Types::Ellipse(Point2f(obsPointD.x, obsPointD.y), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,255));
+	drawcont.add(el);
+
+	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
+	elL->setCol(CV_RGB(255,255,255));
+	drawcont.add(elL);
+
+	elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
+	elL->setCol(CV_RGB(255,255,255));
+	drawcont.add(elL);
+
+	elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
+	elL->setCol(CV_RGB(255,255,255));
+
+	drawcont.add(elL);
+	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
+	elL->setCol(CV_RGB(255,255,255));
+	drawcont.add(elL);
 
 
 }
