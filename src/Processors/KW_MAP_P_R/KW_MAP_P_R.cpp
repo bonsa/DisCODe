@@ -830,9 +830,9 @@ cout<<RSamples.at<float>(19,13)<<"\n";
 	}
 
 	plik << "d=" << d << "\n";
-
-	plik.close();
 */
+	plik.close();
+
 }
 
 

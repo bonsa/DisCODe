@@ -220,7 +220,7 @@ void KW_MAP2_Samples::getObservation(){
 
 		nObservation[0][ileObrazkow -1] = CenterOfGravity_x;
 		nObservation[1][ileObrazkow -1] = CenterOfGravity_y;
-		nObservation[2][ileObrazkow -1] = angle;
+		nObservation[2][ileObrazkow -1] = angle * 180 / M_PI;
 		nObservation[3][ileObrazkow -1] = height;
 		nObservation[4][ileObrazkow -1] = width;
 
@@ -266,6 +266,12 @@ void KW_MAP2_Samples::observationToState()
 	s.push_back(s_heigth);
 	s.push_back(s_width);
 
+	nStates[0][ileObrazkow -1] = s_mx;
+	nStates[1][ileObrazkow -1] = s_my;
+	nStates[2][ileObrazkow -1] = s_angle * 180 / M_PI;
+	nStates[3][ileObrazkow -1] = s_heigth;
+	nStates[4][ileObrazkow -1] = s_width;
+
 
 }
 
@@ -282,7 +288,7 @@ void KW_MAP2_Samples::calculate()
 	{
 		for(int j = 0; j< ileObrazkow; j++)
 		{
-			plik<<setprecision(3)<<nObservation[i][j]<<" \t";
+			plik<<setprecision(5)<<nObservation[i][j]<<" \t";
 		}
 		plik<<";";
 	}
@@ -296,11 +302,13 @@ void KW_MAP2_Samples::calculate()
 	{
 		for(int j = 0; j< ileObrazkow; j++)
 		{
-			plik<<setprecision(3)<<nStates[i][j]<<" \t";
+			plik<<setprecision(5)<<nStates[i][j]<<" \t";
 		}
 		plik<<";";
 	}
 	plik<<"]";
+
+	plik.close();
 }
 //konstruktor
 KW_MAP2_Samples::KW_MAP2_Samples(const std::string & name) :

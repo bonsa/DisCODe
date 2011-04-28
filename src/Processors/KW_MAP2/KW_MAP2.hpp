@@ -164,11 +164,11 @@ protected:
 	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
 	void stateToObservation();
 
-	// Funkcja obliczająca jakobian H
-	void calculateH();
-
 	// Funkcja obliczająca o jaki wektor nalezy zaktualizowac wektor stan
 	void calculateDiff();
+
+	// Funckja aktualizująca wektor stanu i macierz kowariancji P
+	void updateState();
 
 
 
@@ -204,8 +204,23 @@ private:
 	//macierz H
 	double H[5][5];
 
+	//macierz P
+	double P[5][5];
 
+	//macierz R
+	double R[5][5];
 
+	//macierz odwrotna kowariancji P
+	double invP[5][5];
+
+	//macierz odwrotna kowariancji R
+	double invR[5][5];
+
+	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
+	vector<double> diff;
+
+	//wspołczynnik zapominania
+	double factor;
 
 };
 

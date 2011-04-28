@@ -200,10 +200,11 @@ private:
 	double nStates[5][18];
 
 	//macierz przechowująca punkty char dla kilku obrazków
-	int nObservation[5][18];
+	double nObservation[5][18];
 
 	// ile obrazków w sekwencji juz task podbrał
 	int ileObrazkow;
+
 
 };
 
