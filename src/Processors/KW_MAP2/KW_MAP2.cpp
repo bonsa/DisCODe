@@ -67,11 +67,14 @@ bool KW_MAP2::onStep() {
 
 		z.clear();
 		s.clear();
+		h_z.clear();
 
 		getObservation();
-		projectionObservation();
+		projectionObservation(z, 255, 255, 255);
 		observationToState();
 		projectionState();
+		stateToObservation();
+		projectionObservation(h_z, 255, 0, 255);
 
 
 
@@ -215,13 +218,6 @@ void KW_MAP2::getObservation(){
 		z.push_back(height);
 		z.push_back(width);
 
-		cout<<z[0]<<"\n";
-		cout<<z[1]<<"\n";
-		cout<<z[2]<<"\n";
-		cout<<z[2]*180/M_PI<<"\n";
-		cout<<z[3]<<"\n";
-		cout<<z[4]<<"\n";
-
 		result.AddBlob(blobs.GetBlob(id));
 		out_signs.write(result);
 
@@ -239,7 +235,7 @@ cv::Point KW_MAP2::rot(cv::Point p, double angle, cv::Point p0) {
 	return t;
 }
 
-void KW_MAP2::projectionObservation()
+void KW_MAP2::projectionObservation(vector<double> z, int R, int G, int B)
 {
 	cv::Point obsPointA;
 	cv::Point obsPointB;
@@ -271,11 +267,11 @@ void KW_MAP2::projectionObservation()
 
 
 	Types::Ellipse * el;
+	Types::Line * elL;
 
-	el = new Types::Ellipse(cv::Point(topPoint.x, topPoint.y), Size2f(10, 10));
-	el->setCol(CV_RGB(255,255,255));
-	drawcont.add(el);
 
+
+	/*
 	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
 	el->setCol(CV_RGB(0,0,0));
 	drawcont.add(el);
@@ -292,7 +288,6 @@ void KW_MAP2::projectionObservation()
 	el->setCol(CV_RGB(0,0,0));
 	drawcont.add(el);
 
-	Types::Line * elL;
 	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
 	elL->setCol(CV_RGB(0,0,0));
 	drawcont.add(elL);
@@ -310,45 +305,47 @@ void KW_MAP2::projectionObservation()
 	drawcont.add(elL);
 
 	cv::Point pt1 = rot(topPoint, rotAngle, cv::Point(z[0], z[1]));
+
+	el = new Types::Ellipse(cv::Point(pt1.x, pt1.y), Size2f(10, 10));
+	el->setCol(CV_RGB(0,0,0));
+	drawcont.add(el);
+*/
 	obsPointA = rot(obsPointA, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointB = rot(obsPointB, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
 
-	el = new Types::Ellipse(cv::Point(pt1.x, pt1.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,0,0));
-	drawcont.add(el);
 
 	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
-	el->setCol(CV_RGB(255,255,255));
+	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
 
 	el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
-	el->setCol(CV_RGB(255,255,255));
+	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
 
 	el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
-	el->setCol(CV_RGB(255,255,255));
+	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
 
 	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
-	el->setCol(CV_RGB(255,255,255));
+	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
 
 	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
-	elL->setCol(CV_RGB(255,255,255));
+	elL->setCol(CV_RGB(R,G,B));
 	drawcont.add(elL);
 
 	elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
-	elL->setCol(CV_RGB(255,255,255));
+	elL->setCol(CV_RGB(R,G,B));
 	drawcont.add(elL);
 
 	elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
-	elL->setCol(CV_RGB(255,255,255));
+	elL->setCol(CV_RGB(R,G,B));
 
 	drawcont.add(elL);
 	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
-	elL->setCol(CV_RGB(255,255,255));
+	elL->setCol(CV_RGB(R,G,B));
 	drawcont.add(elL);
 
 
@@ -361,7 +358,7 @@ void KW_MAP2::observationToState()
 	float s_mx, s_my, s_angle, s_heigth, s_width;
 
 	s_mx = z[0] - 0.025 * z[4];
-	s_my = z[1] + 2.0/14.0 * z[3];
+	s_my = z[1] + 1.0/7.0 * z[3];
 
 	Types::Ellipse * el;
 
@@ -484,6 +481,32 @@ void KW_MAP2::projectionState()
 	elL->setCol(CV_RGB(0,255,255));
 	drawcont.add(elL);
 
+
+}
+
+void KW_MAP2:: stateToObservation()
+{
+	float hz_mx, hz_my, hz_angle, hz_heigth, hz_width;
+
+	hz_mx = s[0] +  0.05 * s[4];
+	hz_my = s[1] - 5.0/14.0 * s[3];
+	hz_angle = s[2];
+	hz_heigth = 5.0/2.0 * s[3];
+	hz_width = 2 * s[4];
+
+	h_z.push_back(hz_mx);
+	h_z.push_back(hz_my);
+	h_z.push_back(hz_angle);
+	h_z.push_back(hz_heigth);
+	h_z.push_back(hz_width);
+
+	cout<<"h_z\n";
+	cout<<h_z[0]<<"\n";
+	cout<<h_z[1]<<"\n";
+	cout<<h_z[2]<<"\n";
+	cout<<h_z[3]<<"\n";
+	cout<<h_z[4]<<"\n";
+	cout<<"koniec h_z\n";
 
 }
 

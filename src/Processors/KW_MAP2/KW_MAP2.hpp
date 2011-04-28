@@ -153,13 +153,16 @@ protected:
 	cv::Point rot(cv::Point p, double angle, cv::Point p0);
 
 	// Funckja odpowiedzialna za projekcie obserwacji
-	void projectionObservation();
+	void projectionObservation(vector<double> z, int R, int G, int B);
 
-	// Funkcja wyliczajaca wartosci parametru stanu na podstawie wartosci obserwacji
+	// Funkcja wyliczajaca wartosci parametrów stanu na podstawie wartosci obserwacji
 	void observationToState();
 
 	// Funckja odpowiedzialna za projekcie stanu
 	void projectionState();
+
+	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
+	void stateToObservation();
 
 
 
@@ -188,6 +191,9 @@ private:
 
 	// wektor stanu dłoni
 	vector<double> s;
+
+	// wektor obserwacji dłoni
+	vector<double> h_z;
 
 
 
