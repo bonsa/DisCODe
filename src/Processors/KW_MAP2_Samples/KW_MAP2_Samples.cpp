@@ -306,7 +306,17 @@ void KW_MAP2_Samples::calculate()
 		}
 		plik<<";";
 	}
-	plik<<"]";
+	plik<<"]\n\n";
+	
+	for (unsigned int i = 0 ; i < 5; i++)
+	{
+		for (int j = 0; j < ileObrazkow; j++)
+		{
+			meanStates[i] += nStates[i][j];
+		}
+		meanStates[i] /= ileObrazkow;
+		plik<<"meanStates["<<i<<"] = "<<meanStates[i]<<";\n";
+	}
 
 	plik.close();
 }
@@ -314,8 +324,8 @@ void KW_MAP2_Samples::calculate()
 KW_MAP2_Samples::KW_MAP2_Samples(const std::string & name) :
 	Base::Component(name) {
 	LOG(LTRACE) << "Hello KW_MAP2_Samples\n";
-	
-	
+
+
 }
 
 }//: namespace KW_MAP2_Samples

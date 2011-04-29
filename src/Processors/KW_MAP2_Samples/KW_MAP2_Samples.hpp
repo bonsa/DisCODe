@@ -205,6 +205,9 @@ private:
 	// ile obrazków w sekwencji juz task podbrał
 	int ileObrazkow;
 
+	//macierz przechowująca parametry stanu dla kilku obrazków
+	double meanStates[5];
+
 
 };
 

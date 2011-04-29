@@ -66,18 +66,16 @@ bool KW_MAP2::onStep() {
 		drawcont.clear();
 
 		z.clear();
-		s.clear();
 		h_z.clear();
 
 		getObservation();
 		projectionObservation(z, 255, 255, 255);
-		observationToState();
+	//	observationToState();
 		projectionState();
 		stateToObservation();
 		projectionObservation(h_z, 255, 0, 255);
-
-
-
+		calculateDiff();
+		updateState();
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -205,8 +203,9 @@ void KW_MAP2::getObservation(){
 		//argument kąta nachylenia
 		double angle = abs(atan2(dy, dx));
 
-		z.push_back(angle);
+		z.push_back(angle * 180/ M_PI);
 
+		cout<<"angle"<<angle * 180/ M_PI<<"\n";
 		MinX = currentBlob->MinX();
 		MaxX = currentBlob->MaxX();
 		MinY = currentBlob->MinY();
@@ -243,7 +242,15 @@ void KW_MAP2::projectionObservation(vector<double> z, int R, int G, int B)
 	cv::Point obsPointD;
 
 	double rotAngle = 0;
-
+	if((z[2] * M_PI/180 )> M_PI_2)
+	{
+		rotAngle = ((z[2] * M_PI/180) - M_PI_2);
+	}
+	else if ((z[2] * M_PI / 180)< M_PI_2)
+	{
+		rotAngle = - (M_PI_2 - (z[2] * M_PI / 180));
+	}
+	/*
 	if(z[2]> M_PI_2)
 	{
 		rotAngle = (z[2] - M_PI_2);
@@ -252,7 +259,7 @@ void KW_MAP2::projectionObservation(vector<double> z, int R, int G, int B)
 	{
 		rotAngle = - (M_PI_2 - z[2]);
 	}
-
+*/
 	obsPointA.x = z[0] - 0.5 * z[4];
 	obsPointA.y = z[1] - 4/7.0 *z[3];
 
@@ -388,13 +395,13 @@ void KW_MAP2::projectionState()
 
 	double rotAngle = 0;
 
-	if(z[2]> M_PI_2)
+	if((s[2] * M_PI / 180)> M_PI_2)
 	{
-		rotAngle = (z[2] - M_PI_2);
+		rotAngle = ((s[2] * M_PI / 180) - M_PI_2);
 	}
-	else if (z[2]< M_PI_2)
+	else if ((s[2] * M_PI / 180)< M_PI_2)
 	{
-		rotAngle = - (M_PI_2 - z[2]);
+		rotAngle = - (M_PI_2 - (s[2] * M_PI / 180));
 	}
 
 	obsPointA.x = s[0] - 0.5 * s[4];
@@ -410,7 +417,9 @@ void KW_MAP2::projectionState()
 	obsPointD.y = s[1] + 0.5 *s[3];
 
 	Types::Ellipse * el;
+	Types::Line * elL;
 
+/*
 	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
 	el->setCol(CV_RGB(0,0,255));
 	drawcont.add(el);
@@ -427,7 +436,6 @@ void KW_MAP2::projectionState()
 	el->setCol(CV_RGB(0,0,255));
 	drawcont.add(el);
 
-	Types::Line * elL;
 	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
 	elL->setCol(CV_RGB(0,0,255));
 	drawcont.add(elL);
@@ -443,7 +451,7 @@ void KW_MAP2::projectionState()
 	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
 	elL->setCol(CV_RGB(0,0,255));
 	drawcont.add(elL);
-
+*/
 	obsPointA = rot(obsPointA, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointB = rot(obsPointB, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
@@ -581,6 +589,14 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	Base::Component(name) {
 	LOG(LTRACE) << "Hello KW_MAP\n";
 	
+	factor = 0.01;
+
+	s.push_back(197.68);
+	s.push_back(398.36);
+	s.push_back(96.86);
+	s.push_back(136.24);
+	s.push_back(176.81);
+
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 5; j++) {
 			H[i][j] = 0;
