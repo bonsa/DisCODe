@@ -21,7 +21,7 @@ namespace Processors {
 namespace BlobExtractor {
 
 BlobExtractor_Processor::BlobExtractor_Processor(const std::string & name) : Base::Component(name),
-	min_size("min size", 26000, "range")
+	min_size("min size", 10, "range")
 {
 	LOG(LTRACE)<<"Hello BlobExtractor_Processor\n";
 	min_size.addConstraint("0");
@@ -81,7 +81,7 @@ void BlobExtractor_Processor::onNewImage() {
 	cv::Mat in = in_img.read();
 	in.convertTo(img_uchar, CV_8UC1);
 	IplImage * img = &IplImage(img_uchar);
-	//cv::Mat out = cv::Mat::zeros(in.size(), CV_8UC3);
+//	cv::Mat out = cv::Mat::zeros(in.size(), CV_8UC3);
 
 	Types::Blobs::Blob_vector res;
 	bool success;
@@ -109,9 +109,9 @@ void BlobExtractor_Processor::onNewImage() {
 			LOG(LTRACE) << "blobs written";
 			newBlobs->raise();
 			LOG(LTRACE) << "blobs sent";
-	//		result.draw(out, CV_RGB(255, 0, 0), 0, 0);
-	//		out_img.write(in);
-	//		newImage->raise();
+		//	result.draw(out, CV_RGB(255, 0, 0), 0, 0);
+		//	out_img.write(in);
+		//	newImage->raise();
 		}
 
 		LOG(LINFO) << "Blobing took " << timer.elapsed() << " seconds\n";
