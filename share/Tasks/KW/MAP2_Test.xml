@@ -52,7 +52,7 @@
 	<!-- Threads of execution -->
 	<Executors>
 		  
-<!--			
+			
 		<Exec1 type="periodic">
 			<main_component>Movie</main_component>
 			<period>1.0</period>
@@ -63,7 +63,7 @@
 			<main_component>Window4</main_component>
 			<interval>0.2</interval>
 		</Exec2>
-	-->
+<!--
 	
 		<Exec1 type="continuous">
 			<main_component>Movie</main_component>
@@ -73,7 +73,7 @@
 		<Exec2 type="continuous">
 			<main_component>Window4</main_component>
 		</Exec2>
-
+	-->
 
 	</Executors>
 

@@ -159,7 +159,7 @@ protected:
 	void observationToState();
 
 	// Funckja odpowiedzialna za projekcie stanu
-	void projectionState();
+	void projectionState(vector<double> s, int R, int G, int B);
 
 	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
 	void stateToObservation();
@@ -197,6 +197,9 @@ private:
 
 	// wektor stanu dłoni
 	vector<double> s;
+
+	// wektor stanu dłoni obliczona na podstawie aktualnej obserwacji
+	vector<double> sTest;
 
 	// wektor obserwacji dłoni
 	vector<double> h_z;

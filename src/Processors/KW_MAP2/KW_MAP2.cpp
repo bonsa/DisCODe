@@ -68,11 +68,13 @@ bool KW_MAP2::onStep() {
 		z.clear();
 		h_z.clear();
 		diff.clear();
+		sTest.clear();
 
 		getObservation();
 		projectionObservation(z, 255, 255, 255);
-	//	observationToState();
-		projectionState();
+		observationToState();
+		projectionState(sTest, 255, 0, 0);
+		projectionState(s, 0, 255, 255);
 		stateToObservation();
 		projectionObservation(h_z, 255, 0, 255);
 		calculateDiff();
@@ -365,7 +367,9 @@ void KW_MAP2::observationToState()
 {
 	float s_mx, s_my, s_angle, s_heigth, s_width;
 
-	s_mx = z[0] - 0.025 * z[4];
+	s_mx = z[0] - 0.05 * z[4];
+//	s_mx = z[0] - 0.07 * z[4];
+//	s_my = z[1] + 1.5/7.0 * z[3];
 	s_my = z[1] + 1.0/7.0 * z[3];
 
 	Types::Ellipse * el;
@@ -377,17 +381,18 @@ void KW_MAP2::observationToState()
 	s_angle = z[2];
 	s_heigth = 0.4 * z[3];
 	s_width = 0.5 * z[4];
+	//s_width = 0.55 * z[4];
 
-	s.push_back(s_mx);
-	s.push_back(s_my);
-	s.push_back(s_angle);
-	s.push_back(s_heigth);
-	s.push_back(s_width);
+	sTest.push_back(s_mx);
+	sTest.push_back(s_my);
+	sTest.push_back(s_angle);
+	sTest.push_back(s_heigth);
+	sTest.push_back(s_width);
 
 
 }
 
-void KW_MAP2::projectionState()
+void KW_MAP2::projectionState(vector<double> s, int R, int G, int B)
 {
 	cv::Point obsPointA;
 	cv::Point obsPointB;
@@ -459,35 +464,35 @@ void KW_MAP2::projectionState()
 	obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
 
 	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,255,255));
+	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
 
 	el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,255,255));
+	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
 
 	el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,255,255));
+	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
 
 	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,255,255));
+	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
 
 	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
-	elL->setCol(CV_RGB(0,255,255));
+	elL->setCol(CV_RGB(R,G,B));
 	drawcont.add(elL);
 
 	elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
-	elL->setCol(CV_RGB(0,255,255));
+	elL->setCol(CV_RGB(R,G,B));
 	drawcont.add(elL);
 
 	elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
-	elL->setCol(CV_RGB(0,255,255));
+	elL->setCol(CV_RGB(R,G,B));
 
 	drawcont.add(elL);
 	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
-	elL->setCol(CV_RGB(0,255,255));
+	elL->setCol(CV_RGB(R,G,B));
 	drawcont.add(elL);
 
 
@@ -559,10 +564,10 @@ void KW_MAP2::calculateDiff()
 		t3[i] = 0;
 		for (unsigned int j = 0; j < 5; j++) {
 			//mnożenie macierzy P * t2
-			t3[i] +=  P[i][j] * t2[j];
+			t3[i] +=   P[i][j] * t2[j];
 
 		}
-		t3[i] *= factor;
+		t3[i] *= 10.0*factor;
 		diff.push_back(t3[i]);
 		error2 += abs(t3[i]);
 
@@ -594,7 +599,7 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	Base::Component(name) {
 	LOG(LTRACE) << "Hello KW_MAP\n";
 	
-	factor = 0.05;
+	factor = 0.001;
 
 	s.push_back(197.68);
 	s.push_back(398.36);
