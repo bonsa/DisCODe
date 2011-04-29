@@ -85,23 +85,6 @@
 			
 		<Event source="BW.newImage" destination="Blob.onNewImage"/>
 		<Event source="Blob.newBlobs" destination="Window1.onNewImage"/>
-
-		
-<!--		<Event source="Blob.newBlobs" destination="Sink.onNewImage"/>
-
-
-	
-		<Event source="Blob.newBlobs" destination="Sink.onNewImage"/>
-
--->
-	<!--
-
-		<Event source="SkinDec.newImage" destination="Split.onNewImage"/>
-		<Event source="Split.newImage" destination="Window.onNewImage0"/>
-		<Event source="Split.newImage" destination="Window.onNewImage1"/>
-		<Event source="Split.newImage" destination="Window.onNewImage2"/>
--->
-
 	
 	
 	</Events>
