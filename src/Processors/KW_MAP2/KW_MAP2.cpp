@@ -67,6 +67,7 @@ bool KW_MAP2::onStep() {
 
 		z.clear();
 		h_z.clear();
+		diff.clear();
 
 		getObservation();
 		projectionObservation(z, 255, 255, 255);
@@ -539,11 +540,10 @@ void KW_MAP2::calculateDiff()
 		t1[i] = 0;
 		for (unsigned int j = 0; j < 5; j++) {
 			//t = iloraz odwrotnej macierzy R * roznica D
-			t1[i] += invR[i][j] *D[j];
+			t1[i] += invR[i][j] * D[j];
 		}
 	}
 
-	cout<<"t2\n";
 	double t2[5];
 	for (unsigned int i = 0; i < 5; i++) {
 		t2[i] = 0;
@@ -567,13 +567,18 @@ void KW_MAP2::calculateDiff()
 		error2 += abs(t3[i]);
 
 	}
+	cout <<"ERROR2"<<error2<<"\n";
 }
 
 void KW_MAP2::updateState()
 {
 	for (unsigned int i = 0; i < 5; i++) {
+		cout << i << " diff\t" << diff[i] << "\n";
+	}
+
+	for (unsigned int i = 0; i < 5; i++) {
 		s[i] = s[i] - diff[i];
-//		cout << i << " states\t" << state[i] << "\n";
+		cout << i << " states\t" << s[i] << "\n";
 	}
 
 	for (unsigned int i = 0; i < 5; i++) {
@@ -589,13 +594,19 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	Base::Component(name) {
 	LOG(LTRACE) << "Hello KW_MAP\n";
 	
-	factor = 0.01;
+	factor = 0.05;
 
 	s.push_back(197.68);
 	s.push_back(398.36);
 	s.push_back(96.86);
 	s.push_back(136.24);
 	s.push_back(176.81);
+
+	for(unsigned int i = 0; i<5; i++)
+	{
+		cout << i << " states\t" << s[i] << "\n";
+
+	}
 
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 5; j++) {
@@ -610,6 +621,7 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	H[2][2] = 1;
 	H[3][3] = 5.0/3.0;
 	H[4][4] = 2;
+
 	P[0][0] = 46.990883;
 	P[0][1] = 1.528119;
 	P[0][2] = -5.323601;
