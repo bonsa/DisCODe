@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Task>
-	<!-- List of components, data: 01.03.10 -->
+	<!-- List of components, data: 29.04.11 -->
 	<Components>
 
 		<Movie type="CameraOpenCV" thread="Exec1" group="s1">
 		</Movie>
 		
-		<Seq1 type="Sequence" thread="Exec1" group="s1">
-			<directory>/home/kasia/Pobrane/</directory> 
-			<pattern>.*\.png</pattern>
-			<loop>false</loop>
-		</Seq1>
+		<Seq type="Sequence" thread="Exec1" group="s1">
+			<directory>/home/kasia/Filmy/zdjecia/MAP3/</directory> 
+			<pattern>.*\.jpg</pattern>
+			<loop>true</loop>
+		</Seq>
 		
 
 		<Window1 type="CvWindow" thread="Exec2" group="s1">
@@ -21,7 +21,7 @@
 
 		</Window2>
 
-		<Filtr type="KW_InitialFilterAkademik" thread="Exec1" group="s1">
+		<Filtr type="KW_MAP3_InitialFilter" thread="Exec1" group="s1">
 				
 		</Filtr> 
 
@@ -29,7 +29,7 @@
 				
 		</ConColor> 
 		
-		
+	
 		<SkinDec type="KW_Skin_Detection_TSL2" thread="Exec1" group="s1">
 		</SkinDec>
 		
@@ -37,42 +37,18 @@
 		<type>BGR2GRAY</type>
 		</BW>
 		
-		<MorphClose1 type="CvMorphology" thread="Exec1" group="s1">
-			<type>MORPH_CLOSE</type>
-			<iterations>0</iterations>
-		</MorphClose1>
-		
-		<MorphOpen type="CvMorphology" thread="Exec1" group="s1">
-			<type>MORPH_OPEN</type>
-			<iterations>0</iterations>
-		</MorphOpen>	
-		
-		<MorphClose2 type="CvMorphology" thread="Exec1" group="s1">
-			<type>MORPH_CLOSE</type>
-			<iterations>0</iterations>
-		</MorphClose2>
-		
-		<Window3 type="CvWindow" thread="Exec2" group="s1">
-
-		</Window3>
 		
 		<Blob type="BlobExtractor" thread="Exec1" group="s1">
 			<min_size>5000</min_size>
 		</Blob>
 		
+		<Window3 type="CvWindow" thread="Exec2" group="s1">
+
+		</Window3>
+		
 		<Window4 type="CvWindow" thread="Exec2" group="s1">
 
 		</Window4>
-		
-		<Window5 type="CvWindow" thread="Exec2" group="s1">
-
-		</Window5>
-	
-	
-		<Sink type="CvVideoWriter" thread="Exec1" group="s1">
-			<filename>/home/kasia/output2.avi</filename>
-			<fourcc>XVID</fourcc>
-		</Sink>
 	
 
 	
@@ -83,14 +59,15 @@
 		  
 		
 		<Exec1 type="periodic">
-			<main_component>Seq1</main_component>
-			<interval>0.01</interval>
+			<main_component>Seq</main_component>
+			<interval>0.2</interval>
 		</Exec1>
 
 		<Exec2 type="periodic">
 			<main_component>Window1</main_component>
 			<interval>0.2</interval>
 		</Exec2>
+		
 
 
 	</Executors>
@@ -98,9 +75,9 @@
 	<!-- Event connections -->
 	<Events>
 
-		<Event source="Seq1.newImage" destination="Filtr.onNewImage"/>
-		<Event source="Seq1.newImage" destination="Window1.onNewImage"/>
-		<Event source="Filtr.newImage" destination="Window5.onNewImage"/>
+		<Event source="Seq.newImage" destination="Filtr.onNewImage"/>
+		<Event source="Seq.newImage" destination="Window1.onNewImage"/>
+		<Event source="Filtr.newImage" destination="Window4.onNewImage"/>
 		
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
 		<Event source="ConColor.newImage" destination="SkinDec.onNewImage"/>
@@ -108,12 +85,7 @@
 		
 		<Event source="SkinDec.newImage" destination="BW.onNewImage"/>
 			
-		<Event source="BW.newImage" destination="MorphClose1.onNewImage"/>
-		<Event source="MorphClose1.newImage" destination="MorphOpen.onNewImage"/>
-		<Event source="MorphOpen.newImage" destination="MorphClose2.onNewImage"/>
-		<Event source="MorphClose2.newImage" destination="Window3.onNewImage"/>
-		
-		<Event source="MorphClose2.newImage" destination="Blob.onNewImage"/>
+		<Event source="BW.newImage" destination="Blob.onNewImage"/>
 		<Event source="Blob.newBlobs" destination="Window4.onNewImage"/>
 
 		<Event source="Movie.newImage" destination="Window4.onNewImage"/>
@@ -138,9 +110,9 @@
 
 	<!-- Data stream assignments -->
 	<DataStreams>
-		<Seq1>
+		<Seq>
 			<out_img type="out" group="Con1"/>
-		</Seq1>
+		</Seq>
 		
 		
 		<Filtr>
@@ -152,9 +124,9 @@
 			<in_img0 type="in" group="Con1"/>
 		</Window1>
 		
-		<Window5>
+		<Window4>
 			<in_img0 type="in" group="Con2"/>
-		</Window5>
+		</Window4>
 				
 		<ConColor>
 				<in_img  type="in" group="Con2"/>
@@ -178,40 +150,17 @@
 		</BW> 
 		
 		
-		<MorphClose1>
-				<in_img  type="in" group="Con5"/>
-				<out_img type="out" group="Con6"/>
-		</MorphClose1> 
-
-				
-		<MorphOpen>
-				<in_img  type="in" group="Con6"/>
-				<out_img type="out" group="Con7"/>
-		</MorphOpen> 
-		
-		<MorphClose2>
-				<in_img  type="in" group="Con7"/>
-				<out_img type="out" group="Con8"/>
-		</MorphClose2> 
-		
-		<Window3>
-			<in_img0 type="in" group="Con8"/>
-		</Window3>
-		
 		<Blob>
-				<in_img  type="in" group="Con8"/>
-				<out_blobs type="out" group="Con9"/>
+				<in_img  type="in" group="Con5"/>
+				<out_blobs type="out" group="Con6"/>
 		</Blob> 
 		
-
-
-
 		
-		<Window4>
+		<Window3>
 			<in_img type="in" group="Con1"/>
-			<in_draw type="in" group="Con9"/>	
+			<in_draw type="in" group="Con6"/>	
 
-		</Window4>
+		</Window3>
 		
 		
 	<!--	<Split>

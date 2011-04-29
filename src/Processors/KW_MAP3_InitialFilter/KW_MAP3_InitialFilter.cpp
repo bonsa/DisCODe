@@ -19,26 +19,26 @@ namespace KW_MAP3_Filter {
 
 KW_MAP3_InitialFilter::KW_MAP3_InitialFilter(const std::string & name) : Base::Component(name),
 
-		blue_B("grupa1|  down_blue_B", 20, "range"),
-		blue_R("grupa1|  up_blue_R", 255, "range"),
-		blue_G("grupa1|  up_blue_G", 119, "range"),
+		blue_B("grupa1|  down_blue_B", 255, "range"),
+		blue_R("grupa1|  up_blue_R", 150, "range"),
+		blue_G("grupa1|  up_blue_G", 0, "range"),
 
-		green_G("grupa2|  down_green_G", 93, "range"),
-		green_R("grupa2|  up_green_R", 151, "range"),
-		green_B("grupa2|  up_green_B", 232, "range"),
+		green_G("grupa2|  down_green_G", 0, "range"),
+		green_R("grupa2|  up_green_R", 117, "range"),
+		green_B("grupa2|  up_green_B", 255, "range"),
 
-		dark_R("grupa3|  up_dark_R", 212, "range"),
-		dark_G("grupa3|  up_dark_G", 131, "range"),
-		dark_B("grupa3|  up_dark_B", 112, "range"),
+		dark_R("grupa3|  up_dark_R", 158, "range"),
+		dark_G("grupa3|  up_dark_G", 163, "range"),
+		dark_B("grupa3|  up_dark_B", 156, "range"),
 
-		green("grupa4|  down_green", 200, "range"),
-		red_green("grupa4|  down_red_green", 400, "range"),
+		green("grupa4|  down_green", 156, "range"),
+		red_green("grupa4|  down_red_green", 145, "range"),
 
-		yellow_G("grupa5|  down_yellow_G", 150, "range"),
-		yellow_B("grupa5|  up_yellow_B", 90, "range"),
+		yellow_G("grupa5|  down_yellow_G", 140, "range"),
+		yellow_B("grupa5|  up_yellow_B", 100, "range"),
 
 		blue_in_contast("grupa6|  down_blue_in_contast", 40, "range"),
-		green_in_contast("grupa6|  down_green_in_contast", 40, "range")
+		green_in_contast("grupa6|  down_green_in_contast", 45, "range")
 
 
 
