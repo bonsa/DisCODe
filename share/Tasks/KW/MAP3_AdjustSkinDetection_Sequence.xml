@@ -3,23 +3,29 @@
 	<!-- List of components, data: 29.04.11 -->
 	<Components>
 
-		<Movie type="CameraOpenCV" thread="Exec1" group="s1">
-		</Movie>
 		
 		<Seq type="Sequence" thread="Exec1" group="s1">
 			<directory>/home/kasia/Filmy/zdjecia/MAP3/</directory> 
 			<pattern>.*\.jpg</pattern>
 			<loop>true</loop>
+			<triggered>false</triggered>
 		</Seq>
 		
+		<Kbd1 type="Keyboard" thread="Exec3" group="s1">
+            <keys>t</keys> 
+        </Kbd1>
 
 		<Window1 type="CvWindow" thread="Exec2" group="s1">
-
+			<colorful>true</colorful>
 		</Window1>
 		
 		<Window2 type="CvWindow" thread="Exec2" group="s1">
 
 		</Window2>
+		
+		<Window4 type="CvWindow" thread="Exec2" group="s1">
+
+		</Window4>
 
 		<Filtr type="KW_MAP3_InitialFilter" thread="Exec1" group="s1">
 				
@@ -37,14 +43,22 @@
 		<type>BGR2GRAY</type>
 		</BW>
 		
+		<MorphClose type="CvMorphology" thread="Exec1" group="s1">
+			<type>MORPH_OPEN</type>
+			<iterations>3</iterations>
+		</MorphClose>	
 		
 		<Blob type="BlobExtractor" thread="Exec1" group="s1">
 			<min_size>5000</min_size>
 		</Blob>
 		
+		<MAP type="KW_MAP2" thread="Exec1" group="s1">
+		</MAP>
+		
 		<Window3 type="CvWindow" thread="Exec2" group="s1">
 
 		</Window3>
+		
 		
 
 	
@@ -58,23 +72,28 @@
 		
 		<Exec1 type="periodic">
 			<main_component>Seq</main_component>
-			<interval>0.2</interval>
+			<interval>0.01</interval>
 		</Exec1>
 
 		<Exec2 type="periodic">
 			<main_component>Window1</main_component>
-			<interval>0.01</interval>
+			<interval>0.5</interval>
 		</Exec2>
 		
+		<Exec3 type="continuous">
+			<main_component>Kbd1</main_component>
+			<keys>t</keys> 
+		</Exec3>
 
 
 	</Executors>
 
 	<!-- Event connections -->
 	<Events>
+		
+		<Event source="Kbd1.t_Pressed" destination="Seq.onTrigger"/>
 
 		<Event source="Seq.newImage" destination="Filtr.onNewImage"/>
-		<Event source="Seq.newImage" destination="Window1.onNewImage"/>
 		<Event source="Filtr.newImage" destination="Window2.onNewImage"/>
 		
 		<Event source="Filtr.newImage" destination="ConColor.onNewImage"/>
@@ -82,9 +101,15 @@
 		<Event source="SkinDec.newImage" destination="Window3.onNewImage"/>
 		
 		<Event source="SkinDec.newImage" destination="BW.onNewImage"/>
+		<Event source="BW.newImage" destination="MorphClose.onNewImage"/>
 			
-		<Event source="BW.newImage" destination="Blob.onNewImage"/>
-		<Event source="Blob.newBlobs" destination="Window1.onNewImage"/>
+		<Event source="MorphClose.newImage" destination="Blob.onNewImage"/>
+		<Event source="Blob.newBlobs" destination="MAP.onNewBlobs"/>
+		<Event source="MAP.newImage" destination="Window1.onNewImage"/>
+		<Event source="Seq.newImage" destination="Window1.onNewImage"/>
+		
+		<Event source="MAP.newImage" destination="Window4.onNewImage"/>
+		<Event source="Seq.newImage" destination="Window4.onNewImage"/>
 	
 	
 	</Events>
@@ -118,7 +143,7 @@
 			
 		
 		<Window3>
-			<in_img0 type="in" group="Con4"/>
+			<in_img0 type="in" group="Con6"/>
 		</Window3>
 		
 		<BW>
@@ -126,16 +151,37 @@
 				<out_img type="out" group="Con5"/>
 		</BW> 
 		
-		
-		<Blob>
+		<MorphClose>
 				<in_img  type="in" group="Con5"/>
-				<out_blobs type="out" group="Con6"/>
-		</Blob> 
+				<out_img type="out" group="Con6"/>
+		</MorphClose> 
 		
+	
+		<Blob>
+				<in_img  type="in" group="Con6"/>
+				<out_blobs type="out" group="Con7"/>
+		</Blob> 
+
+						
+		<MAP>
+			<in_img type="in" group="Con6"/>
+			<in_blobs type="in" group="Con7"/>
+			<out_signs type="out" group="Con8"/>
+		</MAP>
+	
 		<Window1>
-			<in_img0 type="in" group="Con1"/>
-			<in_draw type="in" group="Con6"/>	
-		</Window1>
+			<in_img type="in" group="Con1"/>
+			<in_draw type="in" group="Con8"/>	
+		</Window1>	
+		
+		<Window4>
+			<in_img type="in" group="Con4"/>
+			<in_draw type="in" group="Con7"/>	
+		</Window4>	
+	
+
+	
+
 
 		
 	</DataStreams>

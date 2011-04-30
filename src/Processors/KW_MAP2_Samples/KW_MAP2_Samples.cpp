@@ -158,6 +158,7 @@ void KW_MAP2_Samples::getObservation(){
 		//największy blob to dłoń
 		for (int i = 0; i < blobs.GetNumBlobs(); i++) {
 			currentBlob = blobs.GetBlob(i);
+			cout<<"i_"<<i<<"\n";
 
 			Area = currentBlob->Area();
 			//szukanie bloba o największej powierzchni
@@ -165,11 +166,12 @@ void KW_MAP2_Samples::getObservation(){
 				MaxArea = Area;
 				// id największego bloba, czyli dłoni
 				id = i;
+				cout<<"i_"<<i<<"\n";
 			}
 		}
 		//current Blob przychowuje największego bloba, czyli dłoni
 		currentBlob = blobs.GetBlob(id);
-
+		cout<<"id"<<id<<"\n";
 
 		// calculate moments
 		m00 = currentBlob->Moment(0, 0);

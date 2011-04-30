@@ -197,10 +197,10 @@ private:
 	double H[5][5];
 
 	//macierz przechowująca parametry stanu dla kilku obrazków
-	double nStates[5][18];
+	double nStates[5][20];
 
 	//macierz przechowująca punkty char dla kilku obrazków
-	double nObservation[5][18];
+	double nObservation[5][20];
 
 	// ile obrazków w sekwencji juz task podbrał
 	int ileObrazkow;

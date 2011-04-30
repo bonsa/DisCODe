@@ -5,9 +5,9 @@
 
 		
 		<Seq type="Sequence" thread="Exec1" group="s1">
-			<directory>/home/kasia/Filmy/zdjecia/MAP</directory> 
-			<loop>true</loop>
-			<triggered>true</triggered>	
+			<directory>/home/kasia/Filmy/zdjecia/MAP3</directory> 
+			<loop>false</loop>
+			<triggered>false</triggered>	
 		
 		</Seq>
 		 
@@ -41,9 +41,7 @@
 			<type>MORPH_CLOSE</type>
 			<iterations>4</iterations>
 		</MorphClose1>
-
-		
-		
+	
 		<Blob type="BlobExtractor" thread="Exec1" group="s1">
 			<min_size>5000</min_size>
 		</Blob>
@@ -60,7 +58,7 @@
 				
 		<Exec1 type="periodic">
 			<main_component>Seq</main_component>
-			<interval>0.001</interval>
+			<interval>0.6</interval>
 	
 		</Exec1>
 
@@ -150,7 +148,7 @@
 	
 		<Window4>
 			<in_img type="in" group="Con1"/>
-			<in_draw type="in" group="Con10"/>	
+			<in_draw type="in" group="Con9"/>	
 
 		</Window4>
 		
