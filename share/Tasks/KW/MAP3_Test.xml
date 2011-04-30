@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Task>
-	<!-- List of components, data: 01.03.10 -->
+	<!-- List of components, data: 30.04.11 -->
 	<Components>
 
 		<Movie type="Movie" thread="Exec1" group="s1">
-		<filename>/home/kasia/Filmy/10.04.avi</filename>
+		<filename>/home/kasia/Filmy/29.04/29.04_12.avi</filename>
 		<loop>true</loop>
 		</Movie>
 
@@ -13,7 +13,7 @@
 
 		</Window4>
 
-		<Filtr type="KW_InitialFilter_Movie" thread="Exec1" group="s1">
+		<Filtr type="KW_MAP3_InitialFilter" thread="Exec1" group="s1">
 				
 		</Filtr> 
 
@@ -22,7 +22,7 @@
 		</ConColor> 
 		
 		
-		<SkinDec type="KW_Skin_Detection_TSL_Movie" thread="Exec1" group="s1">
+		<SkinDec type="KW_MAP3_SkinDetection" thread="Exec1" group="s1">
 		</SkinDec>
 		
 		<BW type="CvColorConv" thread="Exec1" group="s1">
@@ -30,8 +30,8 @@
 		</BW>
 		
 		<MorphClose1 type="CvMorphology" thread="Exec1" group="s1">
-			<type>MORPH_CLOSE</type>
-			<iterations>4</iterations>
+			<type>MORPH_OPEN</type>
+			<iterations>3</iterations>
 		</MorphClose1>
 		
 		<Blob type="BlobExtractor" thread="Exec1" group="s1">
@@ -52,7 +52,7 @@
 	<!-- Threads of execution -->
 	<Executors>
 		  
-	<!--		
+<!--
 		<Exec1 type="periodic">
 			<main_component>Movie</main_component>
 			<period>1.0</period>
@@ -73,7 +73,7 @@
 		<Exec2 type="continuous">
 			<main_component>Window4</main_component>
 		</Exec2>
-
+	
 
 	</Executors>
 

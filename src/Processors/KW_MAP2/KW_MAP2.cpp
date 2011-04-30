@@ -502,7 +502,7 @@ void KW_MAP2:: stateToObservation()
 {
 	float hz_mx, hz_my, hz_angle, hz_heigth, hz_width;
 
-	hz_mx = s[0] +  0.05 * s[4];
+	hz_mx = s[0] +  0.1 * s[4];
 	hz_my = s[1] - 5.0/14.0 * s[3];
 	hz_angle = s[2];
 	hz_heigth = 5.0/2.0 * s[3];
