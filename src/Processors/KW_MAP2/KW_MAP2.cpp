@@ -65,20 +65,28 @@ bool KW_MAP2::onStep() {
 
 		drawcont.clear();
 
-		z.clear();
-		h_z.clear();
-		diff.clear();
-		sTest.clear();
+		if(STOP == false)
+		{
+			z.clear();
+			h_z.clear();
+			diff.clear();
+			sTest.clear();
 
-		getObservation();
-		projectionObservation(z, 255, 255, 255);
-		observationToState();
-		projectionState(sTest, 255, 0, 0);
-		projectionState(s, 0, 255, 255);
-		stateToObservation();
-		projectionObservation(h_z, 255, 0, 255);
-		calculateDiff();
-		updateState();
+			getObservation();
+			projectionObservation(z, 255, 255, 255);
+			observationToState();
+			projectionState(sTest, 255, 0, 0);
+			projectionState(s, 0, 255, 255);
+			stateToObservation();
+			projectionObservation(h_z, 255, 0, 255);
+			calculateDiff();
+			updateState();
+			stopCondition();
+		}
+		else
+		{
+			projectionState(s, 0, 255, 255);
+		}
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -593,6 +601,46 @@ void KW_MAP2::updateState()
 	}
 }
 
+void KW_MAP2::stopCondition()
+{
+	// różnica stanów estymacji i hipoteza poczatkowa (średniego wektora cech stanu)
+	vector<double> diffS;
+
+	//wektor błędu, jeśli suma jego elementów jest mniejsza niż określony warunek stopu nastepuje koniec estymacji
+	vector<double> tempError;
+
+	for (unsigned int i = 0; i < 5; i++)
+	{
+		diffS.push_back(s[i] - s0[i]);
+	}
+
+	double t1[5];
+	for (unsigned int i = 0; i < 5; i++)
+	{
+		t1[i] = 0;
+		for (unsigned int j = 0; j < 5; j++) {
+			//mnożenie macierzy odwrotnej P * roznica S
+			t1[i] += invP[i][j] * diffS[j];
+		}
+	}
+
+	double error = 0;
+	for (unsigned int i = 0; i < 5; i++)
+	{
+		tempError.push_back(diff[i]+t1[i]);
+		error += abs(tempError[i]);
+	}
+
+	//warunek końca estymacji MAP
+	cout<<"\nERROR!!!!!: "<<error<<"\n";
+	if(error < 1.5)
+	{
+		cout<< "STOP is true\n";
+		STOP = true;
+	}
+
+}
+
 
 //konstruktor
 KW_MAP2::KW_MAP2(const std::string & name) :
@@ -764,6 +812,12 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	s.push_back(96.532);
 	s.push_back(152.78);
 	s.push_back(178.57);
+
+	s0.push_back(352.18);
+	s0.push_back(331.46);
+	s0.push_back(96.532);
+	s0.push_back(152.78);
+	s0.push_back(178.57);
 
 	for(unsigned int i = 0; i<5; i++)
 	{
