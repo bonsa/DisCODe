@@ -633,7 +633,7 @@ void KW_MAP2::stopCondition()
 
 	//warunek końca estymacji MAP
 	cout<<"\nERROR!!!!!: "<<error<<"\n";
-	if(error < 1.5)
+	if(error < 1.3)
 	{
 		cout<< "STOP is true\n";
 		STOP = true;

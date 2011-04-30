@@ -229,12 +229,6 @@ private:
 	//wspołczynnik zapominania
 	double factor;
 
-	// różnica stanów estymacji i hipoteza poczatkowa (średniego wektora cech stanu)
-	vector<double> diffS;
-
-	//wektor błędu, jeśli suma jego elementów jest mniejsza niż określony warunek stopu nastepuje koniec estymacji
-	vector<double> tempError;
-
 	// funkcja warunek stopu, jesli STOP = true estymacja MAP jest zakończona
 	bool STOP;
 
