@@ -64,6 +64,7 @@ bool KW_MAP2::onStep() {
 	try {
 
 		drawcont.clear();
+		z_MFinger.clear();
 
 		if(STOP == false)
 		{
@@ -76,17 +77,20 @@ bool KW_MAP2::onStep() {
 			projectionObservation(z, 255, 255, 255);
 			observationToState();
 			projectionState(sTest, 255, 0, 0);
-			projectionState(s, 0, 255, 255);
-			stateToObservation();
-			projectionObservation(h_z, 255, 0, 255);
-			calculateDiff();
-			updateState();
-			stopCondition();
+		//	projectionState(s, 0, 255, 255);
+		//	stateToObservation();
+		//	projectionObservation(h_z, 255, 0, 255);
+		//	calculateDiff();
+		//	updateState();
+		//	stopCondition();
 		}
 		else
 		{
 			projectionState(s, 0, 255, 255);
 		}
+
+		getMiddleFingerObservation();
+		projectionFingerObservation(z_MFinger, 200, 200, 200);
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -155,7 +159,7 @@ void KW_MAP2::getObservation(){
 		//momenty goemetryczne potrzebne do obliczenia środka ciężkości
 		double m00, m10, m01;
 		//powierzchnia bloba, powiedzchnia największego bloba, współrzędne środka ciężkości, maksymalna wartośc współrzędnej Y
-		double Area, MaxArea, CenterOfGravity_x, CenterOfGravity_y, MaxY, MinY,  MaxX, MinX;
+		double Area, MaxArea, CenterOfGravity_x, CenterOfGravity_y;
 
 		double height, width;
 		MaxArea = 0;
@@ -641,6 +645,150 @@ void KW_MAP2::stopCondition()
 
 }
 
+//*****************************************************************//
+//*SRODKOWY PALEC**************************************************//
+//*****************************************************************//
+
+// Otrzymanie obserwacji środkowego palca
+void KW_MAP2::getMiddleFingerObservation()
+{
+	z_MFinger.push_back(z[0] - 3/7.0 * (topPoint.x - z[0]));
+	z_MFinger.push_back(z[1] - 3/7.0 * (topPoint.y - z[1]));
+	z_MFinger.push_back(z[2]);
+	z_MFinger.push_back(topPoint.x - z_MFinger[0]);
+	z_MFinger.push_back(topPoint.y - z_MFinger[1]);
+	z_MFinger.push_back(z[4]);
+
+	Types::Ellipse * el;
+	el = new Types::Ellipse(cv::Point(z_MFinger[0], z_MFinger[1]), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,255));
+	drawcont.add(el);
+
+}
+
+void KW_MAP2::projectionFingerObservation(vector<double> z, int R, int G, int B)
+{
+	cv::Point obsPointA;
+		cv::Point obsPointB;
+		cv::Point obsPointC;
+		cv::Point obsPointD;
+
+		double rotAngle = 0;
+		if((z[2] * M_PI/180 )> M_PI_2)
+		{
+			rotAngle = ((z[2] * M_PI/180) - M_PI_2);
+		}
+		else if ((z[2] * M_PI / 180)< M_PI_2)
+		{
+			rotAngle = - (M_PI_2 - (z[2] * M_PI / 180));
+		}
+		/*
+		if(z[2]> M_PI_2)
+		{
+			rotAngle = (z[2] - M_PI_2);
+		}
+		else if (z[2]< M_PI_2)
+		{
+			rotAngle = - (M_PI_2 - z[2]);
+		}
+	*/
+		double h = sqrt(z[3] * z[3] + z[4] * z[4]);
+		obsPointA.x = z[0] - 0.06 * z[5];
+		obsPointA.y = z[1] - h;
+
+		obsPointB.x = z[0] + 0.06 * z[5];
+		obsPointB.y = z[1] - h;
+
+		obsPointC.x = z[0] + 0.06 * z[5];
+		obsPointC.y = z[1];
+
+		obsPointD.x = z[0] - 0.06 * z[5];
+		obsPointD.y = z[1];
+
+
+		Types::Ellipse * el;
+		Types::Line * elL;
+
+
+
+		/*
+		el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
+		el->setCol(CV_RGB(0,0,0));
+		drawcont.add(el);
+
+		el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
+		el->setCol(CV_RGB(0,0,0));
+		drawcont.add(el);
+
+		el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
+		el->setCol(CV_RGB(0,0,0));
+		drawcont.add(el);
+
+		el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
+		el->setCol(CV_RGB(0,0,0));
+		drawcont.add(el);
+
+		elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
+		elL->setCol(CV_RGB(0,0,0));
+		drawcont.add(elL);
+
+		elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
+		elL->setCol(CV_RGB(0,0,0));
+		drawcont.add(elL);
+
+		elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
+		elL->setCol(CV_RGB(0,0,0));
+
+		drawcont.add(elL);
+		elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
+		elL->setCol(CV_RGB(0,0,0));
+		drawcont.add(elL);
+
+		cv::Point pt1 = rot(topPoint, rotAngle, cv::Point(z[0], z[1]));
+
+		el = new Types::Ellipse(cv::Point(pt1.x, pt1.y), Size2f(10, 10));
+		el->setCol(CV_RGB(0,0,0));
+		drawcont.add(el);
+	*/
+		obsPointA = rot(obsPointA, - rotAngle, cv::Point(z[0], z[1]));
+		obsPointB = rot(obsPointB, - rotAngle, cv::Point(z[0], z[1]));
+		obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
+		obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
+
+
+		el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
+		el->setCol(CV_RGB(R,G,B));
+		drawcont.add(el);
+
+		el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
+		el->setCol(CV_RGB(R,G,B));
+		drawcont.add(el);
+
+		el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
+		el->setCol(CV_RGB(R,G,B));
+		drawcont.add(el);
+
+		el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
+		el->setCol(CV_RGB(R,G,B));
+		drawcont.add(el);
+
+		elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
+		elL->setCol(CV_RGB(R,G,B));
+		drawcont.add(elL);
+
+		elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
+		elL->setCol(CV_RGB(R,G,B));
+		drawcont.add(elL);
+
+		elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
+		elL->setCol(CV_RGB(R,G,B));
+
+		drawcont.add(elL);
+		elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
+		elL->setCol(CV_RGB(R,G,B));
+		drawcont.add(elL);
+}
+
 
 //konstruktor
 KW_MAP2::KW_MAP2(const std::string & name) :
@@ -963,6 +1111,7 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	invR[4][4] = 0.004521;
 
 }
+
 
 }//: namespace KW_MAP2
 }//: namespace Processors

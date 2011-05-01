@@ -173,6 +173,12 @@ protected:
 	// Funkcja sprawdzająca czy warunek końcowy jest sprawdzony
 	void stopCondition();
 
+	// Otrzymanie obserwacji środkowego palca
+	void getMiddleFingerObservation();
+
+	// Funckja odpowiedzialna za projekcie obserwacji palca
+	void projectionFingerObservation(vector<double> z, int R, int G, int B);
+
 private:
 
 	cv::Mat tsl_img;
@@ -192,6 +198,8 @@ private:
 
 	// wektor obserwacji dłoni
 	vector<double> z;
+
+	double MaxY, MinY,  MaxX, MinX;
 
 	//czubek srodkowego palca
 	cv::Point topPoint;
@@ -231,6 +239,16 @@ private:
 
 	// funkcja warunek stopu, jesli STOP = true estymacja MAP jest zakończona
 	bool STOP;
+
+	//*****************************************************************//
+	//*ZMIENNE SRODKOWEGO PALCA****************************************//
+	//*****************************************************************//
+
+	// wektor obserwacji dłoni
+	vector<double> z_MFinger;
+
+	// wektor stanu dłoni
+	vector<double> s_MFinger;
 
 };
 
