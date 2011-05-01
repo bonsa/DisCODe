@@ -65,6 +65,7 @@ bool KW_MAP2::onStep() {
 
 		drawcont.clear();
 		z_MFinger.clear();
+		h_z_MFinger.clear();
 		s_MFinger.clear();
 
 		if(STOP == false)
@@ -94,6 +95,8 @@ bool KW_MAP2::onStep() {
 		projectionFingerObservation(z_MFinger, 200, 200, 200);
 		observationMiddleFingerToState();
 		projectionState(s_MFinger, z_MFinger, 255, 0, 0);
+		stateMiddleFingerToObservation();
+		projectionFingerObservation(h_z_MFinger, 0, 0, 0);
 
 
 		out_draw.write(drawcont);
@@ -812,6 +815,31 @@ void KW_MAP2:: observationMiddleFingerToState()
 
 }
 
+// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
+void KW_MAP2::stateMiddleFingerToObservation()
+{
+	float hz_mx, hz_my, hz_angle, hz_heigth, hz_width;
+
+	hz_mx = s_MFinger[0];
+	hz_my = s_MFinger[1] + 7.0/6.0 * s_MFinger[3];
+	hz_angle = s_MFinger[2];
+	hz_heigth = 5.0/3.0 * s_MFinger[3];
+	hz_width = 25/3.0 * s_MFinger[4];
+
+	h_z_MFinger.push_back(hz_mx);
+	h_z_MFinger.push_back(hz_my);
+	h_z_MFinger.push_back(hz_angle);
+	h_z_MFinger.push_back(hz_heigth);
+	h_z_MFinger.push_back(hz_width);
+
+	cout<<"h_z_MFinger\n";
+	cout<<h_z_MFinger[0]<<"\n";
+	cout<<h_z_MFinger[1]<<"\n";
+	cout<<h_z_MFinger[2]<<"\n";
+	cout<<h_z_MFinger[3]<<"\n";
+	cout<<h_z_MFinger[4]<<"\n";
+	cout<<"koniec h_z\n";
+}
 
 
 //konstruktor
@@ -1135,6 +1163,20 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	invR[4][4] = 0.004521;
 
 	//srodkowy palec
+
+
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			H_MFinger[i][j] = 0;
+		}
+	}
+
+	H_MFinger[0][0] = 1;
+	H_MFinger[1][1] = 1;
+	H_MFinger[4][1] = 7/6.0;
+	H_MFinger[2][2] = 1;
+	H_MFinger[3][3] = 5/3.0;
+	H_MFinger[4][4] = 25/3.0;
 
 	s_MFinger.push_back(371.22);
 	s_MFinger.push_back(157.58);

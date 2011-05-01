@@ -186,6 +186,8 @@ protected:
 	// Funkcja wyliczajaca wartosci parametrów stanu środkowego palca na podstawie wartosci obserwacji
 	void observationMiddleFingerToState();
 
+	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
+	void stateMiddleFingerToObservation();
 
 private:
 
@@ -275,6 +277,9 @@ private:
 
 	//macierz odwrotna kowariancji R
 	double invR_MFinger[5][5];
+
+	// wektor obserwacji dłoni
+	vector<double> h_z_MFinger;
 
 };
 
