@@ -66,7 +66,8 @@ bool KW_MAP2::onStep() {
 		drawcont.clear();
 		z_MFinger.clear();
 		h_z_MFinger.clear();
-		s_MFinger.clear();
+		diff_MFinger.clear();
+	//	s_MFinger.clear();
 
 		if(STOP == false)
 		{
@@ -77,8 +78,8 @@ bool KW_MAP2::onStep() {
 
 			getObservation();
 			projectionObservation(z, 255, 255, 255);
-			observationToState();
-			projectionState(sTest, z, 255, 0, 0);
+		//	observationToState();
+		//	projectionState(sTest, z, 255, 0, 0);
 		//	projectionState(s, 0, 255, 255);
 		//	stateToObservation();
 		//	projectionObservation(h_z, 255, 0, 255);
@@ -91,12 +92,17 @@ bool KW_MAP2::onStep() {
 			//projectionState(s, 0, 255, 255);
 		}
 
+		sTest.clear();
 		getMiddleFingerObservation();
 		projectionFingerObservation(z_MFinger, 200, 200, 200);
 		observationMiddleFingerToState();
-		projectionState(s_MFinger, z_MFinger, 255, 0, 0);
+		projectionState(sTest, z_MFinger, 255, 0, 0);
+		projectionState(s_MFinger, z_MFinger, 0, 0, 0);
 		stateMiddleFingerToObservation();
-		projectionFingerObservation(h_z_MFinger, 0, 0, 0);
+	//	projectionFingerObservation(h_z_MFinger, 0, 0, 0);
+		calculateMiddleFingerDiff();
+		updateMiddleFingerState();
+
 
 
 		out_draw.write(drawcont);
@@ -807,11 +813,11 @@ void KW_MAP2:: observationMiddleFingerToState()
 	s_heigth = 0.6 * z_MFinger[3];
 	s_width = 0.12 * z_MFinger[4];
 
-	s_MFinger.push_back(s_mx);
-	s_MFinger.push_back(s_my);
-	s_MFinger.push_back(s_angle);
-	s_MFinger.push_back(s_heigth);
-	s_MFinger.push_back(s_width);
+	sTest.push_back(s_mx);
+	sTest.push_back(s_my);
+	sTest.push_back(s_angle);
+	sTest.push_back(s_heigth);
+	sTest.push_back(s_width);
 
 }
 
@@ -839,6 +845,74 @@ void KW_MAP2::stateMiddleFingerToObservation()
 	cout<<h_z_MFinger[3]<<"\n";
 	cout<<h_z_MFinger[4]<<"\n";
 	cout<<"koniec h_z\n";
+}
+
+void  KW_MAP2::calculateMiddleFingerDiff()
+{
+	//różnicaiedzy wektorami h(s) i z
+	double D[5];
+	float error3 = 0;
+
+	for (unsigned int i = 0; i < 5; i ++)
+	{
+		//różnica miedzy punktami charakterystycznymi aktualnego obraz
+		D[i] =  h_z_MFinger[i] - z_MFinger[i];
+		cout<<"\nD"<<D[i];
+	}
+
+	double t1[5];
+	for (unsigned int i = 0; i < 5; i++) {
+		t1[i] = 0;
+		for (unsigned int j = 0; j < 5; j++) {
+			//t = iloraz odwrotnej macierzy R * roznica D
+			t1[i] += invR_MFinger[i][j] * D[j];
+		}
+	}
+
+	double t2[5];
+	for (unsigned int i = 0; i < 5; i++) {
+		t2[i] = 0;
+		for (unsigned int j = 0; j < 5; j++) {
+			//t1 = iloraz macierzy H * t1
+			t2[i] += H_MFinger[i][j] * t1[j];
+		}
+	//	cout<<t1[i]<<"\n";
+	}
+
+	double t3[5];
+	for (unsigned int i = 0; i < 5; i++) {
+		t3[i] = 0;
+		for (unsigned int j = 0; j < 5; j++) {
+			//mnożenie macierzy P * t2
+			t3[i] +=  P_MFinger[i][j] * t2[j];
+
+		}
+		t3[i] *= 0.1;//*factor;
+		diff_MFinger.push_back(t3[i]);
+		error3 += abs(t3[i]);
+
+	}
+	cout <<"\nERROR M Finger"<<error3<<"\n";
+}
+
+// Funckja aktualizująca wektor stanu i macierz kowariancji P
+void KW_MAP2::updateMiddleFingerState()
+{
+
+	for (unsigned int i = 0; i < 5; i++) {
+		cout << i << " diff_MFinger\t" << diff_MFinger[i] << "\n";
+	}
+
+	for (unsigned int i = 0; i < 5; i++) {
+		s_MFinger[i] = s_MFinger[i] - diff_MFinger[i];
+		cout << i << " states\t" << s_MFinger[i] << "\n";
+	}
+
+	for (unsigned int i = 0; i < 5; i++) {
+		for (unsigned int j = 0; j < 5; j++) {
+			P_MFinger[i][j] *= (1 - factor);
+		}
+	}
 }
 
 

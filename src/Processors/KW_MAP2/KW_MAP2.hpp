@@ -189,6 +189,12 @@ protected:
 	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
 	void stateMiddleFingerToObservation();
 
+	// Funkcja obliczająca o jaki wektor nalezy zaktualizowac wektor stan
+	void calculateMiddleFingerDiff();
+
+	// Funckja aktualizująca wektor stanu i macierz kowariancji P
+	void updateMiddleFingerState();
+
 private:
 
 	cv::Mat tsl_img;
@@ -280,6 +286,9 @@ private:
 
 	// wektor obserwacji dłoni
 	vector<double> h_z_MFinger;
+
+	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
+	vector<double> diff_MFinger;
 
 };
 
