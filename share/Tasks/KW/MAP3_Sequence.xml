@@ -61,7 +61,7 @@
 				
 		<Exec1 type="periodic">
 			<main_component>Seq</main_component>
-			<interval>0.001</interval>
+			<interval>0.8</interval>
 	
 		</Exec1>
 

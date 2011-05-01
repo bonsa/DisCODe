@@ -173,11 +173,21 @@ protected:
 	// Funkcja sprawdzająca czy warunek końcowy jest sprawdzony
 	void stopCondition();
 
+	//*****************************************************************//
+	//*FUNKCJE SRODKOWEGO PALCA****************************************//
+	//*****************************************************************//
+
 	// Otrzymanie obserwacji środkowego palca
 	void getMiddleFingerObservation();
 
 	// Funckja odpowiedzialna za projekcie obserwacji palca
 	void projectionFingerObservation(vector<double> z, int R, int G, int B);
+
+	// Funkcja wyliczajaca wartosci parametrów stanu środkowego palca na podstawie wartosci obserwacji
+	void observationMiddleFingerToState();
+
+	// Funckja odpowiedzialna za projekcie stanu palca
+	void projectionFingerState(vector<double> s, int R, int G, int B);
 
 private:
 
