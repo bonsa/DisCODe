@@ -67,6 +67,7 @@ bool KW_MAP2::onStep() {
 		z_MFinger.clear();
 		h_z_MFinger.clear();
 		diff_MFinger.clear();
+		sTest2.clear();
 	//	s_MFinger.clear();
 
 		if(STOP == false)
@@ -77,14 +78,14 @@ bool KW_MAP2::onStep() {
 			sTest.clear();
 
 			getObservation();
-			projectionObservation(z, 255, 255, 255);
-		//	observationToState();
-		//	projectionState(sTest, z, 255, 0, 0);
-		//	projectionState(s, 0, 255, 255);
-		//	stateToObservation();
+		//	projectionObservation(z, 255, 255, 255);
+			observationToState();
+			projectionState(sTest, z, 0, 255, 255);
+			projectionState(s, z, 255, 255, 255);
+			stateToObservation();
 		//	projectionObservation(h_z, 255, 0, 255);
-		//	calculateDiff();
-		//	updateState();
+			calculateDiff();
+			updateState();
 		//	stopCondition();
 		}
 		else
@@ -94,10 +95,10 @@ bool KW_MAP2::onStep() {
 
 		sTest.clear();
 		getMiddleFingerObservation();
-		projectionFingerObservation(z_MFinger, 200, 200, 200);
+	//	projectionFingerObservation(z_MFinger, 200, 200, 200);
 		observationMiddleFingerToState();
-		projectionState(sTest, z_MFinger, 255, 0, 0);
-		projectionState(s_MFinger, z_MFinger, 0, 0, 0);
+		projectionState(sTest2, z_MFinger, 0, 255, 255);
+		projectionState(s_MFinger, z_MFinger, 255, 255, 255);
 		stateMiddleFingerToObservation();
 	//	projectionFingerObservation(h_z_MFinger, 0, 0, 0);
 		calculateMiddleFingerDiff();
@@ -813,11 +814,11 @@ void KW_MAP2:: observationMiddleFingerToState()
 	s_heigth = 0.6 * z_MFinger[3];
 	s_width = 0.12 * z_MFinger[4];
 
-	sTest.push_back(s_mx);
-	sTest.push_back(s_my);
-	sTest.push_back(s_angle);
-	sTest.push_back(s_heigth);
-	sTest.push_back(s_width);
+	sTest2.push_back(s_mx);
+	sTest2.push_back(s_my);
+	sTest2.push_back(s_angle);
+	sTest2.push_back(s_heigth);
+	sTest2.push_back(s_width);
 
 }
 

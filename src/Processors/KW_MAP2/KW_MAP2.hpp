@@ -290,6 +290,9 @@ private:
 	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
 	vector<double> diff_MFinger;
 
+	// wektor stanu dłoni obliczona na podstawie aktualnej obserwacji
+	vector<double> sTest2;
+
 };
 
 }//: namespace KW_MAP2
