@@ -75,9 +75,15 @@ bool KW_MAP2_Samples::onStep() {
 		z.clear();
 		s.clear();
 		h_z.clear();
+		z_MFinger.clear();
+		s_MFinger.clear();
 
 		getObservation();
 		observationToState();
+
+		//środkowy palec
+		getMiddleFingerObservation();
+		observationMiddleFingerToState();
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -150,10 +156,6 @@ void KW_MAP2_Samples::getObservation(){
 
 		double height, width;
 		MaxArea = 0;
-		MaxY = 0;
-		MaxX = 0;
-		MinY = 1000000000.0;
-		MinX = 1000000000.0;
 
 		//największy blob to dłoń
 		for (int i = 0; i < blobs.GetNumBlobs(); i++) {
@@ -277,6 +279,69 @@ void KW_MAP2_Samples::observationToState()
 
 }
 
+
+//*****************************************************************//
+//*SRODKOWY PALEC**************************************************//
+//*****************************************************************//
+
+// Otrzymanie obserwacji środkowego palca
+void KW_MAP2_Samples::getMiddleFingerObservation()
+{
+	float z_mx, z_my, z_angle, z_height, z_width;
+
+	z_mx = z[0] - 3/7.0 * (topPoint.x - z[0]);
+	z_my = z[1] - 3/7.0 * (topPoint.y - z[1]);
+	z_angle = z[2];
+	double dx = topPoint.x - z_mx;
+	double dy = topPoint.y - z_my;
+	z_height = sqrt(dx * dx + dy * dy);
+	z_width = z[4];
+
+	z_MFinger.push_back(z_mx);
+	z_MFinger.push_back(z_my);
+	z_MFinger.push_back(z_angle);
+	z_MFinger.push_back(z_height);
+	z_MFinger.push_back(z_width);
+
+	nObservation_MFinger[0][ileObrazkow -1] = z_mx;
+	nObservation_MFinger[1][ileObrazkow -1] = z_my;
+	nObservation_MFinger[2][ileObrazkow -1] = z_angle * 180 / M_PI;
+	nObservation_MFinger[3][ileObrazkow -1] = z_height;
+	nObservation_MFinger[4][ileObrazkow -1] = z_width;
+
+}
+
+
+void KW_MAP2_Samples:: observationMiddleFingerToState()
+{
+
+	float s_mx, s_my, s_angle, s_heigth, s_width;
+
+	s_mx = z_MFinger[0];
+	s_my = z_MFinger[1] - 0.7 * z_MFinger[3];
+
+//	s_mx = z_MFinger[0] + 0.7 * z_MFinger[3];
+//	s_my = z_MFinger[1] + 0.7 * z_MFinger[4];
+
+	s_angle = z_MFinger[2];
+	s_heigth = 0.6 * z_MFinger[3];
+	s_width = 0.12 * z_MFinger[4];
+
+	s_MFinger.push_back(s_mx);
+	s_MFinger.push_back(s_my);
+	s_MFinger.push_back(s_angle);
+	s_MFinger.push_back(s_heigth);
+	s_MFinger.push_back(s_width);
+
+	nStates_MFinger[0][ileObrazkow -1] = s_mx;
+	nStates_MFinger[1][ileObrazkow -1] = s_my;
+	nStates_MFinger[2][ileObrazkow -1] = s_angle * 180 / M_PI;
+	nStates_MFinger[3][ileObrazkow -1] = s_heigth;
+	nStates_MFinger[4][ileObrazkow -1] = s_width;
+
+}
+
+
 void KW_MAP2_Samples::calculate()
 {
 	//zapisywanie macierzy P, invP, R, invR do pliku, tworzenie pliku
@@ -309,7 +374,7 @@ void KW_MAP2_Samples::calculate()
 		plik<<";";
 	}
 	plik<<"]\n\n";
-	
+
 	for (unsigned int i = 0 ; i < 5; i++)
 	{
 		for (int j = 0; j < ileObrazkow; j++)
@@ -320,8 +385,54 @@ void KW_MAP2_Samples::calculate()
 		plik<<"meanStates["<<i<<"] = "<<meanStates[i]<<";\n";
 	}
 
+	//*****************************************************************//
+	//*ZMIENNE SRODKOWEGO PALCA****************************************//
+	//*****************************************************************//
+
+
+		plik<<"\n ";
+		plik<<"RSamples_MFinger\n ";
+
+		plik<<"R_MFinger = [\n ";
+		for (int i = 0; i< 5; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
+			{
+				plik<<setprecision(5)<<nObservation_MFinger[i][j]<<" \t";
+			}
+			plik<<";";
+		}
+		plik<<"]";
+
+		plik<<"\n ";
+		plik<<"PSamples_MFinger\n ";
+
+		plik<<"P_MFinger = [\n ";
+		for (int i = 0; i< 5; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
+			{
+				plik<<setprecision(5)<<nStates_MFinger[i][j]<<" \t";
+			}
+			plik<<";";
+		}
+		plik<<"]\n\n";
+
+		for (unsigned int i = 0 ; i < 5; i++)
+		{
+			for (int j = 0; j < ileObrazkow; j++)
+			{
+				meanStates_MFinger[i] += nStates_MFinger[i][j];
+			}
+			meanStates_MFinger[i] /= ileObrazkow;
+			plik<<"meanStates_MFinger["<<i<<"] = "<<meanStates_MFinger[i]<<";\n";
+		}
+
+
 	plik.close();
 }
+
+
 //konstruktor
 KW_MAP2_Samples::KW_MAP2_Samples(const std::string & name) :
 	Base::Component(name) {

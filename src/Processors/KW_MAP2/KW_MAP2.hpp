@@ -159,7 +159,7 @@ protected:
 	void observationToState();
 
 	// Funckja odpowiedzialna za projekcie stanu
-	void projectionState(vector<double> s, int R, int G, int B);
+	void projectionState(vector<double> s, vector<double> z,int R, int G, int B);
 
 	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
 	void stateToObservation();
@@ -186,8 +186,6 @@ protected:
 	// Funkcja wyliczajaca wartosci parametrów stanu środkowego palca na podstawie wartosci obserwacji
 	void observationMiddleFingerToState();
 
-	// Funckja odpowiedzialna za projekcie stanu palca
-	void projectionFingerState(vector<double> s, int R, int G, int B);
 
 private:
 
@@ -259,6 +257,24 @@ private:
 
 	// wektor stanu dłoni
 	vector<double> s_MFinger;
+
+	// poczatkowa hipoteza środkowego palca
+	vector<double> s0_MFinger;
+
+	//macierz H
+	double H_MFinger[5][5];
+
+	//macierz P
+	double P_MFinger[5][5];
+
+	//macierz R
+	double R_MFinger[5][5];
+
+	//macierz odwrotna kowariancji P
+	double invP_MFinger[5][5];
+
+	//macierz odwrotna kowariancji R
+	double invR_MFinger[5][5];
 
 };
 

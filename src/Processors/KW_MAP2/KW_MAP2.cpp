@@ -77,7 +77,7 @@ bool KW_MAP2::onStep() {
 			getObservation();
 			projectionObservation(z, 255, 255, 255);
 			observationToState();
-			projectionState(sTest, 255, 0, 0);
+			projectionState(sTest, z, 255, 0, 0);
 		//	projectionState(s, 0, 255, 255);
 		//	stateToObservation();
 		//	projectionObservation(h_z, 255, 0, 255);
@@ -87,13 +87,14 @@ bool KW_MAP2::onStep() {
 		}
 		else
 		{
-			projectionState(s, 0, 255, 255);
+			//projectionState(s, 0, 255, 255);
 		}
 
 		getMiddleFingerObservation();
 		projectionFingerObservation(z_MFinger, 200, 200, 200);
 		observationMiddleFingerToState();
-		projectionFingerState(s_MFinger, 0, 255, 255);
+		projectionState(s_MFinger, z_MFinger, 255, 0, 0);
+
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -294,8 +295,6 @@ void KW_MAP2::projectionObservation(vector<double> z, int R, int G, int B)
 	Types::Ellipse * el;
 	Types::Line * elL;
 
-
-
 	/*
 	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
 	el->setCol(CV_RGB(0,0,0));
@@ -340,7 +339,7 @@ void KW_MAP2::projectionObservation(vector<double> z, int R, int G, int B)
 	obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
 
-
+/*
 	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
 	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
@@ -356,6 +355,7 @@ void KW_MAP2::projectionObservation(vector<double> z, int R, int G, int B)
 	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
 	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
+*/
 
 	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
 	elL->setCol(CV_RGB(R,G,B));
@@ -383,8 +383,6 @@ void KW_MAP2::observationToState()
 	float s_mx, s_my, s_angle, s_heigth, s_width;
 
 	s_mx = z[0] - 0.05 * z[4];
-//	s_mx = z[0] - 0.07 * z[4];
-//	s_my = z[1] + 1.5/7.0 * z[3];
 	s_my = z[1] + 1.0/7.0 * z[3];
 
 	Types::Ellipse * el;
@@ -396,7 +394,6 @@ void KW_MAP2::observationToState()
 	s_angle = z[2];
 	s_heigth = 0.4 * z[3];
 	s_width = 0.5 * z[4];
-	//s_width = 0.55 * z[4];
 
 	sTest.push_back(s_mx);
 	sTest.push_back(s_my);
@@ -407,7 +404,7 @@ void KW_MAP2::observationToState()
 
 }
 
-void KW_MAP2::projectionState(vector<double> s, int R, int G, int B)
+void KW_MAP2::projectionState(vector<double> s, vector<double> z, int R, int G, int B)
 {
 	cv::Point obsPointA;
 	cv::Point obsPointB;
@@ -473,11 +470,13 @@ void KW_MAP2::projectionState(vector<double> s, int R, int G, int B)
 	elL->setCol(CV_RGB(0,0,255));
 	drawcont.add(elL);
 */
+
 	obsPointA = rot(obsPointA, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointB = rot(obsPointB, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
 	obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
 
+/*
 	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
 	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
@@ -493,6 +492,7 @@ void KW_MAP2::projectionState(vector<double> s, int R, int G, int B)
 	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
 	el->setCol(CV_RGB(R,G,B));
 	drawcont.add(el);
+*/
 
 	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
 	elL->setCol(CV_RGB(R,G,B));
@@ -664,11 +664,6 @@ void KW_MAP2::getMiddleFingerObservation()
 	z_MFinger.push_back(sqrt(dx * dx + dy * dy));
 	z_MFinger.push_back(z[4]);
 
-	Types::Ellipse * el;
-	el = new Types::Ellipse(cv::Point(z_MFinger[0], z_MFinger[1]), Size2f(10, 10));
-	el->setCol(CV_RGB(255,255,255));
-	drawcont.add(el);
-
 }
 
 void KW_MAP2::projectionFingerObservation(vector<double> z, int R, int G, int B)
@@ -760,7 +755,7 @@ void KW_MAP2::projectionFingerObservation(vector<double> z, int R, int G, int B)
 		obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
 		obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
 
-
+/*
 		el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
 		el->setCol(CV_RGB(R,G,B));
 		drawcont.add(el);
@@ -776,7 +771,7 @@ void KW_MAP2::projectionFingerObservation(vector<double> z, int R, int G, int B)
 		el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
 		el->setCol(CV_RGB(R,G,B));
 		drawcont.add(el);
-
+*/
 		elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
 		elL->setCol(CV_RGB(R,G,B));
 		drawcont.add(elL);
@@ -802,15 +797,8 @@ void KW_MAP2:: observationMiddleFingerToState()
 	s_mx = z_MFinger[0];
 	s_my = z_MFinger[1] - 0.7 * z_MFinger[3];
 
-	cout<<"dodatnia\n"<<z_MFinger[3]<<"\n";
 //	s_mx = z_MFinger[0] + 0.7 * z_MFinger[3];
 //	s_my = z_MFinger[1] + 0.7 * z_MFinger[4];
-
-	Types::Ellipse * el;
-
-	el = new Types::Ellipse(cv::Point(s_mx, s_my), Size2f(10, 10));
-	el->setCol(CV_RGB(30,30,30));
-	drawcont.add(el);
 
 	s_angle = z_MFinger[2];
 	s_heigth = 0.6 * z_MFinger[3];
@@ -824,117 +812,6 @@ void KW_MAP2:: observationMiddleFingerToState()
 
 }
 
-void KW_MAP2::projectionFingerState(vector<double> s, int R, int G, int B)
-{
-
-	cv::Point obsPointA;
-	cv::Point obsPointB;
-	cv::Point obsPointC;
-	cv::Point obsPointD;
-
-	double rotAngle = 0;
-
-	if((s[2] * M_PI / 180)> M_PI_2)
-	{
-		rotAngle = ((s[2] * M_PI / 180) - M_PI_2);
-	}
-	else if ((s[2] * M_PI / 180)< M_PI_2)
-	{
-		rotAngle = - (M_PI_2 - (s[2] * M_PI / 180));
-	}
-
-	obsPointA.x = s[0] - 0.5 * s[4];
-	obsPointA.y = s[1] - 0.5 * s[3];
-
-	obsPointB.x = s[0] + 0.5 * s[4];
-	obsPointB.y = s[1] - 0.5 * s[3];
-
-	obsPointC.x = s[0] + 0.5 * s[4];
-	obsPointC.y = s[1] + 0.5 * s[3];
-
-	obsPointD.x = s[0] - 0.5 * s[4];
-	obsPointD.y = s[1] + 0.5 * s[3];
-
-	Types::Ellipse * el;
-	Types::Line * elL;
-
-/*
-	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,0,255));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,0,255));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,0,255));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,0,255));
-	drawcont.add(el);
-
-	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
-	elL->setCol(CV_RGB(0,0,255));
-	drawcont.add(elL);
-
-	elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
-	elL->setCol(CV_RGB(0,0,255));
-	drawcont.add(elL);
-
-	elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
-	elL->setCol(CV_RGB(0,0,255));
-
-	drawcont.add(elL);
-	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
-	elL->setCol(CV_RGB(0,0,255));
-	drawcont.add(elL);
-*/
-
-	obsPointA = rot(obsPointA, - rotAngle, cv::Point(z_MFinger[0], z_MFinger[1]));
-	obsPointB = rot(obsPointB, - rotAngle, cv::Point(z_MFinger[0], z_MFinger[1]));
-	obsPointC = rot(obsPointC, - rotAngle, cv::Point(z_MFinger[0], z_MFinger[1]));
-	obsPointD = rot(obsPointD, - rotAngle, cv::Point(z_MFinger[0], z_MFinger[1]));
-
-	el = new Types::Ellipse(cv::Point(z_MFinger[0], z_MFinger[1]), Size2f(10, 10));
-	el->setCol(CV_RGB(0,0,0));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
-	el->setCol(CV_RGB(R,G,B));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
-	el->setCol(CV_RGB(R,G,B));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
-	el->setCol(CV_RGB(R,G,B));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
-	el->setCol(CV_RGB(R,G,B));
-	drawcont.add(el);
-
-	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
-	elL->setCol(CV_RGB(R,G,B));
-	drawcont.add(elL);
-
-	elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
-	elL->setCol(CV_RGB(R,G,B));
-	drawcont.add(elL);
-
-	elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
-	elL->setCol(CV_RGB(R,G,B));
-
-	drawcont.add(elL);
-	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
-	elL->setCol(CV_RGB(R,G,B));
-	drawcont.add(elL);
-
-
-}
 
 
 //konstruktor
@@ -1256,6 +1133,146 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	invR[4][2] = -0.008026;
 	invR[4][3] = -0.005873;
 	invR[4][4] = 0.004521;
+
+	//srodkowy palec
+
+	s_MFinger.push_back(371.22);
+	s_MFinger.push_back(157.58);
+	s_MFinger.push_back(96.532);
+	s_MFinger.push_back(177.87);
+	s_MFinger.push_back(42.858);
+
+	s0_MFinger.push_back(371.22);
+	s0_MFinger.push_back(157.58);
+	s0_MFinger.push_back(96.532);
+	s0_MFinger.push_back(177.87);
+	s0_MFinger.push_back(42.858);
+
+
+	 P_MFinger[0][0] = 7895.858947;
+	 P_MFinger[0][1] = 443.708058;
+	 P_MFinger[0][2] = 36.385724;
+	 P_MFinger[0][3] = -379.978611;
+	 P_MFinger[0][4] = -94.657705;
+
+	 P_MFinger[1][0] = 443.708058;
+	 P_MFinger[1][1] = 502.456430;
+	 P_MFinger[1][2] = 23.274423;
+	 P_MFinger[1][3] = -288.467117;
+	 P_MFinger[1][4] = -72.428889;
+
+	 P_MFinger[2][0] = 36.385724;
+	 P_MFinger[2][1] = 23.274423;
+	 P_MFinger[2][2] = 12.361747;
+	 P_MFinger[2][3] = 2.006577;
+	 P_MFinger[2][4] = 3.993406;
+
+	 P_MFinger[3][0] = -379.978611;
+	 P_MFinger[3][1] = -288.467117;
+	 P_MFinger[3][2] = 2.006577;
+	 P_MFinger[3][3] = 348.553026;
+	 P_MFinger[3][4] = 97.536609;
+
+	 P_MFinger[4][0] = -94.657705;
+	 P_MFinger[4][1] = -72.428889;
+	 P_MFinger[4][2] = 3.993406;
+	 P_MFinger[4][3] = 97.536609;
+	 P_MFinger[4][4] = 29.273343;
+
+
+	invP_MFinger[0][0] = 0.000136;
+	invP_MFinger[0][1] = -0.000032;
+	invP_MFinger[0][2] = -0.000337;
+	invP_MFinger[0][3] = 0.000147;
+	invP_MFinger[0][4] = -0.000084;
+
+	invP_MFinger[1][0] = -0.000032;
+	invP_MFinger[1][1] = 0.004734;
+	invP_MFinger[1][2] = -0.007716;
+	invP_MFinger[1][3] = 0.005682;
+	invP_MFinger[1][4] = -0.006269;
+
+	invP_MFinger[2][0] = -0.000337;
+	invP_MFinger[2][1] = -0.007716;
+	invP_MFinger[2][2] = 0.169943;
+	invP_MFinger[2][3] = 0.065118;
+	invP_MFinger[2][4] = -0.260334;
+
+	invP_MFinger[3][0] = 0.000147;
+	invP_MFinger[3][1] = 0.005682;
+	invP_MFinger[3][2] = 0.065118;
+	invP_MFinger[3][3] = 0.085417;
+	invP_MFinger[3][4] = -0.278951;
+
+	invP_MFinger[4][0] = -0.000084;
+	invP_MFinger[4][1] = -0.006269;
+	invP_MFinger[4][2] = -0.260334;
+	invP_MFinger[4][3] = -0.278951;
+	invP_MFinger[4][4] = 0.983338;
+
+
+	R_MFinger[0][0] = 7895.858947;
+	R_MFinger[0][1] = 0.497900;
+	R_MFinger[0][2] = 36.385724;
+	R_MFinger[0][3] = -633.194142;
+	R_MFinger[0][4] = -788.814211;
+
+	R_MFinger[1][0] = 0.497900;
+	R_MFinger[1][1] = 303.854636;
+	R_MFinger[1][2] = 25.621243;
+	R_MFinger[1][3] = 196.970474;
+	R_MFinger[1][4] = 344.682000;
+
+	R_MFinger[2][0] = 36.385724;
+	R_MFinger[2][1] = 25.621243;
+	R_MFinger[2][2] = 12.361747;
+	R_MFinger[2][3] = 3.346355;
+	R_MFinger[2][4] = 33.278387;
+
+	R_MFinger[3][0] = -633.194142;
+	R_MFinger[3][1] = 196.970474;
+	R_MFinger[3][2] = 3.346355;
+	R_MFinger[3][3] = 968.224609;
+	R_MFinger[3][4] = 1354.696447;
+
+	R_MFinger[4][0] = -788.814211;
+	R_MFinger[4][1] = 344.682000;
+	R_MFinger[4][2] = 33.278387;
+	R_MFinger[4][3] = 1354.696447;
+	R_MFinger[4][4] = 2032.871053;
+
+
+	invR_MFinger[0][0] = 0.000136;
+	invR_MFinger[0][1] = -0.000032;
+	invR_MFinger[0][2] = -0.000337;
+	invR_MFinger[0][3] = 0.000110;
+	invR_MFinger[0][4] = -0.000010;
+
+	invR_MFinger[1][0] = -0.000032;
+	invR_MFinger[1][1] = 0.004733;
+	invR_MFinger[1][2] = -0.007721;
+	invR_MFinger[1][3] = 0.000092;
+	invR_MFinger[1][4] = -0.000750;
+
+	invR_MFinger[2][0] = -0.000337;
+	invR_MFinger[2][1] = -0.007721;
+	invR_MFinger[2][2] = 0.169955;
+	invR_MFinger[2][3] = 0.044475;
+	invR_MFinger[2][4] = -0.031242;
+
+	invR_MFinger[3][0] = 0.000110;
+	invR_MFinger[3][1] = 0.000092;
+	invR_MFinger[3][2] = 0.044475;
+	invR_MFinger[3][3] = 0.028297;
+	invR_MFinger[3][4] = -0.019558;
+
+	invR_MFinger[4][0] = -0.000010;
+	invR_MFinger[4][1] = -0.000750;
+	invR_MFinger[4][2] = -0.031242;
+	invR_MFinger[4][3] = -0.019558;
+	invR_MFinger[4][4] = 0.014160;
+
+
 
 }
 
