@@ -142,10 +142,13 @@ protected:
 	Props props;
 
 
+
 	/*!
 	 * Otrzymanie obserwacji dłoni
 	 */
 	void getObservation();
+
+	void projectionFingertips();
 
 	/*!
 	 * Funkcja obracająca punkt p o kąt angle względem układu współrzędnych znajdującego się w punkcie pO
@@ -195,6 +198,13 @@ protected:
 	// Funckja aktualizująca wektor stanu i macierz kowariancji P
 	void updateMiddleFingerState();
 
+	//*****************************************************************//
+	//*FUNKCJE PALCA WSKAZUJĄCEGO**************************************//
+	//*****************************************************************//
+
+	// Otrzymanie obserwacji środkowego palca
+	void getForeFingerObservation();
+
 private:
 
 	cv::Mat tsl_img;
@@ -202,6 +212,11 @@ private:
 
 	bool blobs_ready;
 	bool img_ready;
+
+	// wektor stanu dłoni
+	vector<int> idFingertips;
+
+	vector<cv::Point> fingertips;
 
 	// czy funkcja jest pierwszy raz uruchomiana
 	bool first;
@@ -292,6 +307,12 @@ private:
 
 	// wektor stanu dłoni obliczona na podstawie aktualnej obserwacji
 	vector<double> sTest2;
+
+	//*****************************************************************//
+	//*ZMIENNE PALCA WSKAZUJĄCEG0**************************************//
+	//*****************************************************************//
+	//forefinger
+
 
 };
 
