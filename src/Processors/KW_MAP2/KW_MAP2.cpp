@@ -70,7 +70,7 @@ bool KW_MAP2::onStep() {
 		sTest2.clear();
 		fingertips.clear();
 		idFingertips.clear();
-	//	s_MFinger.clear();
+		s_MFinger.clear();
 
 		if(STOP == false)
 		{
@@ -101,8 +101,8 @@ bool KW_MAP2::onStep() {
 		projectionFingerObservation(z_MFinger, 200, 200, 200);
 		observationMiddleFingerToState();
 		projectionState(sTest2, 0, 255, 255);
-	//	projectionState(s_MFinger, z_MFinger, 255, 255, 255);
-	//	stateMiddleFingerToObservation();
+	//	projectionState(s_MFinger, 255, 255, 255);
+		stateMiddleFingerToObservation(sTest2);
 	//	projectionFingerObservation(h_z_MFinger, 0, 0, 0);
 	//	calculateMiddleFingerDiff();
 	//	updateMiddleFingerState();
@@ -878,27 +878,34 @@ void KW_MAP2:: observationMiddleFingerToState()
 }
 
 // Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
-void KW_MAP2::stateMiddleFingerToObservation()
+void KW_MAP2::stateMiddleFingerToObservation(vector <double> s_MFinger)
 {
-	float hz_mx, hz_my, hz_angle, hz_heigth, hz_width;
+	float hz_downX, hz_downY, hz_topX, hz_topY, hz_angle, hz_heigth, hz_width;
 
-	hz_mx = s_MFinger[0] - 7.0/6.0 * s_MFinger[3]*cos(s_MFinger[2]);
-	hz_mx = s_MFinger[1] + 7.0/6.0 * s_MFinger[3]*sin(s_MFinger[2]);
+	hz_downX = s_MFinger[0] - 7.0/6.0 * s_MFinger[3]*cos(s_MFinger[2] * M_PI/180);
+	hz_downY = s_MFinger[1] + 7.0/6.0 * s_MFinger[3]*sin(s_MFinger[2] * M_PI/180);
+
+	hz_topX = s_MFinger[0] + 1.0/2.0 * s_MFinger[3]*cos(s_MFinger[2] * M_PI/180);
+	hz_topY = s_MFinger[1] - 1.0/2.0 * s_MFinger[3]*sin(s_MFinger[2] * M_PI/180);
 
 	Types::Ellipse * el;
 
-	el = new Types::Ellipse(cv::Point(hz_mx, hz_mx ), Size2f(10, 10));
+	el = new Types::Ellipse(cv::Point(hz_downX, hz_downY ), Size2f(10, 10));
 	el->setCol(CV_RGB(255,255,0));
 	drawcont.add(el);
 
-	hz_angle = s_MFinger[2];
-	hz_heigth = 5.0/3.0 * s_MFinger[3];
-	hz_width = 25/3.0 * s_MFinger[4];
+	el = new Types::Ellipse(cv::Point(hz_topX, hz_topY ), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,0));
+	drawcont.add(el);
 
-	h_z_MFinger.push_back(hz_mx);
-	h_z_MFinger.push_back(hz_my);
+	hz_angle = s_MFinger[4];
+	hz_width = 25/3.0 * s_MFinger[5];
+
+	h_z_MFinger.push_back(hz_downX);
+	h_z_MFinger.push_back(hz_downY);
+	h_z_MFinger.push_back(hz_topX);
+	h_z_MFinger.push_back(hz_topY);
 	h_z_MFinger.push_back(hz_angle);
-	h_z_MFinger.push_back(hz_heigth);
 	h_z_MFinger.push_back(hz_width);
 
 	cout<<"h_z_MFinger\n";
@@ -907,6 +914,7 @@ void KW_MAP2::stateMiddleFingerToObservation()
 	cout<<h_z_MFinger[2]<<"\n";
 	cout<<h_z_MFinger[3]<<"\n";
 	cout<<h_z_MFinger[4]<<"\n";
+	cout<<h_z_MFinger[5]<<"\n";
 	cout<<"koniec h_z\n";
 }
 

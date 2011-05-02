@@ -190,7 +190,7 @@ protected:
 	void observationMiddleFingerToState();
 
 	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
-	void stateMiddleFingerToObservation();
+	void stateMiddleFingerToObservation(vector <double> s_MFinger);
 
 	// Funkcja obliczająca o jaki wektor nalezy zaktualizowac wektor stan
 	void calculateMiddleFingerDiff();
