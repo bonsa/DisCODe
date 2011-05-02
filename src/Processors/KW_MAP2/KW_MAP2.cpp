@@ -83,8 +83,8 @@ bool KW_MAP2::onStep() {
 			projectionFingertips();
 		//	projectionObservation(z, 255, 255, 255);
 			observationToState();
-			projectionState(sTest, z, 0, 255, 255);
-			projectionState(s, z, 255, 255, 255);
+			projectionState(sTest, 0, 255, 255);
+		//	projectionState(s, z, 255, 255, 255);
 			stateToObservation();
 		//	projectionObservation(h_z, 255, 0, 255);
 			calculateDiff();
@@ -98,14 +98,14 @@ bool KW_MAP2::onStep() {
 
 		sTest.clear();
 		getMiddleFingerObservation();
-	//	projectionFingerObservation(z_MFinger, 200, 200, 200);
+		projectionFingerObservation(z_MFinger, 200, 200, 200);
 		observationMiddleFingerToState();
-		projectionState(sTest2, z_MFinger, 0, 255, 255);
-		projectionState(s_MFinger, z_MFinger, 255, 255, 255);
-		stateMiddleFingerToObservation();
+		projectionState(sTest2, 0, 255, 255);
+	//	projectionState(s_MFinger, z_MFinger, 255, 255, 255);
+	//	stateMiddleFingerToObservation();
 	//	projectionFingerObservation(h_z_MFinger, 0, 0, 0);
-		calculateMiddleFingerDiff();
-		updateMiddleFingerState();
+	//	calculateMiddleFingerDiff();
+	//	updateMiddleFingerState();
 
 
 
@@ -550,7 +550,7 @@ void KW_MAP2::observationToState()
 
 }
 
-void KW_MAP2::projectionState(vector<double> s, vector<double> z, int R, int G, int B)
+void KW_MAP2::projectionState(vector<double> s, int R, int G, int B)
 {
 	cv::Point obsPointA;
 	cv::Point obsPointB;
@@ -617,10 +617,10 @@ void KW_MAP2::projectionState(vector<double> s, vector<double> z, int R, int G, 
 	drawcont.add(elL);
 */
 
-	obsPointA = rot(obsPointA, - rotAngle, cv::Point(z[0], z[1]));
-	obsPointB = rot(obsPointB, - rotAngle, cv::Point(z[0], z[1]));
-	obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
-	obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
+	obsPointA = rot(obsPointA, - rotAngle, cv::Point(s[0], s[1]));
+	obsPointB = rot(obsPointB, - rotAngle, cv::Point(s[0], s[1]));
+	obsPointC = rot(obsPointC, - rotAngle, cv::Point(s[0], s[1]));
+	obsPointD = rot(obsPointD, - rotAngle, cv::Point(s[0], s[1]));
 
 /*
 	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
@@ -802,136 +802,52 @@ void KW_MAP2::stopCondition()
 void KW_MAP2::getMiddleFingerObservation()
 {
 
-	z_MFinger.push_back(z[0] - 3/7.0 * (topPoint.x - z[0]));
-	z_MFinger.push_back(z[1] - 3/7.0 * (topPoint.y - z[1]));
-	z_MFinger.push_back(z[2]);
-	double dx = topPoint.x - z_MFinger[0];
-	double dy = topPoint.y - z_MFinger[1];
-	z_MFinger.push_back(sqrt(dx * dx + dy * dy));
-	z_MFinger.push_back(z[4]);
+	double downX, downY, topX, topY, alfa, w;
+
+	downX = z[0] - 3.0/7.0 * (topPoint.x - z[0]);
+	downY = z[1] - 3.0/7.0 * (topPoint.y - z[1]);
+
+	Types::Ellipse * el;
+
+	el = new Types::Ellipse(cv::Point(z[0], z[1]), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,255));
+	drawcont.add(el);
+
+	topX = topPoint.x;
+	topY = topPoint.y;
+
+	alfa = z[2];
+	w = z[4];
+
+	z_MFinger.push_back(downX);
+	z_MFinger.push_back(downY);
+	z_MFinger.push_back(topX);
+	z_MFinger.push_back(topY);
+	z_MFinger.push_back(alfa);
+	z_MFinger.push_back(w);
 
 }
 
 void KW_MAP2::projectionFingerObservation(vector<double> z, int R, int G, int B)
 {
-	cv::Point obsPointA;
-		cv::Point obsPointB;
-		cv::Point obsPointC;
-		cv::Point obsPointD;
-
-		double rotAngle = 0;
-		if((z[2] * M_PI/180 )> M_PI_2)
-		{
-			rotAngle = ((z[2] * M_PI/180) - M_PI_2);
-		}
-		else if ((z[2] * M_PI / 180)< M_PI_2)
-		{
-			rotAngle = - (M_PI_2 - (z[2] * M_PI / 180));
-		}
-		/*
-		if(z[2]> M_PI_2)
-		{
-			rotAngle = (z[2] - M_PI_2);
-		}
-		else if (z[2]< M_PI_2)
-		{
-			rotAngle = - (M_PI_2 - z[2]);
-		}
-	*/
-
-		obsPointA.x = z[0] - 0.06 * z[4];
-		obsPointA.y = z[1] - z[3];
-
-		obsPointB.x = z[0] + 0.06 * z[4];
-		obsPointB.y = z[1] - z[3];
-
-		obsPointC.x = z[0] + 0.06 * z[4];
-		obsPointC.y = z[1];
-
-		obsPointD.x = z[0] - 0.06 * z[4];
-		obsPointD.y = z[1];
-
+	cv::Point obsPointDown = cv::Point(z[0], z[1]);
+	cv::Point obsPointTop  = cv::Point(z[2], z[3]);
 
 		Types::Ellipse * el;
 		Types::Line * elL;
 
-
-
-		/*
-		el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
-		el->setCol(CV_RGB(0,0,0));
-		drawcont.add(el);
-
-		el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
-		el->setCol(CV_RGB(0,0,0));
-		drawcont.add(el);
-
-		el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
-		el->setCol(CV_RGB(0,0,0));
-		drawcont.add(el);
-
-		el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
-		el->setCol(CV_RGB(0,0,0));
-		drawcont.add(el);
-
-		elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
-		elL->setCol(CV_RGB(0,0,0));
-		drawcont.add(elL);
-
-		elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
-		elL->setCol(CV_RGB(0,0,0));
-		drawcont.add(elL);
-
-		elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
-		elL->setCol(CV_RGB(0,0,0));
-
-		drawcont.add(elL);
-		elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
-		elL->setCol(CV_RGB(0,0,0));
-		drawcont.add(elL);
-
-		cv::Point pt1 = rot(topPoint, rotAngle, cv::Point(z[0], z[1]));
-
-		el = new Types::Ellipse(cv::Point(pt1.x, pt1.y), Size2f(10, 10));
-		el->setCol(CV_RGB(0,0,0));
-		drawcont.add(el);
-	*/
-		obsPointA = rot(obsPointA, - rotAngle, cv::Point(z[0], z[1]));
-		obsPointB = rot(obsPointB, - rotAngle, cv::Point(z[0], z[1]));
-		obsPointC = rot(obsPointC, - rotAngle, cv::Point(z[0], z[1]));
-		obsPointD = rot(obsPointD, - rotAngle, cv::Point(z[0], z[1]));
-
-/*
-		el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
+		el = new Types::Ellipse(cv::Point(obsPointDown.x, obsPointDown.y), Size2f(10, 10));
 		el->setCol(CV_RGB(R,G,B));
 		drawcont.add(el);
 
-		el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
+		el = new Types::Ellipse(cv::Point(obsPointTop.x, obsPointTop.y), Size2f(10, 10));
 		el->setCol(CV_RGB(R,G,B));
 		drawcont.add(el);
 
-		el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
-		el->setCol(CV_RGB(R,G,B));
-		drawcont.add(el);
-
-		el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
-		el->setCol(CV_RGB(R,G,B));
-		drawcont.add(el);
-*/
-		elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
+		elL = new Types::Line(cv::Point(obsPointDown.x, obsPointDown.y), cv::Point(obsPointTop.x, obsPointTop.y));
 		elL->setCol(CV_RGB(R,G,B));
 		drawcont.add(elL);
 
-		elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
-		elL->setCol(CV_RGB(R,G,B));
-		drawcont.add(elL);
-
-		elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
-		elL->setCol(CV_RGB(R,G,B));
-
-		drawcont.add(elL);
-		elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
-		elL->setCol(CV_RGB(R,G,B));
 		drawcont.add(elL);
 }
 
@@ -940,15 +856,18 @@ void KW_MAP2:: observationMiddleFingerToState()
 
 	float s_mx, s_my, s_angle, s_heigth, s_width;
 
-	s_mx = z_MFinger[0];
-	s_my = z_MFinger[1] - 0.7 * z_MFinger[3];
+	s_mx = z_MFinger[0] + 0.7 * (z_MFinger[2] - z_MFinger[0]);
+	s_my = z_MFinger[1] + 0.7 * (z_MFinger[3] - z_MFinger[1]);
 
-//	s_mx = z_MFinger[0] + 0.7 * z_MFinger[3];
-//	s_my = z_MFinger[1] + 0.7 * z_MFinger[4];
+	Types::Ellipse * el;
 
-	s_angle = z_MFinger[2];
-	s_heigth = 0.6 * z_MFinger[3];
-	s_width = 0.12 * z_MFinger[4];
+	el = new Types::Ellipse(cv::Point(s_mx, s_my ), Size2f(10, 10));
+	el->setCol(CV_RGB(0,255,255));
+	drawcont.add(el);
+
+	s_angle = z_MFinger[4];
+	s_heigth = 0.6 * (sqrt((z_MFinger[0]-z_MFinger[2])*(z_MFinger[0]-z_MFinger[2])+(z_MFinger[1]-z_MFinger[3])*(z_MFinger[1]-z_MFinger[3])));
+	s_width = 0.12 * z_MFinger[5];
 
 	sTest2.push_back(s_mx);
 	sTest2.push_back(s_my);
@@ -963,8 +882,15 @@ void KW_MAP2::stateMiddleFingerToObservation()
 {
 	float hz_mx, hz_my, hz_angle, hz_heigth, hz_width;
 
-	hz_mx = s_MFinger[0];
-	hz_my = s_MFinger[1] + 7.0/6.0 * s_MFinger[3];
+	hz_mx = s_MFinger[0] - 7.0/6.0 * s_MFinger[3]*cos(s_MFinger[2]);
+	hz_mx = s_MFinger[1] + 7.0/6.0 * s_MFinger[3]*sin(s_MFinger[2]);
+
+	Types::Ellipse * el;
+
+	el = new Types::Ellipse(cv::Point(hz_mx, hz_mx ), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,0));
+	drawcont.add(el);
+
 	hz_angle = s_MFinger[2];
 	hz_heigth = 5.0/3.0 * s_MFinger[3];
 	hz_width = 25/3.0 * s_MFinger[4];

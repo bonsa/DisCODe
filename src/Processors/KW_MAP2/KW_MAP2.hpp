@@ -162,7 +162,7 @@ protected:
 	void observationToState();
 
 	// Funckja odpowiedzialna za projekcie stanu
-	void projectionState(vector<double> s, vector<double> z,int R, int G, int B);
+	void projectionState(vector<double> s,int R, int G, int B);
 
 	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
 	void stateToObservation();
