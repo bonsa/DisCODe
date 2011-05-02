@@ -234,7 +234,7 @@ private:
 	double nStates_MFinger[5][20];
 
 	//macierz przechowująca parametry obserwacji środkowego palca dla kilku obrazków
-	double nObservation_MFinger[5][20];
+	double nObservation_MFinger[6][20];
 
 	//macierz przechowująca parametry stanu dla kilku obrazków
 	double meanStates_MFinger[5];

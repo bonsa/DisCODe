@@ -1332,141 +1332,154 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	H_MFinger[3][3] = 5/3.0;
 	H_MFinger[4][4] = 25/3.0;
 
-	s_MFinger.push_back(371.22);
-	s_MFinger.push_back(157.58);
-	s_MFinger.push_back(96.532);
-	s_MFinger.push_back(177.87);
-	s_MFinger.push_back(42.858);
 
-	s0_MFinger.push_back(371.22);
-	s0_MFinger.push_back(157.58);
-	s0_MFinger.push_back(96.532);
-	s0_MFinger.push_back(177.87);
-	s0_MFinger.push_back(42.858);
+	 P_MFinger[0][0] = 7888.528068;
+	 P_MFinger[0][1] = 406.435705;
+	 P_MFinger[0][2] = -7.714173;
+	 P_MFinger[0][3] = -435.621592;
+	 P_MFinger[0][4] = -122.957084;
 
+	 P_MFinger[1][0] = 406.435705;
+	 P_MFinger[1][1] = 521.170785;
+	 P_MFinger[1][2] = 28.149490;
+	 P_MFinger[1][3] = -285.146180;
+	 P_MFinger[1][4] = -70.328615;
 
-	 P_MFinger[0][0] = 7895.858947;
-	 P_MFinger[0][1] = 443.708058;
-	 P_MFinger[0][2] = 36.385724;
-	 P_MFinger[0][3] = -379.978611;
-	 P_MFinger[0][4] = -94.657705;
-
-	 P_MFinger[1][0] = 443.708058;
-	 P_MFinger[1][1] = 502.456430;
-	 P_MFinger[1][2] = 23.274423;
-	 P_MFinger[1][3] = -288.467117;
-	 P_MFinger[1][4] = -72.428889;
-
-	 P_MFinger[2][0] = 36.385724;
-	 P_MFinger[2][1] = 23.274423;
+	 P_MFinger[2][0] = -7.714173;
+	 P_MFinger[2][1] = 28.149490;
 	 P_MFinger[2][2] = 12.361747;
 	 P_MFinger[2][3] = 2.006577;
 	 P_MFinger[2][4] = 3.993406;
 
-	 P_MFinger[3][0] = -379.978611;
-	 P_MFinger[3][1] = -288.467117;
+	 P_MFinger[3][0] = -435.621592;
+	 P_MFinger[3][1] = -285.146180;
 	 P_MFinger[3][2] = 2.006577;
 	 P_MFinger[3][3] = 348.553026;
 	 P_MFinger[3][4] = 97.536609;
 
-	 P_MFinger[4][0] = -94.657705;
-	 P_MFinger[4][1] = -72.428889;
+	 P_MFinger[4][0] = -122.957084;
+	 P_MFinger[4][1] = -70.328615;
 	 P_MFinger[4][2] = 3.993406;
 	 P_MFinger[4][3] = 97.536609;
 	 P_MFinger[4][4] = 29.273343;
 
 
-	invP_MFinger[0][0] = 0.000136;
-	invP_MFinger[0][1] = -0.000032;
-	invP_MFinger[0][2] = -0.000337;
-	invP_MFinger[0][3] = 0.000147;
-	invP_MFinger[0][4] = -0.000084;
+	invP_MFinger[0][0] = 0.000137;
+	invP_MFinger[0][1] = -0.000040;
+	invP_MFinger[0][2] = 0.000155;
+	invP_MFinger[0][3] = 0.000139;
+	invP_MFinger[0][4] = -0.000006;
 
-	invP_MFinger[1][0] = -0.000032;
-	invP_MFinger[1][1] = 0.004734;
-	invP_MFinger[1][2] = -0.007716;
-	invP_MFinger[1][3] = 0.005682;
-	invP_MFinger[1][4] = -0.006269;
+	invP_MFinger[1][0] = -0.000040;
+	invP_MFinger[1][1] = 0.004670;
+	invP_MFinger[1][2] = -0.009785;
+	invP_MFinger[1][3] = 0.005334;
+	invP_MFinger[1][4] = -0.005386;
 
-	invP_MFinger[2][0] = -0.000337;
-	invP_MFinger[2][1] = -0.007716;
-	invP_MFinger[2][2] = 0.169943;
-	invP_MFinger[2][3] = 0.065118;
-	invP_MFinger[2][4] = -0.260334;
+	invP_MFinger[2][0] = 0.000155;
+	invP_MFinger[2][1] = -0.009785;
+	invP_MFinger[2][2] = 0.176792;
+	invP_MFinger[2][3] = 0.063831;
+	invP_MFinger[2][4] = -0.259656;
 
-	invP_MFinger[3][0] = 0.000147;
-	invP_MFinger[3][1] = 0.005682;
-	invP_MFinger[3][2] = 0.065118;
-	invP_MFinger[3][3] = 0.085417;
-	invP_MFinger[3][4] = -0.278951;
+	invP_MFinger[3][0] = 0.000139;
+	invP_MFinger[3][1] = 0.005334;
+	invP_MFinger[3][2] = 0.063831;
+	invP_MFinger[3][3] = 0.084687;
+	invP_MFinger[3][4] = -0.277477;
 
-	invP_MFinger[4][0] = -0.000084;
-	invP_MFinger[4][1] = -0.006269;
-	invP_MFinger[4][2] = -0.260334;
-	invP_MFinger[4][3] = -0.278951;
-	invP_MFinger[4][4] = 0.983338;
+	invP_MFinger[4][0] = -0.000006;
+	invP_MFinger[4][1] = -0.005386;
+	invP_MFinger[4][2] = -0.259656;
+	invP_MFinger[4][3] = -0.277477;
+	invP_MFinger[4][4] = 0.981151;
+
 
 
 	R_MFinger[0][0] = 7895.858947;
 	R_MFinger[0][1] = 0.497900;
-	R_MFinger[0][2] = 36.385724;
-	R_MFinger[0][3] = -633.194142;
-	R_MFinger[0][4] = -788.814211;
+	R_MFinger[0][2] = 7772.402632;
+	R_MFinger[0][3] = 668.163684;
+	R_MFinger[0][4] = 36.385724;
+	R_MFinger[0][5] = -788.814211;
 
 	R_MFinger[1][0] = 0.497900;
 	R_MFinger[1][1] = 303.854636;
-	R_MFinger[1][2] = 25.621243;
-	R_MFinger[1][3] = 196.970474;
-	R_MFinger[1][4] = 344.682000;
+	R_MFinger[1][2] = -154.575263;
+	R_MFinger[1][3] = 124.265368;
+	R_MFinger[1][4] = 25.621243;
+	R_MFinger[1][5] = 344.682000;
 
-	R_MFinger[2][0] = 36.385724;
-	R_MFinger[2][1] = 25.621243;
-	R_MFinger[2][2] = 12.361747;
-	R_MFinger[2][3] = 3.346355;
-	R_MFinger[2][4] = 33.278387;
+	R_MFinger[2][0] = 7772.402632;
+	R_MFinger[2][1] = -154.575263;
+	R_MFinger[2][2] = 7986.368421;
+	R_MFinger[2][3] = 609.263158;
+	R_MFinger[2][4] = -26.617342;
+	R_MFinger[2][5] = -1125.710526;
 
-	R_MFinger[3][0] = -633.194142;
-	R_MFinger[3][1] = 196.970474;
-	R_MFinger[3][2] = 3.346355;
-	R_MFinger[3][3] = 968.224609;
-	R_MFinger[3][4] = 1354.696447;
+	R_MFinger[3][0] = 668.163684;
+	R_MFinger[3][1] = 124.265368;
+	R_MFinger[3][2] = 609.263158;
+	R_MFinger[3][3] = 901.252632;
+	R_MFinger[3][4] = 29.241363;
+	R_MFinger[3][5] = -984.963158;
 
-	R_MFinger[4][0] = -788.814211;
-	R_MFinger[4][1] = 344.682000;
-	R_MFinger[4][2] = 33.278387;
-	R_MFinger[4][3] = 1354.696447;
-	R_MFinger[4][4] = 2032.871053;
+	R_MFinger[4][0] = 36.385724;
+	R_MFinger[4][1] = 25.621243;
+	R_MFinger[4][2] = -26.617342;
+	R_MFinger[4][3] = 29.241363;
+	R_MFinger[4][4] = 12.361747;
+	R_MFinger[4][5] = 33.278387;
+
+	R_MFinger[5][0] = -788.814211;
+	R_MFinger[5][1] = 344.682000;
+	R_MFinger[5][2] = -1125.710526;
+	R_MFinger[5][3] = -984.963158;
+	R_MFinger[5][4] = 33.278387;
+	R_MFinger[5][5] = 2032.871053;
 
 
-	invR_MFinger[0][0] = 0.000136;
-	invR_MFinger[0][1] = -0.000032;
-	invR_MFinger[0][2] = -0.000337;
-	invR_MFinger[0][3] = 0.000110;
-	invR_MFinger[0][4] = -0.000010;
+	invR_MFinger[0][0] = 0.530698;
+	invR_MFinger[0][1] = 0.008287;
+	invR_MFinger[0][2] = -0.531523;
+	invR_MFinger[0][3] = -0.009853;
+	invR_MFinger[0][4] = -2.558533;
+	invR_MFinger[0][5] = -0.052702;
 
-	invR_MFinger[1][0] = -0.000032;
-	invR_MFinger[1][1] = 0.004733;
-	invR_MFinger[1][2] = -0.007721;
-	invR_MFinger[1][3] = 0.000092;
-	invR_MFinger[1][4] = -0.000750;
+	invR_MFinger[1][0] = 0.008287;
+	invR_MFinger[1][1] = 0.036851;
+	invR_MFinger[1][2] = -0.008141;
+	invR_MFinger[1][3] = -0.031749;
+	invR_MFinger[1][4] = 0.019370;
+	invR_MFinger[1][5] = -0.023241;
 
-	invR_MFinger[2][0] = -0.000337;
-	invR_MFinger[2][1] = -0.007721;
-	invR_MFinger[2][2] = 0.169955;
-	invR_MFinger[2][3] = 0.044475;
-	invR_MFinger[2][4] = -0.031242;
+	invR_MFinger[2][0] = -0.531523;
+	invR_MFinger[2][1] = -0.008141;
+	invR_MFinger[2][2] = 0.532487;
+	invR_MFinger[2][3] = 0.009679;
+	invR_MFinger[2][4] = 2.563064;
+	invR_MFinger[2][5] = 0.052733;
 
-	invR_MFinger[3][0] = 0.000110;
-	invR_MFinger[3][1] = 0.000092;
-	invR_MFinger[3][2] = 0.044475;
-	invR_MFinger[3][3] = 0.028297;
-	invR_MFinger[3][4] = -0.019558;
+	invR_MFinger[3][0] = -0.009853;
+	invR_MFinger[3][1] = -0.031749;
+	invR_MFinger[3][2] = 0.009679;
+	invR_MFinger[3][3] = 0.031390;
+	invR_MFinger[3][4] = -0.019017;
+	invR_MFinger[3][5] = 0.022440;
 
-	invR_MFinger[4][0] = -0.000010;
-	invR_MFinger[4][1] = -0.000750;
-	invR_MFinger[4][2] = -0.031242;
-	invR_MFinger[4][3] = -0.019558;
-	invR_MFinger[4][4] = 0.014160;
+	invR_MFinger[4][0] = -2.558533;
+	invR_MFinger[4][1] = 0.019370;
+	invR_MFinger[4][2] = 2.563064;
+	invR_MFinger[4][3] = -0.019017;
+	invR_MFinger[4][4] = 12.574947;
+	invR_MFinger[4][5] = 0.208169;
+
+	invR_MFinger[5][0] = -0.052702;
+	invR_MFinger[5][1] = -0.023241;
+	invR_MFinger[5][2] = 0.052733;
+	invR_MFinger[5][3] = 0.022440;
+	invR_MFinger[5][4] = 0.208169;
+	invR_MFinger[5][5] = 0.020648;
 
 
 

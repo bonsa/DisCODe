@@ -287,27 +287,36 @@ void KW_MAP2_Samples::observationToState()
 // Otrzymanie obserwacji środkowego palca
 void KW_MAP2_Samples::getMiddleFingerObservation()
 {
-	float z_mx, z_my, z_angle, z_height, z_width;
+	double downX, downY, topX, topY, alfa, w;
 
-	z_mx = z[0] - 3/7.0 * (topPoint.x - z[0]);
-	z_my = z[1] - 3/7.0 * (topPoint.y - z[1]);
-	z_angle = z[2];
-	double dx = topPoint.x - z_mx;
-	double dy = topPoint.y - z_my;
-	z_height = sqrt(dx * dx + dy * dy);
-	z_width = z[4];
+	downX = z[0] - 3.0/7.0 * (topPoint.x - z[0]);
+	downY = z[1] - 3.0/7.0 * (topPoint.y - z[1]);
 
-	z_MFinger.push_back(z_mx);
-	z_MFinger.push_back(z_my);
-	z_MFinger.push_back(z_angle);
-	z_MFinger.push_back(z_height);
-	z_MFinger.push_back(z_width);
+	Types::Ellipse * el;
 
-	nObservation_MFinger[0][ileObrazkow -1] = z_mx;
-	nObservation_MFinger[1][ileObrazkow -1] = z_my;
-	nObservation_MFinger[2][ileObrazkow -1] = z_angle * 180 / M_PI;
-	nObservation_MFinger[3][ileObrazkow -1] = z_height;
-	nObservation_MFinger[4][ileObrazkow -1] = z_width;
+	el = new Types::Ellipse(cv::Point(z[0], z[1]), Size2f(10, 10));
+	el->setCol(CV_RGB(255,255,255));
+	drawcont.add(el);
+
+	topX = topPoint.x;
+	topY = topPoint.y;
+
+	alfa = z[2];
+	w = z[4];
+
+	z_MFinger.push_back(downX);
+	z_MFinger.push_back(downY);
+	z_MFinger.push_back(topX);
+	z_MFinger.push_back(topY);
+	z_MFinger.push_back(alfa);
+	z_MFinger.push_back(w);
+
+	nObservation_MFinger[0][ileObrazkow -1] = downX;
+	nObservation_MFinger[1][ileObrazkow -1] = downY;
+	nObservation_MFinger[2][ileObrazkow -1] = topX;
+	nObservation_MFinger[3][ileObrazkow -1] = topY;
+	nObservation_MFinger[4][ileObrazkow -1] = alfa* 180 / M_PI;
+	nObservation_MFinger[5][ileObrazkow -1] = w;
 
 }
 
@@ -317,21 +326,18 @@ void KW_MAP2_Samples:: observationMiddleFingerToState()
 
 	float s_mx, s_my, s_angle, s_heigth, s_width;
 
-	s_mx = z_MFinger[0];
-	s_my = z_MFinger[1] - 0.7 * z_MFinger[3];
+	s_mx = z_MFinger[0] + 0.7 * (z_MFinger[2] - z_MFinger[0]);
+	s_my = z_MFinger[1] + 0.7 * (z_MFinger[3] - z_MFinger[1]);
 
-//	s_mx = z_MFinger[0] + 0.7 * z_MFinger[3];
-//	s_my = z_MFinger[1] + 0.7 * z_MFinger[4];
+	Types::Ellipse * el;
 
-	s_angle = z_MFinger[2];
-	s_heigth = 0.6 * z_MFinger[3];
-	s_width = 0.12 * z_MFinger[4];
+	el = new Types::Ellipse(cv::Point(s_mx, s_my ), Size2f(10, 10));
+	el->setCol(CV_RGB(0,255,255));
+	drawcont.add(el);
 
-	s_MFinger.push_back(s_mx);
-	s_MFinger.push_back(s_my);
-	s_MFinger.push_back(s_angle);
-	s_MFinger.push_back(s_heigth);
-	s_MFinger.push_back(s_width);
+	s_angle = z_MFinger[4];
+	s_heigth = 0.6 * (sqrt((z_MFinger[0]-z_MFinger[2])*(z_MFinger[0]-z_MFinger[2])+(z_MFinger[1]-z_MFinger[3])*(z_MFinger[1]-z_MFinger[3])));
+	s_width = 0.12 * z_MFinger[5];
 
 	nStates_MFinger[0][ileObrazkow -1] = s_mx;
 	nStates_MFinger[1][ileObrazkow -1] = s_my;
@@ -394,7 +400,7 @@ void KW_MAP2_Samples::calculate()
 		plik<<"RSamples_MFinger\n ";
 
 		plik<<"R_MFinger = [\n ";
-		for (int i = 0; i< 5; i++)
+		for (int i = 0; i< 6; i++)
 		{
 			for(int j = 0; j< ileObrazkow; j++)
 			{
