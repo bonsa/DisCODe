@@ -175,12 +175,19 @@ protected:
 
 	// Funkcja sprawdzająca czy warunek końcowy jest sprawdzony
 	void stopCondition();
+
+
 	//*****************************************************************//
 	//*FUNKCJE wspolne dla PALCÓW****************************************//
 	//*****************************************************************//
 
+	// Otrzymanie obserwacji środkowego palca
+	vector <double> getFingerObservation(int i);
+
 	// Funckja odpowiedzialna za projekcie obserwacji palca
 	void projectionFingerObservation(vector<double> z, int R, int G, int B);
+
+	vector <double> observationFingerToState(vector <double> z_Finger,float a, float b);
 
 	void projectionFingerState(vector<double> s, int R, int G, int B);
 
@@ -211,8 +218,6 @@ protected:
 	//*FUNKCJE PALCA WSKAZUJĄCEGO**************************************//
 	//*****************************************************************//
 
-	// Otrzymanie obserwacji środkowego palca
-	void getForeFingerObservation();
 
 	// Funkcja wyliczajaca wartosci parametrów stanu palca wskazujacego na podstawie wartosci obserwacji
 	void observationForeFingerToState();
