@@ -13,6 +13,7 @@
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Props.hpp"
+#include "Property.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -123,6 +124,15 @@ protected:
 	/// New set of blobs is waiting
 	Base::EventHandler <KW_MAP2> h_onNewBlobs;
 
+	/*!
+	 * Event handler function.
+	 */
+	void map();
+
+	/// Event handler.
+	/// New image is waiting
+	Base::EventHandler <KW_MAP2> h_map;
+
 
 	/// Input blobs
 	Base::DataStreamIn <Types::Blobs::BlobResult> in_blobs;
@@ -215,6 +225,8 @@ protected:
 
 
 private:
+
+	bool MAP;
 
 	cv::Mat tsl_img;
 	cv::Mat segments;
