@@ -200,6 +200,7 @@ protected:
 
 	vector <double> updateFingerState(vector <double> diff_Finger, vector <double> s_Finger, double P_Finger[5][5]);
 
+	bool stopCondition(vector <double> s, vector <double> s0, double invP[5][5], vector <double> diff, float limit);
 
 	//*****************************************************************//
 	//*FUNKCJE SRODKOWEGO PALCA****************************************//
@@ -316,6 +317,8 @@ private:
 	// wektor stanu dłoni obliczona na podstawie aktualnej obserwacji
 	vector<double> sTest2;
 
+	bool STOP_MFinger;
+
 	//*****************************************************************//
 	//*ZMIENNE PALCA WSKAZUJĄCEG0**************************************//
 	//*****************************************************************//
@@ -352,6 +355,8 @@ private:
 
 	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
 	vector<double> diff_FFinger;
+
+	bool STOP_FFinger;
 
 	//*****************************************************************//
 	//*ZMIENNE KCIUKA**************************************************//
@@ -390,6 +395,8 @@ private:
 	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
 	vector<double> diff_TFinger;
 
+	bool STOP_TFinger;
+
 	//*****************************************************************//
 	//*ZMIENNE MAŁEGO PALCA********************************************//
 	//*****************************************************************//
@@ -427,6 +434,8 @@ private:
 	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
 	vector<double> diff_SFinger;
 
+	bool STOP_SFinger;
+
 	//*****************************************************************//
 	//*ZMIENNE PALEC SERDECZNY*****************************************//
 	//*****************************************************************//
@@ -463,6 +472,8 @@ private:
 
 	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
 	vector<double> diff_RFinger;
+
+	bool STOP_RFinger;
 
 
 
