@@ -361,14 +361,14 @@ void KW_MAP2::getObservation(){
 		//argument kąta nachylenia
 		double angle = abs(atan2(dy, dx));
 
-		z.push_back(angle * 180/ M_PI);
+		//kat w radianach
+		z.push_back(angle);
 
 		height = MaxY - MinY;
 		width = MaxX - MinX;
 
 		z.push_back(height);
 		z.push_back(width);
-
 
 		result.AddBlob(blobs.GetBlob(id));
 		out_signs.write(result);
@@ -408,7 +408,7 @@ void KW_MAP2::projectionObservation(vector<double> z, int R, int G, int B)
 	cv::Point obsPointD;
 
 	double rotAngle = 0;
-	if((z[2] * M_PI/180 )> M_PI_2)
+/*	if((z[2] * M_PI/180 )> M_PI_2)
 	{
 		rotAngle = ((z[2] * M_PI/180) - M_PI_2);
 	}
@@ -416,7 +416,8 @@ void KW_MAP2::projectionObservation(vector<double> z, int R, int G, int B)
 	{
 		rotAngle = - (M_PI_2 - (z[2] * M_PI / 180));
 	}
-	/*
+	*/
+
 	if(z[2]> M_PI_2)
 	{
 		rotAngle = (z[2] - M_PI_2);
@@ -425,7 +426,7 @@ void KW_MAP2::projectionObservation(vector<double> z, int R, int G, int B)
 	{
 		rotAngle = - (M_PI_2 - z[2]);
 	}
-*/
+
 	obsPointA.x = z[0] - 0.5 * z[4];
 	obsPointA.y = z[1] - 4/7.0 *z[3];
 
@@ -561,8 +562,17 @@ void KW_MAP2::projectionState(vector<double> s, int R, int G, int B)
 	cv::Point obsPointD;
 
 	double rotAngle = 0;
+	if(s[2]> M_PI_2)
+	{
+		rotAngle = (s[2] - M_PI_2);
+	}
+	else if (s[2]< M_PI_2)
+	{
+		rotAngle = - (M_PI_2 - s[2]);
+	}
 
-	if((s[2] * M_PI / 180)> M_PI_2)
+
+/*	if((s[2] * M_PI / 180)> M_PI_2)
 	{
 		rotAngle = ((s[2] * M_PI / 180) - M_PI_2);
 	}
@@ -570,7 +580,7 @@ void KW_MAP2::projectionState(vector<double> s, int R, int G, int B)
 	{
 		rotAngle = - (M_PI_2 - (s[2] * M_PI / 180));
 	}
-
+*/
 	obsPointA.x = s[0] - 0.5 * s[4];
 	obsPointA.y = s[1] - 0.5 * s[3];
 
@@ -583,66 +593,12 @@ void KW_MAP2::projectionState(vector<double> s, int R, int G, int B)
 	obsPointD.x = s[0] - 0.5 * s[4];
 	obsPointD.y = s[1] + 0.5 *s[3];
 
-
 	Types::Line * elL;
-
-/*
-	Types::Ellipse * el;
-	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,0,255));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,0,255));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,0,255));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
-	el->setCol(CV_RGB(0,0,255));
-	drawcont.add(el);
-
-	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
-	elL->setCol(CV_RGB(0,0,255));
-	drawcont.add(elL);
-
-	elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
-	elL->setCol(CV_RGB(0,0,255));
-	drawcont.add(elL);
-
-	elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
-	elL->setCol(CV_RGB(0,0,255));
-
-	drawcont.add(elL);
-	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
-	elL->setCol(CV_RGB(0,0,255));
-	drawcont.add(elL);
-*/
 
 	obsPointA = rot(obsPointA, - rotAngle, cv::Point(s[0], s[1]));
 	obsPointB = rot(obsPointB, - rotAngle, cv::Point(s[0], s[1]));
 	obsPointC = rot(obsPointC, - rotAngle, cv::Point(s[0], s[1]));
 	obsPointD = rot(obsPointD, - rotAngle, cv::Point(s[0], s[1]));
-
-/*
-	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
-	el->setCol(CV_RGB(R,G,B));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointB.x, obsPointB.y), Size2f(10, 10));
-	el->setCol(CV_RGB(R,G,B));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointC.x, obsPointC.y), Size2f(10, 10));
-	el->setCol(CV_RGB(R,G,B));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(obsPointD.x, obsPointD.y), Size2f(10, 10));
-	el->setCol(CV_RGB(R,G,B));
-	drawcont.add(el);
-*/
 
 	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
 	elL->setCol(CV_RGB(R,G,B));
@@ -813,7 +769,7 @@ void KW_MAP2::getMiddleFingerObservation()
 	topY = topPoint.y;
 
 	//z jest w stopniach, a alfa ma byc w radianach
-	alfa = z[2]*M_PI/180;  //kat w radianach
+	alfa = z[2];  //kat w radianach
 	w = z[4];
 
 	z_MFinger.push_back(downX);
@@ -1253,13 +1209,13 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 
 	s.push_back(352.18);
 	s.push_back(331.46);
-	s.push_back(96.532);
+	s.push_back(1.6848);
 	s.push_back(152.78);
 	s.push_back(178.57);
 
 	s0.push_back(352.18);
 	s0.push_back(331.46);
-	s0.push_back(96.532);
+	s0.push_back(1.6848);
 	s0.push_back(152.78);
 	s0.push_back(178.57);
 
@@ -1284,127 +1240,130 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	H[4][4] = 2;
 
 
+
 	P[0][0] = 7898.123517;
 	P[0][1] = 37.669557;
-	P[0][2] = 16.654725;
+	P[0][2] = 0.290219;
 	P[0][3] = -354.473747;
 	P[0][4] = -470.330553;
 
 	P[1][0] = 37.669557;
 	P[1][1] = 262.201038;
-	P[1][2] = 27.000436;
+	P[1][2] = 0.471210;
 	P[1][3] = 3.523747;
 	P[1][4] = 71.038316;
 
-	P[2][0] = 16.654725;
-	P[2][1] = 27.000436;
-	P[2][2] = 12.361747;
-	P[2][3] = 0.812833;
-	P[2][4] = 16.639193;
+	P[2][0] = 0.290219;
+	P[2][1] = 0.471210;
+	P[2][2] = 0.003764;
+	P[2][3] = 0.014130;
+	P[2][4] = 0.290246;
 
 	P[3][0] = -354.473747;
 	P[3][1] = 3.523747;
-	P[3][2] = 0.812833;
+	P[3][2] = 0.014130;
 	P[3][3] = 176.328000;
 	P[3][4] = 274.791053;
 
 	P[4][0] = -470.330553;
 	P[4][1] = 71.038316;
-	P[4][2] = 16.639193;
+	P[4][2] = 0.290246;
 	P[4][3] = 274.791053;
 	P[4][4] = 508.217763;
 
 
 	invP[0][0] = 0.000141;
 	invP[0][1] = 0.000020;
-	invP[0][2] = -0.000068;
+	invP[0][2] = -0.003878;
 	invP[0][3] = 0.000514;
 	invP[0][4] = -0.000148;
 
 	invP[1][0] = 0.000020;
 	invP[1][1] = 0.005368;
-	invP[1][2] = -0.008217;
-	invP[1][3] = 0.004397;
+	invP[1][2] = -0.471001;
+	invP[1][3] = 0.004396;
 	invP[1][4] = -0.002840;
 
-	invP[2][0] = -0.000068;
-	invP[2][1] = -0.008217;
-	invP[2][2] = 0.118934;
-	invP[2][3] = 0.024500;
-	invP[2][4] = -0.016055;
+	invP[2][0] = -0.003878;
+	invP[2][1] = -0.471001;
+	invP[2][2] = 390.568673;
+	invP[2][3] = 1.403795;
+	invP[2][4] = -0.919834;
 
 	invP[3][0] = 0.000514;
-	invP[3][1] = 0.004397;
-	invP[3][2] = 0.024500;
-	invP[3][3] = 0.050643;
-	invP[3][4] = -0.028324;
+	invP[3][1] = 0.004396;
+	invP[3][2] = 1.403795;
+	invP[3][3] = 0.050642;
+	invP[3][4] = -0.028323;
 
 	invP[4][0] = -0.000148;
 	invP[4][1] = -0.002840;
-	invP[4][2] = -0.016055;
-	invP[4][3] = -0.028324;
-	invP[4][4] = 0.018068;
+	invP[4][2] = -0.919834;
+	invP[4][3] = -0.028323;
+	invP[4][4] = 0.018067;
+
 
 	R[0][0] = 7852.336300;
 	R[0][1] = 162.862329;
-	R[0][2] = 17.485060;
+	R[0][2] = 0.304703;
 	R[0][3] = -851.867079;
 	R[0][4] = -889.894553;
 
 	R[1][0] = 162.862329;
 	R[1][1] = 282.185173;
-	R[1][2] = 26.707663;
+	R[1][2] = 0.466120;
 	R[1][3] = -148.634526;
 	R[1][4] = -54.218000;
 
-	R[2][0] = 17.485060;
-	R[2][1] = 26.707663;
-	R[2][2] = 12.361747;
-	R[2][3] = 2.032082;
-	R[2][4] = 33.278387;
+	R[2][0] = 0.304703;
+	R[2][1] = 0.466120;
+	R[2][2] = 0.003764;
+	R[2][3] = 0.035326;
+	R[2][4] = 0.580491;
 
 	R[3][0] = -851.867079;
 	R[3][1] = -148.634526;
-	R[3][2] = 2.032082;
+	R[3][2] = 0.035326;
 	R[3][3] = 1102.050000;
 	R[3][4] = 1373.955263;
 
 	R[4][0] = -889.894553;
 	R[4][1] = -54.218000;
-	R[4][2] = 33.278387;
+	R[4][2] = 0.580491;
 	R[4][3] = 1373.955263;
 	R[4][4] = 2032.871053;
 
 
 	invR[0][0] = 0.000141;
 	invR[0][1] = 0.000020;
-	invR[0][2] = -0.000068;
+	invR[0][2] = -0.003881;
 	invR[0][3] = 0.000208;
 	invR[0][4] = -0.000077;
 
 	invR[1][0] = 0.000020;
 	invR[1][1] = 0.005367;
-	invR[1][2] = -0.008215;
+	invR[1][2] = -0.470892;
 	invR[1][3] = 0.002525;
 	invR[1][4] = -0.001420;
 
-	invR[2][0] = -0.000068;
-	invR[2][1] = -0.008215;
-	invR[2][2] = 0.118929;
-	invR[2][3] = 0.008627;
-	invR[2][4] = -0.008026;
+	invR[2][0] = -0.003881;
+	invR[2][1] = -0.470892;
+	invR[2][2] = 390.553502;
+	invR[2][3] = 0.494273;
+	invR[2][4] = -0.459845;
 
 	invR[3][0] = 0.000208;
 	invR[3][1] = 0.002525;
-	invR[3][2] = 0.008627;
+	invR[3][2] = 0.494273;
 	invR[3][3] = 0.008715;
 	invR[3][4] = -0.005873;
 
 	invR[4][0] = -0.000077;
 	invR[4][1] = -0.001420;
-	invR[4][2] = -0.008026;
+	invR[4][2] = -0.459845;
 	invR[4][3] = -0.005873;
 	invR[4][4] = 0.004521;
+
 
 	//srodkowy palec
 

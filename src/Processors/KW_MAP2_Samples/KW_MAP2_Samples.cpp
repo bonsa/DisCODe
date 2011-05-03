@@ -224,7 +224,7 @@ void KW_MAP2_Samples::getObservation(){
 
 		nObservation[0][ileObrazkow -1] = CenterOfGravity_x;
 		nObservation[1][ileObrazkow -1] = CenterOfGravity_y;
-		nObservation[2][ileObrazkow -1] = angle * 180 / M_PI;
+		nObservation[2][ileObrazkow -1] = angle;
 		nObservation[3][ileObrazkow -1] = height;
 		nObservation[4][ileObrazkow -1] = width;
 
@@ -272,7 +272,7 @@ void KW_MAP2_Samples::observationToState()
 
 	nStates[0][ileObrazkow -1] = s_mx;
 	nStates[1][ileObrazkow -1] = s_my;
-	nStates[2][ileObrazkow -1] = s_angle * 180 / M_PI;
+	nStates[2][ileObrazkow -1] = s_angle;
 	nStates[3][ileObrazkow -1] = s_heigth;
 	nStates[4][ileObrazkow -1] = s_width;
 
