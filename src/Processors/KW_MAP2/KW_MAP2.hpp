@@ -336,6 +336,18 @@ private:
 	//macierz H
 	double H_FFinger[5][6];
 
+	//macierz P
+	double P_FFinger[5][5];
+
+	//macierz R
+	double R_FFinger[6][6];
+
+	//macierz odwrotna kowariancji P
+	double invP_FFinger[5][5];
+
+	//macierz odwrotna kowariancji R
+	double invR_FFinger[6][6];
+
 
 };
 

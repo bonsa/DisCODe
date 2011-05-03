@@ -175,6 +175,11 @@ protected:
 
 
 
+	// Otrzymanie obserwacji środkowego palca
+	vector <double> getFingerObservation(int i);
+
+	vector <double> observationFingerToState(vector <double> z_Finger,float a, float b);
+
 
 private:
 
@@ -183,6 +188,11 @@ private:
 
 	bool blobs_ready;
 	bool img_ready;
+
+	// wektor stanu dłoni
+	vector<int> idFingertips;
+
+	vector<cv::Point> fingertips;
 
 	// czy funkcja jest pierwszy raz uruchomiana
 	bool first;
@@ -238,6 +248,25 @@ private:
 
 	//macierz przechowująca parametry stanu dla kilku obrazków
 	double meanStates_MFinger[5];
+
+	//*****************************************************************//
+	//*ZMIENNE PALCA WSKAZUJATEGO**************************************//
+	//*****************************************************************//
+
+	// wektor obserwacji dłoni
+	vector<double> z_FFinger;
+
+	// wektor stanu dłoni
+	vector<double> s_FFinger;
+
+	//macierz przechowująca parametry stanu środkowego palca dla kilku obrazków
+	double nStates_FFinger[5][20];
+
+	//macierz przechowująca parametry obserwacji środkowego palca dla kilku obrazków
+	double nObservation_FFinger[6][20];
+
+	//macierz przechowująca parametry stanu dla kilku obrazków
+	double meanStates_FFinger[5];
 
 };
 

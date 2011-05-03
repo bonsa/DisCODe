@@ -128,12 +128,12 @@ bool KW_MAP2::onStep() {
 		//palec wskazujacy
 		z_FFinger = getFingerObservation(3);
 		projectionFingerObservation(z_FFinger, 200, 200, 200);
-		sTest3 = observationFingerToState(z_FFinger, 0.7, 0.56);
+		sTest3 = observationFingerToState(z_FFinger, 0.72, 0.56);
 		projectionFingerState(sTest3, 0, 255, 255);
 		h_z_FFinger = stateFingerToObservation(sTest3, 9.0/7.0);
 	//	projectionFingerObservation(h_z_FFinger, 255, 255, 0);
 
-		//calculateFingerH(s_FFinger, H_FFinger, 9.0/7.0);
+		calculateFingerH(s_FFinger, H_FFinger, 9.0/7.0);
 
 
 
@@ -1668,6 +1668,171 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	invR_MFinger[5][3] = 0.022456;
 	invR_MFinger[5][4] = 11.950979;
 	invR_MFinger[5][5] = 0.020669;
+
+	//*******************************************************************************************//
+	//palec wskazujacy
+
+	s_FFinger.push_back(409.44);
+	s_FFinger.push_back(162.31);
+	s_FFinger.push_back(1.3846);
+	s_FFinger.push_back(160.73);
+	s_FFinger.push_back(42.858);
+
+	s0_FFinger.push_back(409.44);
+	s0_FFinger.push_back(162.31);
+	s0_FFinger.push_back(1.3846);
+	s0_FFinger.push_back(160.73);
+	s0_FFinger.push_back(42.858);
+
+
+	 P_FFinger[0][0] = 7740.031841;
+	 P_FFinger[0][1] = 414.422322;
+	 P_FFinger[0][2] = -0.362811;
+	 P_FFinger[0][3] = -339.554147;
+	 P_FFinger[0][4] = -80.359658;
+
+	 P_FFinger[1][0] = 414.422322;
+	 P_FFinger[1][1] = 504.539142;
+	 P_FFinger[1][2] = 0.232257;
+	 P_FFinger[1][3] = -271.977598;
+	 P_FFinger[1][4] = -72.707694;
+
+	 P_FFinger[2][0] = -0.362811;
+	 P_FFinger[2][1] = 0.232257;
+	 P_FFinger[2][2] = 0.003018;
+	 P_FFinger[2][3] = -0.023281;
+	 P_FFinger[2][4] = 0.032337;
+
+	 P_FFinger[3][0] = -339.554147;
+	 P_FFinger[3][1] = -271.977598;
+	 P_FFinger[3][2] = -0.023281;
+	 P_FFinger[3][3] = 293.086467;
+	 P_FFinger[3][4] = 89.050813;
+
+	 P_FFinger[4][0] = -80.359658;
+	 P_FFinger[4][1] = -72.707694;
+	 P_FFinger[4][2] = 0.032337;
+	 P_FFinger[4][3] = 89.050813;
+	 P_FFinger[4][4] = 29.273343;
+
+
+	invP_FFinger[0][0] = 0.000146;
+	invP_FFinger[0][1] = -0.000006;
+	invP_FFinger[0][2] = 0.050324;
+	invP_FFinger[0][3] = 0.000888;
+	invP_FFinger[0][4] = -0.002372;
+
+	invP_FFinger[1][0] = -0.000006;
+	invP_FFinger[1][1] = 0.004827;
+	invP_FFinger[1][2] = -0.073208;
+	invP_FFinger[1][3] = 0.010623;
+	invP_FFinger[1][4] = -0.020261;
+
+	invP_FFinger[2][0] = 0.050324;
+	invP_FFinger[2][1] = -0.073208;
+	invP_FFinger[2][2] = 450.229005;
+	invP_FFinger[2][3] = 2.516361;
+	invP_FFinger[2][4] = -8.195915;
+
+	invP_FFinger[3][0] = 0.000888;
+	invP_FFinger[3][1] = 0.010623;
+	invP_FFinger[3][2] = 2.516361;
+	invP_FFinger[3][3] = 0.086986;
+	invP_FFinger[3][4] = -0.238571;
+
+	invP_FFinger[4][0] = -0.002372;
+	invP_FFinger[4][1] = -0.020261;
+	invP_FFinger[4][2] = -8.195915;
+	invP_FFinger[4][3] = -0.238571;
+	invP_FFinger[4][4] = 0.712123;
+
+
+
+	R_FFinger[0][0] = 7895.858947;
+	R_FFinger[0][1] = 0.497900;
+	R_FFinger[0][2] = 7689.533684;
+	R_FFinger[0][3] = 728.568947;
+	R_FFinger[0][4] = 0.248942;
+	R_FFinger[0][5] = -788.814211;
+
+	R_FFinger[1][0] = 0.497900;
+	R_FFinger[1][1] = 303.854636;
+	R_FFinger[1][2] = -55.510737;
+	R_FFinger[1][3] = 116.235474;
+	R_FFinger[1][4] = 0.319868;
+	R_FFinger[1][5] = 344.682000;
+
+	R_FFinger[2][0] = 7689.533684;
+	R_FFinger[2][1] = -55.510737;
+	R_FFinger[2][2] = 7755.694737;
+	R_FFinger[2][3] = 537.700000;
+	R_FFinger[2][4] = -0.600775;
+	R_FFinger[2][5] = -623.257895;
+
+	R_FFinger[3][0] = 728.568947;
+	R_FFinger[3][1] = 116.235474;
+	R_FFinger[3][2] = 537.700000;
+	R_FFinger[3][3] = 836.892105;
+	R_FFinger[3][4] = 0.198258;
+	R_FFinger[3][5] = -975.544737;
+
+	R_FFinger[4][0] = 0.248942;
+	R_FFinger[4][1] = 0.319868;
+	R_FFinger[4][2] = -0.600775;
+	R_FFinger[4][3] = 0.198258;
+	R_FFinger[4][4] = 0.003018;
+	R_FFinger[4][5] = 0.269476;
+
+	R_FFinger[5][0] = -788.814211;
+	R_FFinger[5][1] = 344.682000;
+	R_FFinger[5][2] = -623.257895;
+	R_FFinger[5][3] = -975.544737;
+	R_FFinger[5][4] = 0.269476;
+	R_FFinger[5][5] = 2032.871053;
+
+
+	invR_FFinger[0][0] = 0.709918;
+	invR_FFinger[0][1] = 0.192100;
+	invR_FFinger[0][2] = -0.708600;
+	invR_FFinger[0][3] = -0.179833;
+	invR_FFinger[0][4] = -205.161305;
+	invR_FFinger[0][5] = -0.033455;
+
+	invR_FFinger[1][0] = 0.192100;
+	invR_FFinger[1][1] = 0.087830;
+	invR_FFinger[1][2] = -0.191119;
+	invR_FFinger[1][3] = -0.076314;
+	invR_FFinger[1][4] = -55.665616;
+	invR_FFinger[1][5] = -0.028189;
+
+	invR_FFinger[2][0] = -0.708600;
+	invR_FFinger[2][1] = -0.191119;
+	invR_FFinger[2][2] = 0.707434;
+	invR_FFinger[2][3] = 0.178894;
+	invR_FFinger[2][4] = 204.815426;
+	invR_FFinger[2][5] = 0.033038;
+
+	invR_FFinger[3][0] = -0.179833;
+	invR_FFinger[3][1] = -0.076314;
+	invR_FFinger[3][2] = 0.178894;
+	invR_FFinger[3][3] = 0.069998;
+	invR_FFinger[3][4] = 51.722692;
+	invR_FFinger[3][5] = 0.024741;
+
+	invR_FFinger[4][0] = -205.161305;
+	invR_FFinger[4][1] = -55.665616;
+	invR_FFinger[4][2] = 204.815426;
+	invR_FFinger[4][3] = 51.722692;
+	invR_FFinger[4][4] = 59672.586988;
+	invR_FFinger[4][5] = 9.534846;
+
+	invR_FFinger[5][0] = -0.033455;
+	invR_FFinger[5][1] = -0.028189;
+	invR_FFinger[5][2] = 0.033038;
+	invR_FFinger[5][3] = 0.024741;
+	invR_FFinger[5][4] = 9.534846;
+	invR_FFinger[5][5] = 0.013028;
+
 
 
 }

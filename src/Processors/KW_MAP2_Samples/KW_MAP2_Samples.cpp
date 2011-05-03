@@ -72,6 +72,11 @@ bool KW_MAP2_Samples::onStep() {
 		cout<<"ilosc obrazkow"<<ileObrazkow<<"\n" ;
 
 		drawcont.clear();
+
+		//czubki palców
+		fingertips.clear();
+		idFingertips.clear();
+
 		z.clear();
 		s.clear();
 		h_z.clear();
@@ -82,8 +87,41 @@ bool KW_MAP2_Samples::onStep() {
 		observationToState();
 
 		//środkowy palec
-		getMiddleFingerObservation();
-		observationMiddleFingerToState();
+		z_MFinger = getFingerObservation(2);
+
+		nObservation_MFinger[0][ileObrazkow -1] = z_MFinger[0];
+		nObservation_MFinger[1][ileObrazkow -1] = z_MFinger[1];
+		nObservation_MFinger[2][ileObrazkow -1] = z_MFinger[2];
+		nObservation_MFinger[3][ileObrazkow -1] = z_MFinger[3];
+		nObservation_MFinger[4][ileObrazkow -1] = z_MFinger[4];
+		nObservation_MFinger[5][ileObrazkow -1] = z_MFinger[5];
+
+		s_MFinger = observationFingerToState(z_MFinger, 0.7, 0.6);
+
+		nStates_MFinger[0][ileObrazkow -1] = s_MFinger[0];
+		nStates_MFinger[1][ileObrazkow -1] = s_MFinger[1];
+		nStates_MFinger[2][ileObrazkow -1] = s_MFinger[2];
+		nStates_MFinger[3][ileObrazkow -1] = s_MFinger[3];
+		nStates_MFinger[4][ileObrazkow -1] = s_MFinger[4];
+
+		//palec wskazujacy
+		z_FFinger = getFingerObservation(3);
+
+		nObservation_FFinger[0][ileObrazkow -1] = z_FFinger[0];
+		nObservation_FFinger[1][ileObrazkow -1] = z_FFinger[1];
+		nObservation_FFinger[2][ileObrazkow -1] = z_FFinger[2];
+		nObservation_FFinger[3][ileObrazkow -1] = z_FFinger[3];
+		nObservation_FFinger[4][ileObrazkow -1] = z_FFinger[4];
+		nObservation_FFinger[5][ileObrazkow -1] = z_FFinger[5];
+
+		s_FFinger = observationFingerToState(z_FFinger, 0.72, 0.56);
+
+		nStates_FFinger[0][ileObrazkow -1] = s_FFinger[0];
+		nStates_FFinger[1][ileObrazkow -1] = s_FFinger[1];
+		nStates_FFinger[2][ileObrazkow -1] = s_FFinger[2];
+		nStates_FFinger[3][ileObrazkow -1] = s_FFinger[3];
+		nStates_FFinger[4][ileObrazkow -1] = s_FFinger[4];
+
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -146,6 +184,17 @@ void KW_MAP2_Samples::getObservation(){
 		cv::Point tempPoint;
 		// wektor zawierający punkty konturu
 		vector<cv::Point> contourPoints;
+		//zmienna pomocnicza
+		float TempDist;
+		//zapamietuje poprzedni znak różnicy miedzy punktami,
+		//1- funkcja jest rosnoca, -1 - funkcja malejąca
+		int lastSign;
+		int lastMinDist;
+		//idenksy punktów charakterystycznych;
+		//powyzej tej odległości od środa cieżkosci moga znajdować sie ekstrema
+		int MINDIST;
+		//id ostatenio wyznaczonego ekstremum
+		int idLastExtreme;
 
 		Types::DrawableContainer signs;
 
@@ -180,6 +229,11 @@ void KW_MAP2_Samples::getObservation(){
 		m01 = currentBlob->Moment(0, 1);
 		m10 = currentBlob->Moment(1, 0);
 
+		MinX = currentBlob->MinX();
+		MaxX = currentBlob->MaxX();
+		MinY = currentBlob->MinY();
+		MaxY = currentBlob->MaxY();
+
 		//obliczenie środka cięzkości
 		CenterOfGravity_x = m10 / m00;
 		CenterOfGravity_y = m01 / m00;
@@ -198,6 +252,114 @@ void KW_MAP2_Samples::getObservation(){
 		cvStartReadSeq(contour, &reader);
 		CV_READ_SEQ_ELEM( actualPoint, reader);
 		topPoint = actualPoint;
+		idFingertips.push_back(0);
+
+		for (int j = 0; j < contour->total; j = j + 1) {
+
+			CV_READ_SEQ_ELEM( actualPoint, reader);
+
+			if (j % 20 == 1)
+			{
+				//wpisanie punktów z konturu do wektora
+				contourPoints.push_back(cv::Point(actualPoint.x, actualPoint.y));
+			}
+		}
+
+		MINDIST = (MaxY - CenterOfGravity_y) * (MaxY - CenterOfGravity_y) * 4/ 9;
+
+		//środek cieżkości przesuwał troche w dół ekranu, aby ułatwić wyznaczanie punktów charakterystycznych
+		CenterOfGravity_y += (MaxY - CenterOfGravity_y) * 2 / 3;
+
+
+		//******************************************************************
+		//obliczenie roznicy miedzy punktami konturu a przesuniętym środkiem ciężkosci
+		vector<double> dist;
+		//1 -oznacza, że ostatni element z konturu należał do dolnej czesci dłoni
+		lastMinDist = 0;
+		idLastExtreme = 0;
+		lastSign = 0; //ta linijka nic nie znaczy, nie chce miec warninga
+		for (unsigned int i = 0; i < contourPoints.size(); i++)
+		{
+			TempDist = (contourPoints[i].x - CenterOfGravity_x)	* (contourPoints[i].x - CenterOfGravity_x) + (contourPoints[i].y - CenterOfGravity_y) * (contourPoints[i].y - CenterOfGravity_y);
+
+			if (TempDist > MINDIST)
+				dist.push_back(TempDist);
+			else
+				//jeśli odległość jest mniejsza niż MINDIST oznacza to, że jest to dolna cześć dłoni i nie znajdują się tam żadnego punkty charakterystyczne poza przesuniętym środkiem ciężkości, dlatego te punkty można ominąć
+				dist.push_back(MINDIST);
+
+			if (i == 1)
+			{
+				if ((dist[1] - dist[0]) > 0)
+					lastSign = 1;
+				else
+					lastSign = -1;
+			}
+			else if (i > 1)
+			{
+				if (dist[i] > MINDIST && dist[i - 1] > MINDIST)
+				{
+
+					//jeżeli ostatnio była wykryta dolna cześci dłoni, następnym charakterystycznych punktem powinien być czubek palca, dlatego lastSign = 1;
+					if (lastMinDist == 1)
+					{
+						lastSign = 1;
+						lastMinDist = 0;
+					}
+					//maksiumum - czubek palca, funkcja rosła i zaczeła maleć
+					if ((dist[i] - dist[i-1]) < 0 && lastSign == 1)
+					{
+						if (((contourPoints[i-1].x - contourPoints[idLastExtreme].x) * (contourPoints[i-1].x - contourPoints[idLastExtreme].x) + (contourPoints[i-1].y - contourPoints[idLastExtreme].y) * (contourPoints[i-1].y - contourPoints[idLastExtreme].y)) > 5000)
+						{
+							if((dist[i-1]>20000) && (idFingertips.size()<5))
+							{
+								idFingertips.push_back(i-1);
+								lastSign = -1;
+								idLastExtreme = i-1;
+							}
+						}
+					}
+					//minimum - punkt między palcami
+					else if ((dist[i] - dist[i-1]) > 0 && lastSign == -1)
+					{
+						if (((contourPoints[i-1].x - contourPoints[idLastExtreme].x) * (contourPoints[i-1].x - contourPoints[idLastExtreme].x) + (contourPoints[i-1].y - contourPoints[idLastExtreme].y) * (contourPoints[i-1].y - contourPoints[idLastExtreme].y)) > 5000)
+						{
+							lastSign = 1;
+							idLastExtreme = i-1;
+						}
+					}
+				}
+				else
+				{
+					// element należący do dołu dłoni
+					lastMinDist = 1;
+				}
+			}
+
+		}
+
+		int idLeftPoint = 0;
+		int xLeftPoint = 1000000;
+		for (unsigned int i = 0; i < idFingertips.size(); i++) {
+			//znajdujemy punkt najbardziej wysynięty na lewo, czyli wierzchołek małego palca
+			if (xLeftPoint > contourPoints[idFingertips[i]].x)
+			{
+				xLeftPoint = contourPoints[idFingertips[i]].x;
+				idLeftPoint = i;
+			}
+		}
+
+		for (int i = idLeftPoint; i >= 0; i--) {
+			//wpisanie do tablicy punktów charakterystycznych punktów opisujących trzy lewe palce
+			fingertips.push_back(cv::Point( contourPoints[idFingertips[i]].x, contourPoints[idFingertips[i]].y));
+		}
+
+		for (int i = idFingertips.size() - 1; i > idLeftPoint; i--) {
+			//wpisanie do tablicy punktów charakterystycznych punktów opisujących dwa prawe palce
+			fingertips.push_back(cv::Point( contourPoints[idFingertips[i]].x,  contourPoints[idFingertips[i]].y));
+		}
+
+
 
 		double dx = - z[0] + topPoint.x;
 		double dy = - z[1] + topPoint.y;
@@ -210,11 +372,6 @@ void KW_MAP2_Samples::getObservation(){
 		double angle = abs(atan2(dy, dx));
 
 		z.push_back(angle);
-
-		MinX = currentBlob->MinX();
-		MaxX = currentBlob->MaxX();
-		MinY = currentBlob->MinY();
-		MaxY = currentBlob->MaxY();
 
 		height = MaxY - MinY;
 		width = MaxX - MinX;
@@ -283,6 +440,79 @@ void KW_MAP2_Samples::observationToState()
 //*****************************************************************//
 //*SRODKOWY PALEC**************************************************//
 //*****************************************************************//
+
+
+
+// Otrzymanie obserwacji środkowego palca
+vector <double> KW_MAP2_Samples::getFingerObservation(int i)
+{
+
+	double downX, downY, topX, topY, alfa, w;
+
+	downX = z[0] - 3.0/7.0 * (topPoint.x - z[0]);
+	downY = z[1] - 3.0/7.0 * (topPoint.y - z[1]);
+
+	Types::Ellipse * el;
+
+	el = new Types::Ellipse(cv::Point(downX, downY), Size2f(10, 10));
+	el->setCol(CV_RGB(255,0,255));
+	drawcont.add(el);
+
+	topX = fingertips[i].x;
+	topY = fingertips[i].y;
+
+	el = new Types::Ellipse(cv::Point(topX, topY), Size2f(10, 10));
+	el->setCol(CV_RGB(255,0,255));
+	drawcont.add(el);
+
+	//z jest w stopniach, a alfa ma byc w radianach
+
+	double dx, dy;
+	dx = topX - downX;
+	dy = topY - downY;
+
+	double angle = abs(atan2(dy, dx));
+	alfa = angle;  //kat w radianach
+	w = z[4];
+
+	vector <double> z_Finger;
+
+	z_Finger.push_back(downX);
+	z_Finger.push_back(downY);
+	z_Finger.push_back(topX);
+	z_Finger.push_back(topY);
+	z_Finger.push_back(alfa);
+	z_Finger.push_back(w);
+
+	return z_Finger;
+}
+
+
+
+vector <double> KW_MAP2_Samples:: observationFingerToState(vector <double> z_Finger, float a, float b)
+{
+
+	float s_mx, s_my, s_angle, s_heigth, s_width;
+
+	s_mx = z_Finger[0] + a * (z_Finger[2] - z_Finger[0]);
+	s_my = z_Finger[1] + a * (z_Finger[3] - z_Finger[1]);
+
+	s_angle = z_Finger[4];
+	s_heigth = b * (sqrt((z_Finger[0]-z_Finger[2])*(z_Finger[0]-z_Finger[2])+(z_Finger[1]-z_Finger[3])*(z_Finger[1]-z_Finger[3])));
+	s_width = 0.12 * z_Finger[5];
+
+	vector <double> sTest;
+	sTest.push_back(s_mx);
+	sTest.push_back(s_my);
+	sTest.push_back(s_angle);
+	sTest.push_back(s_heigth);
+	sTest.push_back(s_width);
+
+	return sTest;
+
+}
+
+
 
 // Otrzymanie obserwacji środkowego palca
 void KW_MAP2_Samples::getMiddleFingerObservation()
@@ -434,6 +664,49 @@ void KW_MAP2_Samples::calculate()
 			meanStates_MFinger[i] /= ileObrazkow;
 			plik<<"meanStates_MFinger["<<i<<"] = "<<meanStates_MFinger[i]<<";\n";
 		}
+
+		//*****************************************************************//
+		//*ZMIENNE PALCA WSKAZUJACEGO**************************************//
+		//*****************************************************************//
+
+
+			plik<<"\n ";
+			plik<<"RSamples_FFinger\n ";
+
+			plik<<"R_FFinger = [\n ";
+			for (int i = 0; i< 6; i++)
+			{
+				for(int j = 0; j< ileObrazkow; j++)
+				{
+					plik<<setprecision(5)<<nObservation_FFinger[i][j]<<" \t";
+				}
+				plik<<";";
+			}
+			plik<<"]";
+
+			plik<<"\n ";
+			plik<<"PSamples_FFinger\n ";
+
+			plik<<"P_MFinger = [\n ";
+			for (int i = 0; i< 5; i++)
+			{
+				for(int j = 0; j< ileObrazkow; j++)
+				{
+					plik<<setprecision(5)<<nStates_FFinger[i][j]<<" \t";
+				}
+				plik<<";";
+			}
+			plik<<"]\n\n";
+
+			for (unsigned int i = 0 ; i < 5; i++)
+			{
+				for (int j = 0; j < ileObrazkow; j++)
+				{
+					meanStates_FFinger[i] += nStates_FFinger[i][j];
+				}
+				meanStates_FFinger[i] /= ileObrazkow;
+				plik<<"meanStates_FFinger["<<i<<"] = "<<meanStates_FFinger[i]<<";\n";
+			}
 
 
 	plik.close();
