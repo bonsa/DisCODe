@@ -301,6 +301,7 @@ void KW_MAP2_Samples::getMiddleFingerObservation()
 	topX = topPoint.x;
 	topY = topPoint.y;
 
+	//katy sa w radianach
 	alfa = z[2];
 	w = z[4];
 
@@ -315,7 +316,7 @@ void KW_MAP2_Samples::getMiddleFingerObservation()
 	nObservation_MFinger[1][ileObrazkow -1] = downY;
 	nObservation_MFinger[2][ileObrazkow -1] = topX;
 	nObservation_MFinger[3][ileObrazkow -1] = topY;
-	nObservation_MFinger[4][ileObrazkow -1] = alfa* 180 / M_PI;
+	nObservation_MFinger[4][ileObrazkow -1] = alfa;
 	nObservation_MFinger[5][ileObrazkow -1] = w;
 
 }
@@ -341,7 +342,7 @@ void KW_MAP2_Samples:: observationMiddleFingerToState()
 
 	nStates_MFinger[0][ileObrazkow -1] = s_mx;
 	nStates_MFinger[1][ileObrazkow -1] = s_my;
-	nStates_MFinger[2][ileObrazkow -1] = s_angle * 180 / M_PI;
+	nStates_MFinger[2][ileObrazkow -1] = s_angle;
 	nStates_MFinger[3][ileObrazkow -1] = s_heigth;
 	nStates_MFinger[4][ileObrazkow -1] = s_width;
 

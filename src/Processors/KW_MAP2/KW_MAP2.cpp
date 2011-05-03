@@ -70,7 +70,7 @@ bool KW_MAP2::onStep() {
 		sTest2.clear();
 		fingertips.clear();
 		idFingertips.clear();
-		s_MFinger.clear();
+	//	s_MFinger.clear();
 
 		if(STOP == false)
 		{
@@ -84,7 +84,7 @@ bool KW_MAP2::onStep() {
 		//	projectionObservation(z, 255, 255, 255);
 			observationToState();
 			projectionState(sTest, 0, 255, 255);
-		//	projectionState(s, z, 255, 255, 255);
+			projectionState(s, 255, 255, 255);
 			stateToObservation();
 		//	projectionObservation(h_z, 255, 0, 255);
 			calculateDiff();
@@ -100,12 +100,14 @@ bool KW_MAP2::onStep() {
 		getMiddleFingerObservation();
 		projectionFingerObservation(z_MFinger, 200, 200, 200);
 		observationMiddleFingerToState();
-		projectionState(sTest2, 0, 255, 255);
-	//	projectionState(s_MFinger, 255, 255, 255);
-		stateMiddleFingerToObservation(sTest2);
-	//	projectionFingerObservation(h_z_MFinger, 0, 0, 0);
-	//	calculateMiddleFingerDiff();
-	//	updateMiddleFingerState();
+		projectionFingerState(sTest2, 0, 255, 255);
+		projectionFingerState(s_MFinger, 255, 255, 255);
+	//	stateMiddleFingerToObservation(sTest2);
+		stateMiddleFingerToObservation(s_MFinger);
+		projectionFingerObservation(h_z_MFinger, 255, 0, 0);
+		calculateMiddleFingerH();
+		calculateMiddleFingerDiff();
+		updateMiddleFingerState();
 
 
 
@@ -265,6 +267,7 @@ void KW_MAP2::getObservation(){
 		//1 -oznacza, że ostatni element z konturu należał do dolnej czesci dłoni
 		lastMinDist = 0;
 		idLastExtreme = 0;
+		lastSign = 0; //ta linijka nic nie znaczy, nie chce miec warninga
 		for (unsigned int i = 0; i < contourPoints.size(); i++)
 		{
 			TempDist = (contourPoints[i].x - CenterOfGravity_x)	* (contourPoints[i].x - CenterOfGravity_x) + (contourPoints[i].y - CenterOfGravity_y) * (contourPoints[i].y - CenterOfGravity_y);
@@ -360,8 +363,6 @@ void KW_MAP2::getObservation(){
 
 		z.push_back(angle * 180/ M_PI);
 
-		cout<<"angle"<<angle * 180/ M_PI<<"\n";
-
 		height = MaxY - MinY;
 		width = MaxX - MinX;
 
@@ -438,10 +439,12 @@ void KW_MAP2::projectionObservation(vector<double> z, int R, int G, int B)
 	obsPointD.y = z[1] + 3/7.0 *z[3];
 
 
-	Types::Ellipse * el;
+
 	Types::Line * elL;
 
 	/*
+	 *
+	Types::Ellipse * el;
 	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
 	el->setCol(CV_RGB(0,0,0));
 	drawcont.add(el);
@@ -580,10 +583,11 @@ void KW_MAP2::projectionState(vector<double> s, int R, int G, int B)
 	obsPointD.x = s[0] - 0.5 * s[4];
 	obsPointD.y = s[1] + 0.5 *s[3];
 
-	Types::Ellipse * el;
+
 	Types::Line * elL;
 
 /*
+	Types::Ellipse * el;
 	el = new Types::Ellipse(cv::Point(obsPointA.x, obsPointA.y), Size2f(10, 10));
 	el->setCol(CV_RGB(0,0,255));
 	drawcont.add(el);
@@ -675,14 +679,6 @@ void KW_MAP2:: stateToObservation()
 	h_z.push_back(hz_heigth);
 	h_z.push_back(hz_width);
 
-	cout<<"h_z\n";
-	cout<<h_z[0]<<"\n";
-	cout<<h_z[1]<<"\n";
-	cout<<h_z[2]<<"\n";
-	cout<<h_z[3]<<"\n";
-	cout<<h_z[4]<<"\n";
-	cout<<"koniec h_z\n";
-
 }
 
 
@@ -698,7 +694,7 @@ void KW_MAP2::calculateDiff()
 	{
 		//różnica miedzy punktami charakterystycznymi aktualnego obraz
 		D[i] =  h_z[i] - z[i];
-		cout<<"\nD"<<D[i];
+	//	cout<<"\nD"<<D[i];
 	}
 
 	double t1[5];
@@ -733,18 +729,18 @@ void KW_MAP2::calculateDiff()
 		error2 += abs(t3[i]);
 
 	}
-	cout <<"ERROR2"<<error2<<"\n";
+	//cout <<"ERROR2"<<error2<<"\n";
 }
 
 void KW_MAP2::updateState()
 {
 	for (unsigned int i = 0; i < 5; i++) {
-		cout << i << " diff\t" << diff[i] << "\n";
+	//	cout << i << " diff\t" << diff[i] << "\n";
 	}
 
 	for (unsigned int i = 0; i < 5; i++) {
 		s[i] = s[i] - diff[i];
-		cout << i << " states\t" << s[i] << "\n";
+//		cout << i << " states\t" << s[i] << "\n";
 	}
 
 	for (unsigned int i = 0; i < 5; i++) {
@@ -785,7 +781,7 @@ void KW_MAP2::stopCondition()
 	}
 
 	//warunek końca estymacji MAP
-	cout<<"\nERROR!!!!!: "<<error<<"\n";
+//	cout<<"\nERROR!!!!!: "<<error<<"\n";
 	if(error < 1.3)
 	{
 		cout<< "STOP is true\n";
@@ -816,7 +812,8 @@ void KW_MAP2::getMiddleFingerObservation()
 	topX = topPoint.x;
 	topY = topPoint.y;
 
-	alfa = z[2];
+	//z jest w stopniach, a alfa ma byc w radianach
+	alfa = z[2]*M_PI/180;  //kat w radianach
 	w = z[4];
 
 	z_MFinger.push_back(downX);
@@ -877,16 +874,88 @@ void KW_MAP2:: observationMiddleFingerToState()
 
 }
 
+
+
+void KW_MAP2::projectionFingerState(vector<double> s, int R, int G, int B)
+{
+	cv::Point obsPointA;
+	cv::Point obsPointB;
+	cv::Point obsPointC;
+	cv::Point obsPointD;
+
+	double rotAngle = 0;
+
+	//katy sa w radianach
+
+	if((s[2])> M_PI_2)
+	{
+		rotAngle = ((s[2]) - M_PI_2);
+	}
+	else if ((s[2])< M_PI_2)
+	{
+		rotAngle = - (M_PI_2 - (s[2]));
+	}
+
+
+	/*
+	if((s[2] * M_PI / 180)> M_PI_2)
+	{
+		rotAngle = ((s[2] * M_PI / 180) - M_PI_2);
+	}
+	else if ((s[2] * M_PI / 180)< M_PI_2)
+	{
+		rotAngle = - (M_PI_2 - (s[2] * M_PI / 180));
+	}
+	*/
+
+	obsPointA.x = s[0] - 0.5 * s[4];
+	obsPointA.y = s[1] - 0.5 * s[3];
+
+	obsPointB.x = s[0] + 0.5 * s[4];
+	obsPointB.y = s[1] - 0.5 *s[3];
+
+	obsPointC.x = s[0] + 0.5 * s[4];
+	obsPointC.y = s[1] + 0.5 *s[3];
+
+	obsPointD.x = s[0] - 0.5 * s[4];
+	obsPointD.y = s[1] + 0.5 *s[3];
+
+
+	Types::Line * elL;
+
+	obsPointA = rot(obsPointA, - rotAngle, cv::Point(s[0], s[1]));
+	obsPointB = rot(obsPointB, - rotAngle, cv::Point(s[0], s[1]));
+	obsPointC = rot(obsPointC, - rotAngle, cv::Point(s[0], s[1]));
+	obsPointD = rot(obsPointD, - rotAngle, cv::Point(s[0], s[1]));
+
+	elL = new Types::Line(cv::Point(obsPointA.x, obsPointA.y), cv::Point(obsPointB.x, obsPointB.y));
+	elL->setCol(CV_RGB(R,G,B));
+	drawcont.add(elL);
+
+	elL = new Types::Line(cv::Point(obsPointB.x, obsPointB.y), cv::Point(obsPointC.x, obsPointC.y));
+	elL->setCol(CV_RGB(R,G,B));
+	drawcont.add(elL);
+
+	elL = new Types::Line(cv::Point(obsPointC.x, obsPointC.y), cv::Point(obsPointD.x, obsPointD.y));
+	elL->setCol(CV_RGB(R,G,B));
+
+	drawcont.add(elL);
+	elL = new Types::Line(cv::Point(obsPointD.x, obsPointD.y), cv::Point(obsPointA.x, obsPointA.y));
+	elL->setCol(CV_RGB(R,G,B));
+	drawcont.add(elL);
+
+
+}
 // Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
 void KW_MAP2::stateMiddleFingerToObservation(vector <double> s_MFinger)
 {
-	float hz_downX, hz_downY, hz_topX, hz_topY, hz_angle, hz_heigth, hz_width;
+	float hz_downX, hz_downY, hz_topX, hz_topY, hz_angle, hz_width;
 
-	hz_downX = s_MFinger[0] - 7.0/6.0 * s_MFinger[3]*cos(s_MFinger[2] * M_PI/180);
-	hz_downY = s_MFinger[1] + 7.0/6.0 * s_MFinger[3]*sin(s_MFinger[2] * M_PI/180);
+	hz_downX = s_MFinger[0] - 7.0/6.0 * s_MFinger[3]*cos(s_MFinger[2]);
+	hz_downY = s_MFinger[1] + 7.0/6.0 * s_MFinger[3]*sin(s_MFinger[2]);
 
-	hz_topX = s_MFinger[0] + 1.0/2.0 * s_MFinger[3]*cos(s_MFinger[2] * M_PI/180);
-	hz_topY = s_MFinger[1] - 1.0/2.0 * s_MFinger[3]*sin(s_MFinger[2] * M_PI/180);
+	hz_topX = s_MFinger[0] + 1.0/2.0 * s_MFinger[3]*cos(s_MFinger[2]);
+	hz_topY = s_MFinger[1] - 1.0/2.0 * s_MFinger[3]*sin(s_MFinger[2]);
 
 	Types::Ellipse * el;
 
@@ -898,8 +967,8 @@ void KW_MAP2::stateMiddleFingerToObservation(vector <double> s_MFinger)
 	el->setCol(CV_RGB(255,255,0));
 	drawcont.add(el);
 
-	hz_angle = s_MFinger[4];
-	hz_width = 25/3.0 * s_MFinger[5];
+	hz_angle = s_MFinger[2];
+	hz_width = 25/3.0 * s_MFinger[4];
 
 	h_z_MFinger.push_back(hz_downX);
 	h_z_MFinger.push_back(hz_downY);
@@ -908,33 +977,54 @@ void KW_MAP2::stateMiddleFingerToObservation(vector <double> s_MFinger)
 	h_z_MFinger.push_back(hz_angle);
 	h_z_MFinger.push_back(hz_width);
 
-	cout<<"h_z_MFinger\n";
-	cout<<h_z_MFinger[0]<<"\n";
-	cout<<h_z_MFinger[1]<<"\n";
-	cout<<h_z_MFinger[2]<<"\n";
-	cout<<h_z_MFinger[3]<<"\n";
-	cout<<h_z_MFinger[4]<<"\n";
-	cout<<h_z_MFinger[5]<<"\n";
-	cout<<"koniec h_z\n";
+}
+
+void KW_MAP2::calculateMiddleFingerH()
+{
+
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			H_MFinger[i][j] = 0;
+		}
+	}
+
+	H_MFinger[0][0] = 1;
+	H_MFinger[2][0] = 7.0/6.0 * s_MFinger[3] * sin(s_MFinger[2]);
+	H_MFinger[3][0] = - 7.0/6.0 * cos(s_MFinger[2]);
+
+	H_MFinger[1][1] = 1;
+	H_MFinger[2][1] = 7.0/6.0 * s_MFinger[3] * cos(s_MFinger[2]);
+	H_MFinger[3][1] = 7.0/6.0 * sin(s_MFinger[2]);
+
+	H_MFinger[0][2] = 1;
+	H_MFinger[2][2] = - 1.0/2.0 * s_MFinger[3] * sin(s_MFinger[2]);
+	H_MFinger[3][2] = 1.0/2.0 * cos(s_MFinger[2]);
+
+	H_MFinger[1][3] = 1;
+	H_MFinger[2][3] = - 1.0/2.0 * s_MFinger[3] * cos(s_MFinger[2]);
+	H_MFinger[3][3] = - 1.0/2.0 * sin(s_MFinger[2]);
+
+	H_MFinger[2][4] = 1.0;
+	H_MFinger[4][5] = 25/3.0;
 }
 
 void  KW_MAP2::calculateMiddleFingerDiff()
 {
 	//różnicaiedzy wektorami h(s) i z
-	double D[5];
+	double D[6];
 	float error3 = 0;
 
-	for (unsigned int i = 0; i < 5; i ++)
+	for (unsigned int i = 0; i < 6; i ++)
 	{
 		//różnica miedzy punktami charakterystycznymi aktualnego obraz
 		D[i] =  h_z_MFinger[i] - z_MFinger[i];
-		cout<<"\nD"<<D[i];
+		cout<<"D"<<i<<" = "<<D[i]<<"\n";
 	}
 
-	double t1[5];
-	for (unsigned int i = 0; i < 5; i++) {
+	double t1[6];
+	for (unsigned int i = 0; i < 6; i++) {
 		t1[i] = 0;
-		for (unsigned int j = 0; j < 5; j++) {
+		for (unsigned int j = 0; j < 6; j++) {
 			//t = iloraz odwrotnej macierzy R * roznica D
 			t1[i] += invR_MFinger[i][j] * D[j];
 		}
@@ -943,7 +1033,7 @@ void  KW_MAP2::calculateMiddleFingerDiff()
 	double t2[5];
 	for (unsigned int i = 0; i < 5; i++) {
 		t2[i] = 0;
-		for (unsigned int j = 0; j < 5; j++) {
+		for (unsigned int j = 0; j < 6; j++) {
 			//t1 = iloraz macierzy H * t1
 			t2[i] += H_MFinger[i][j] * t1[j];
 		}
@@ -1319,168 +1409,165 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	//srodkowy palec
 
 
-	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 5; j++) {
-			H_MFinger[i][j] = 0;
-		}
-	}
+	s_MFinger.push_back(347.62);
+	s_MFinger.push_back(159.3);
+	s_MFinger.push_back(1.6848);
+	s_MFinger.push_back(177.87);
+	s_MFinger.push_back(42.858);
 
-	H_MFinger[0][0] = 1;
-	H_MFinger[1][1] = 1;
-	H_MFinger[4][1] = 7/6.0;
-	H_MFinger[2][2] = 1;
-	H_MFinger[3][3] = 5/3.0;
-	H_MFinger[4][4] = 25/3.0;
+	s0_MFinger.push_back(347.62);
+	s0_MFinger.push_back(159.3);
+	s0_MFinger.push_back(1.6848);
+	s0_MFinger.push_back(177.87);
+	s0_MFinger.push_back(42.858);
 
 
 	 P_MFinger[0][0] = 7888.528068;
 	 P_MFinger[0][1] = 406.435705;
-	 P_MFinger[0][2] = -7.714173;
+	 P_MFinger[0][2] = -0.135018;
 	 P_MFinger[0][3] = -435.621592;
 	 P_MFinger[0][4] = -122.957084;
 
 	 P_MFinger[1][0] = 406.435705;
 	 P_MFinger[1][1] = 521.170785;
-	 P_MFinger[1][2] = 28.149490;
+	 P_MFinger[1][2] = 0.491322;
 	 P_MFinger[1][3] = -285.146180;
 	 P_MFinger[1][4] = -70.328615;
 
-	 P_MFinger[2][0] = -7.714173;
-	 P_MFinger[2][1] = 28.149490;
-	 P_MFinger[2][2] = 12.361747;
-	 P_MFinger[2][3] = 2.006577;
-	 P_MFinger[2][4] = 3.993406;
+	 P_MFinger[2][0] = -0.135018;
+	 P_MFinger[2][1] = 0.491322;
+	 P_MFinger[2][2] = 0.003764;
+	 P_MFinger[2][3] = 0.034951;
+	 P_MFinger[2][4] = 0.069659;
 
 	 P_MFinger[3][0] = -435.621592;
 	 P_MFinger[3][1] = -285.146180;
-	 P_MFinger[3][2] = 2.006577;
+	 P_MFinger[3][2] = 0.034951;
 	 P_MFinger[3][3] = 348.553026;
 	 P_MFinger[3][4] = 97.536609;
 
 	 P_MFinger[4][0] = -122.957084;
 	 P_MFinger[4][1] = -70.328615;
-	 P_MFinger[4][2] = 3.993406;
+	 P_MFinger[4][2] = 0.069659;
 	 P_MFinger[4][3] = 97.536609;
 	 P_MFinger[4][4] = 29.273343;
 
 
 	invP_MFinger[0][0] = 0.000137;
 	invP_MFinger[0][1] = -0.000040;
-	invP_MFinger[0][2] = 0.000155;
+	invP_MFinger[0][2] = 0.008904;
 	invP_MFinger[0][3] = 0.000139;
-	invP_MFinger[0][4] = -0.000006;
+	invP_MFinger[0][4] = -0.000007;
 
 	invP_MFinger[1][0] = -0.000040;
 	invP_MFinger[1][1] = 0.004670;
-	invP_MFinger[1][2] = -0.009785;
-	invP_MFinger[1][3] = 0.005334;
+	invP_MFinger[1][2] = -0.560854;
+	invP_MFinger[1][3] = 0.005335;
 	invP_MFinger[1][4] = -0.005386;
 
-	invP_MFinger[2][0] = 0.000155;
-	invP_MFinger[2][1] = -0.009785;
-	invP_MFinger[2][2] = 0.176792;
-	invP_MFinger[2][3] = 0.063831;
-	invP_MFinger[2][4] = -0.259656;
+	invP_MFinger[2][0] = 0.008904;
+	invP_MFinger[2][1] = -0.560854;
+	invP_MFinger[2][2] = 580.463754;
+	invP_MFinger[2][3] = 3.656078;
+	invP_MFinger[2][4] = -14.873096;
 
 	invP_MFinger[3][0] = 0.000139;
-	invP_MFinger[3][1] = 0.005334;
-	invP_MFinger[3][2] = 0.063831;
-	invP_MFinger[3][3] = 0.084687;
-	invP_MFinger[3][4] = -0.277477;
+	invP_MFinger[3][1] = 0.005335;
+	invP_MFinger[3][2] = 3.656078;
+	invP_MFinger[3][3] = 0.084669;
+	invP_MFinger[3][4] = -0.277407;
 
-	invP_MFinger[4][0] = -0.000006;
+	invP_MFinger[4][0] = -0.000007;
 	invP_MFinger[4][1] = -0.005386;
-	invP_MFinger[4][2] = -0.259656;
-	invP_MFinger[4][3] = -0.277477;
-	invP_MFinger[4][4] = 0.981151;
-
+	invP_MFinger[4][2] = -14.873096;
+	invP_MFinger[4][3] = -0.277407;
+	invP_MFinger[4][4] = 0.980883;
 
 
 	R_MFinger[0][0] = 7895.858947;
 	R_MFinger[0][1] = 0.497900;
 	R_MFinger[0][2] = 7772.402632;
 	R_MFinger[0][3] = 668.163684;
-	R_MFinger[0][4] = 36.385724;
+	R_MFinger[0][4] = 0.634515;
 	R_MFinger[0][5] = -788.814211;
 
 	R_MFinger[1][0] = 0.497900;
 	R_MFinger[1][1] = 303.854636;
 	R_MFinger[1][2] = -154.575263;
 	R_MFinger[1][3] = 124.265368;
-	R_MFinger[1][4] = 25.621243;
+	R_MFinger[1][4] = 0.447130;
 	R_MFinger[1][5] = 344.682000;
 
 	R_MFinger[2][0] = 7772.402632;
 	R_MFinger[2][1] = -154.575263;
 	R_MFinger[2][2] = 7986.368421;
 	R_MFinger[2][3] = 609.263158;
-	R_MFinger[2][4] = -26.617342;
+	R_MFinger[2][4] = -0.464874;
 	R_MFinger[2][5] = -1125.710526;
 
 	R_MFinger[3][0] = 668.163684;
 	R_MFinger[3][1] = 124.265368;
 	R_MFinger[3][2] = 609.263158;
 	R_MFinger[3][3] = 901.252632;
-	R_MFinger[3][4] = 29.241363;
+	R_MFinger[3][4] = 0.510406;
 	R_MFinger[3][5] = -984.963158;
 
-	R_MFinger[4][0] = 36.385724;
-	R_MFinger[4][1] = 25.621243;
-	R_MFinger[4][2] = -26.617342;
-	R_MFinger[4][3] = 29.241363;
-	R_MFinger[4][4] = 12.361747;
-	R_MFinger[4][5] = 33.278387;
+	R_MFinger[4][0] = 0.634515;
+	R_MFinger[4][1] = 0.447130;
+	R_MFinger[4][2] = -0.464874;
+	R_MFinger[4][3] = 0.510406;
+	R_MFinger[4][4] = 0.003764;
+	R_MFinger[4][5] = 0.580491;
 
 	R_MFinger[5][0] = -788.814211;
 	R_MFinger[5][1] = 344.682000;
 	R_MFinger[5][2] = -1125.710526;
 	R_MFinger[5][3] = -984.963158;
-	R_MFinger[5][4] = 33.278387;
+	R_MFinger[5][4] = 0.580491;
 	R_MFinger[5][5] = 2032.871053;
 
 
-	invR_MFinger[0][0] = 0.530698;
-	invR_MFinger[0][1] = 0.008287;
-	invR_MFinger[0][2] = -0.531523;
-	invR_MFinger[0][3] = -0.009853;
-	invR_MFinger[0][4] = -2.558533;
-	invR_MFinger[0][5] = -0.052702;
+	invR_MFinger[0][0] = 0.529629;
+	invR_MFinger[0][1] = 0.008552;
+	invR_MFinger[0][2] = -0.530462;
+	invR_MFinger[0][3] = -0.010065;
+	invR_MFinger[0][4] = -146.296595;
+	invR_MFinger[0][5] = -0.052785;
 
-	invR_MFinger[1][0] = 0.008287;
-	invR_MFinger[1][1] = 0.036851;
-	invR_MFinger[1][2] = -0.008141;
-	invR_MFinger[1][3] = -0.031749;
-	invR_MFinger[1][4] = 0.019370;
-	invR_MFinger[1][5] = -0.023241;
+	invR_MFinger[1][0] = 0.008552;
+	invR_MFinger[1][1] = 0.036847;
+	invR_MFinger[1][2] = -0.008406;
+	invR_MFinger[1][3] = -0.031746;
+	invR_MFinger[1][4] = 1.035149;
+	invR_MFinger[1][5] = -0.023261;
 
-	invR_MFinger[2][0] = -0.531523;
-	invR_MFinger[2][1] = -0.008141;
-	invR_MFinger[2][2] = 0.532487;
-	invR_MFinger[2][3] = 0.009679;
-	invR_MFinger[2][4] = 2.563064;
-	invR_MFinger[2][5] = 0.052733;
+	invR_MFinger[2][0] = -0.530462;
+	invR_MFinger[2][1] = -0.008406;
+	invR_MFinger[2][2] = 0.531433;
+	invR_MFinger[2][3] = 0.009892;
+	invR_MFinger[2][4] = 146.558360;
+	invR_MFinger[2][5] = 0.052817;
 
-	invR_MFinger[3][0] = -0.009853;
-	invR_MFinger[3][1] = -0.031749;
-	invR_MFinger[3][2] = 0.009679;
-	invR_MFinger[3][3] = 0.031390;
-	invR_MFinger[3][4] = -0.019017;
-	invR_MFinger[3][5] = 0.022440;
+	invR_MFinger[3][0] = -0.010065;
+	invR_MFinger[3][1] = -0.031746;
+	invR_MFinger[3][2] = 0.009892;
+	invR_MFinger[3][3] = 0.031387;
+	invR_MFinger[3][4] = -1.029756;
+	invR_MFinger[3][5] = 0.022456;
 
-	invR_MFinger[4][0] = -2.558533;
-	invR_MFinger[4][1] = 0.019370;
-	invR_MFinger[4][2] = 2.563064;
-	invR_MFinger[4][3] = -0.019017;
-	invR_MFinger[4][4] = 12.574947;
-	invR_MFinger[4][5] = 0.208169;
+	invR_MFinger[4][0] = -146.296595;
+	invR_MFinger[4][1] = 1.035149;
+	invR_MFinger[4][2] = 146.558360;
+	invR_MFinger[4][3] = -1.029756;
+	invR_MFinger[4][4] = 41198.890066;
+	invR_MFinger[4][5] = 11.950979;
 
-	invR_MFinger[5][0] = -0.052702;
-	invR_MFinger[5][1] = -0.023241;
-	invR_MFinger[5][2] = 0.052733;
-	invR_MFinger[5][3] = 0.022440;
-	invR_MFinger[5][4] = 0.208169;
-	invR_MFinger[5][5] = 0.020648;
-
+	invR_MFinger[5][0] = -0.052785;
+	invR_MFinger[5][1] = -0.023261;
+	invR_MFinger[5][2] = 0.052817;
+	invR_MFinger[5][3] = 0.022456;
+	invR_MFinger[5][4] = 11.950979;
+	invR_MFinger[5][5] = 0.020669;
 
 
 }

@@ -189,8 +189,14 @@ protected:
 	// Funkcja wyliczajaca wartosci parametrów stanu środkowego palca na podstawie wartosci obserwacji
 	void observationMiddleFingerToState();
 
+	void projectionFingerState(vector<double> s, int R, int G, int B);
+
 	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
 	void stateMiddleFingerToObservation(vector <double> s_MFinger);
+
+
+	// Funkcja obliczajaca macierz jakobianu H
+	void calculateMiddleFingerH();
 
 	// Funkcja obliczająca o jaki wektor nalezy zaktualizowac wektor stan
 	void calculateMiddleFingerDiff();
@@ -285,19 +291,19 @@ private:
 	vector<double> s0_MFinger;
 
 	//macierz H
-	double H_MFinger[5][5];
+	double H_MFinger[5][6];
 
 	//macierz P
 	double P_MFinger[5][5];
 
 	//macierz R
-	double R_MFinger[5][5];
+	double R_MFinger[6][6];
 
 	//macierz odwrotna kowariancji P
 	double invP_MFinger[5][5];
 
 	//macierz odwrotna kowariancji R
-	double invR_MFinger[5][5];
+	double invR_MFinger[6][6];
 
 	// wektor obserwacji dłoni
 	vector<double> h_z_MFinger;
