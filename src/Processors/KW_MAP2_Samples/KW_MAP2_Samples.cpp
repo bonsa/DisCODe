@@ -158,6 +158,24 @@ bool KW_MAP2_Samples::onStep() {
 		nStates_SFinger[3][ileObrazkow -1] = s_SFinger[3];
 		nStates_SFinger[4][ileObrazkow -1] = s_SFinger[4];
 
+		//palec serdeczny
+		z_RFinger = getFingerObservation(1);
+
+		nObservation_RFinger[0][ileObrazkow -1] = z_RFinger[0];
+		nObservation_RFinger[1][ileObrazkow -1] = z_RFinger[1];
+		nObservation_RFinger[2][ileObrazkow -1] = z_RFinger[2];
+		nObservation_RFinger[3][ileObrazkow -1] = z_RFinger[3];
+		nObservation_RFinger[4][ileObrazkow -1] = z_RFinger[4];
+		nObservation_RFinger[5][ileObrazkow -1] = z_RFinger[5];
+
+		s_RFinger = observationFingerToState(z_RFinger, 0.73, 0.54);
+
+		nStates_RFinger[0][ileObrazkow -1] = s_RFinger[0];
+		nStates_RFinger[1][ileObrazkow -1] = s_RFinger[1];
+		nStates_RFinger[2][ileObrazkow -1] = s_RFinger[2];
+		nStates_RFinger[3][ileObrazkow -1] = s_RFinger[3];
+		nStates_RFinger[4][ileObrazkow -1] = s_RFinger[4];
+
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -828,6 +846,49 @@ void KW_MAP2_Samples::calculate()
 			}
 			meanStates_SFinger[i] /= ileObrazkow;
 			plik<<"meanStates_SFinger["<<i<<"] = "<<meanStates_SFinger[i]<<";\n";
+		}
+
+	//*****************************************************************//
+	//*ZMIENNE PALCA SERDECZNEGO***************************************//
+	//*****************************************************************//
+
+
+		plik<<"\n ";
+		plik<<"RSamples_RFinger\n ";
+
+		plik<<"R_RFinger = [\n ";
+		for (int i = 0; i< 6; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
+			{
+				plik<<setprecision(5)<<nObservation_RFinger[i][j]<<" \t";
+			}
+			plik<<";";
+		}
+		plik<<"]";
+
+		plik<<"\n ";
+		plik<<"PSamples_RFinger\n ";
+
+		plik<<"P_RFinger = [\n ";
+		for (int i = 0; i< 5; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
+			{
+				plik<<setprecision(5)<<nStates_RFinger[i][j]<<" \t";
+			}
+			plik<<";";
+		}
+		plik<<"]\n\n";
+
+		for (unsigned int i = 0 ; i < 5; i++)
+		{
+			for (int j = 0; j < ileObrazkow; j++)
+			{
+				meanStates_RFinger[i] += nStates_RFinger[i][j];
+			}
+			meanStates_RFinger[i] /= ileObrazkow;
+			plik<<"meanStates_RFinger["<<i<<"] = "<<meanStates_RFinger[i]<<";\n";
 		}
 
 

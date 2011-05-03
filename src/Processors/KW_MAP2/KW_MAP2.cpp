@@ -93,10 +93,17 @@ bool KW_MAP2::onStep() {
 
 		//mały palec
 		z_SFinger.clear();
-	//	s_FFinger.clear();
+	//	s_SFinger.clear();
 		h_z_SFinger.clear();
 		diff_SFinger.clear();
 		sTest5.clear();
+
+		//mały palec
+		z_RFinger.clear();
+	//	s_RFinger.clear();
+		h_z_RFinger.clear();
+		diff_RFinger.clear();
+		sTest6.clear();
 
 
 		if(STOP == false)
@@ -107,7 +114,7 @@ bool KW_MAP2::onStep() {
 			sTest.clear();
 
 			getObservation();
-			projectionFingertips();
+		//	projectionFingertips();
 		//	projectionObservation(z, 255, 255, 255);
 			observationToState();
 			projectionState(sTest, 0, 255, 255);
@@ -126,10 +133,10 @@ bool KW_MAP2::onStep() {
 		//palec środkowy
 		sTest.clear();
 		z_MFinger = getFingerObservation(2);
-		projectionFingerObservation(z_MFinger, 200, 200, 200);
+	//	projectionFingerObservation(z_MFinger, 200, 200, 200);
 		sTest2 = observationFingerToState(z_MFinger, 0.7, 0.6);
 		projectionFingerState(sTest2, 0, 255, 255);
-	//	projectionFingerState(s_MFinger, 255, 255, 255);
+		projectionFingerState(s_MFinger, 255, 255, 255);
 		h_z_MFinger = stateFingerToObservation(s_MFinger, 7.0/6.0);
 	//	projectionFingerObservation(h_z_MFinger, 255, 255, 0);
 
@@ -143,10 +150,10 @@ bool KW_MAP2::onStep() {
 
 		//palec wskazujacy
 		z_FFinger = getFingerObservation(3);
-		projectionFingerObservation(z_FFinger, 200, 200, 200);
+	//	projectionFingerObservation(z_FFinger, 200, 200, 200);
 		sTest3 = observationFingerToState(z_FFinger, 0.72, 0.56);
 		projectionFingerState(sTest3, 0, 255, 255);
-	//	projectionFingerState(s_FFinger, 255, 255, 255);
+		projectionFingerState(s_FFinger, 255, 255, 255);
 		h_z_FFinger = stateFingerToObservation(s_FFinger, 9.0/7.0);
 	//	projectionFingerObservation(h_z_FFinger, 255, 255, 0);
 
@@ -156,10 +163,10 @@ bool KW_MAP2::onStep() {
 
 		//kciuk
 		z_TFinger = getFingerObservation(4);
-		projectionFingerObservation(z_TFinger, 200, 200, 200);
+	//	projectionFingerObservation(z_TFinger, 200, 200, 200);
 		sTest3 = observationFingerToState(z_TFinger, 0.72, 0.56);
 		projectionFingerState(sTest3, 0, 255, 255);
-	//	projectionFingerState(s_TFinger, 255, 255, 255);
+		projectionFingerState(s_TFinger, 255, 255, 255);
 		h_z_TFinger = stateFingerToObservation(s_TFinger, 9.0/7.0);
 	//	projectionFingerObservation(h_z_TFinger, 255, 255, 0);
 		calculateFingerH(s_TFinger, H_TFinger, 9.0/7.0);
@@ -168,15 +175,30 @@ bool KW_MAP2::onStep() {
 
 		//mały palec
 		z_SFinger = getFingerObservation(0);
-		projectionFingerObservation(z_SFinger, 200, 200, 200);
+	//	projectionFingerObservation(z_SFinger, 200, 200, 200);
 		sTest4 = observationFingerToState(z_SFinger, 0.82, 0.36);
 		projectionFingerState(sTest4, 0, 255, 255);
 		projectionFingerState(s_SFinger, 255, 255, 255);
 		h_z_SFinger = stateFingerToObservation(s_SFinger, 41.0/18.0);
-		projectionFingerObservation(h_z_SFinger, 255, 255, 0);
+	//	projectionFingerObservation(h_z_SFinger, 255, 255, 0);
 		calculateFingerH(s_SFinger, H_SFinger, 41.0/18.0);
 		diff_SFinger = calculateFingerDiff(h_z_SFinger, z_SFinger, invR_SFinger, H_SFinger, P_SFinger);
 		s_SFinger = updateFingerState(diff_SFinger,s_SFinger, P_SFinger);
+
+		//palec serdeczny
+		//ring-finger
+		z_RFinger = getFingerObservation(1);
+	//	projectionFingerObservation(z_RFinger, 200, 200, 200);
+		sTest6 = observationFingerToState(z_RFinger, 0.73, 0.54);
+		projectionFingerState(sTest6, 0, 255, 255);
+		projectionFingerState(s_RFinger, 255, 255, 255);
+		h_z_RFinger = stateFingerToObservation(s_RFinger,73.0/54.0);
+	//	projectionFingerObservation(h_z_RFinger, 255, 255, 0);
+		calculateFingerH(s_RFinger, H_RFinger, 73.0/54.0);
+		diff_RFinger = calculateFingerDiff(h_z_RFinger, z_RFinger, invR_RFinger, H_RFinger, P_RFinger);
+		s_RFinger = updateFingerState(diff_RFinger,s_RFinger, P_RFinger);
+
+
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -416,14 +438,9 @@ void KW_MAP2::getObservation(){
 			fingertips.push_back(cv::Point( contourPoints[idFingertips[i]].x,  contourPoints[idFingertips[i]].y));
 		}
 
-
 		double dx = - z[0] + topPoint.x;
 		double dy = - z[1] + topPoint.y;
 
-		Types::Ellipse * el;
-		el = new Types::Ellipse(Point2f(topPoint.x, topPoint.y), Size2f(10, 10));
-		el->setCol(CV_RGB(0,0,0));
-		drawcont.add(el);
 		//argument kąta nachylenia
 		double angle = abs(atan2(dy, dx));
 
@@ -451,7 +468,6 @@ void KW_MAP2::projectionFingertips() {
 
 	Types::Ellipse * el;
 	for (unsigned int i = 0; i < fingertips.size(); i++) {
-		cout<<"SIZE"<<fingertips.size()<<"\n";
 		el = new Types::Ellipse(cv::Point(fingertips[i].x, fingertips[i].y),Size2f(10, 10));
 		el->setCol(CV_RGB(0,0,255));
 		drawcont.add(el);
@@ -881,12 +897,6 @@ vector <double> KW_MAP2:: observationFingerToState(vector <double> z_Finger, flo
 	s_mx = z_Finger[0] + a * (z_Finger[2] - z_Finger[0]);
 	s_my = z_Finger[1] + a * (z_Finger[3] - z_Finger[1]);
 
-	Types::Ellipse * el;
-
-	el = new Types::Ellipse(cv::Point(s_mx, s_my ), Size2f(10, 10));
-	el->setCol(CV_RGB(0,255,255));
-	drawcont.add(el);
-
 	s_angle = z_Finger[4];
 	s_heigth = b * (sqrt((z_Finger[0]-z_Finger[2])*(z_Finger[0]-z_Finger[2])+(z_Finger[1]-z_Finger[3])*(z_Finger[1]-z_Finger[3])));
 	s_width = 0.12 * z_Finger[5];
@@ -1126,20 +1136,8 @@ vector <double> KW_MAP2::getFingerObservation(int i)
 	downX = z[0] - 3.0/7.0 * (topPoint.x - z[0]);
 	downY = z[1] - 3.0/7.0 * (topPoint.y - z[1]);
 
-	Types::Ellipse * el;
-
-	el = new Types::Ellipse(cv::Point(downX, downY), Size2f(10, 10));
-	el->setCol(CV_RGB(255,0,255));
-	drawcont.add(el);
-
 	topX = fingertips[i].x;
 	topY = fingertips[i].y;
-
-	el = new Types::Ellipse(cv::Point(topX, topY), Size2f(10, 10));
-	el->setCol(CV_RGB(255,0,255));
-	drawcont.add(el);
-
-	//z jest w stopniach, a alfa ma byc w radianach
 
 	double dx, dy;
 	dx = topX - downX;
@@ -2200,6 +2198,174 @@ KW_MAP2::KW_MAP2(const std::string & name) :
 	invR_SFinger[5][3] = 0.077780;
 	invR_SFinger[5][4] = -12.429204;
 	invR_SFinger[5][5] = 0.054051;
+
+	//*******************************************************************************//
+	//palec serdeczny
+
+	s_RFinger.push_back(299.59);
+	s_RFinger.push_back(174.02);
+	s_RFinger.push_back(1.929);
+	s_RFinger.push_back(151.26);
+	s_RFinger.push_back(42.858);
+
+	s0_RFinger.push_back(299.59);
+	s0_RFinger.push_back(174.02);
+	s0_RFinger.push_back(1.929);
+	s0_RFinger.push_back(151.26);
+	s0_RFinger.push_back(42.858);
+
+
+	 P_RFinger[0][0] = 8465.374582;
+	 P_RFinger[0][1] = 345.004152;
+	 P_RFinger[0][2] = -1.033221;
+	 P_RFinger[0][3] = -431.608269;
+	 P_RFinger[0][4] = -153.121165;
+
+	 P_RFinger[1][0] = 345.004152;
+	 P_RFinger[1][1] = 548.874626;
+	 P_RFinger[1][2] = 0.788965;
+	 P_RFinger[1][3] = -210.942662;
+	 P_RFinger[1][4] = -54.042831;
+
+	 P_RFinger[2][0] = -1.033221;
+	 P_RFinger[2][1] = 0.788965;
+	 P_RFinger[2][2] = 0.004481;
+	 P_RFinger[2][3] = 0.065347;
+	 P_RFinger[2][4] = 0.101536;
+
+	 P_RFinger[3][0] = -431.608269;
+	 P_RFinger[3][1] = -210.942662;
+	 P_RFinger[3][2] = 0.065347;
+	 P_RFinger[3][3] = 243.952191;
+	 P_RFinger[3][4] = 80.730688;
+
+	 P_RFinger[4][0] = -153.121165;
+	 P_RFinger[4][1] = -54.042831;
+	 P_RFinger[4][2] = 0.101536;
+	 P_RFinger[4][3] = 80.730688;
+	 P_RFinger[4][4] = 29.273343;
+
+
+	invP_RFinger[0][0] = 0.000135;
+	invP_RFinger[0][1] = -0.000094;
+	invP_RFinger[0][2] = 0.057865;
+	invP_RFinger[0][3] = 0.000370;
+	invP_RFinger[0][4] = -0.000686;
+
+	invP_RFinger[1][0] = -0.000094;
+	invP_RFinger[1][1] = 0.004920;
+	invP_RFinger[1][2] = -0.911412;
+	invP_RFinger[1][3] = 0.005069;
+	invP_RFinger[1][4] = -0.002224;
+
+	invP_RFinger[2][0] = 0.057865;
+	invP_RFinger[2][1] = -0.911412;
+	invP_RFinger[2][2] = 689.786014;
+	invP_RFinger[2][3] = 4.326258;
+	invP_RFinger[2][4] = -15.703518;
+
+	invP_RFinger[3][0] = 0.000370;
+	invP_RFinger[3][1] = 0.005069;
+	invP_RFinger[3][2] = 4.326258;
+	invP_RFinger[3][3] = 0.105388;
+	invP_RFinger[3][4] = -0.294351;
+
+	invP_RFinger[4][0] = -0.000686;
+	invP_RFinger[4][1] = -0.002224;
+	invP_RFinger[4][2] = -15.703518;
+	invP_RFinger[4][3] = -0.294351;
+	invP_RFinger[4][4] = 0.892699;
+
+
+
+
+
+
+	R_RFinger[0][0] = 7895.858947;
+	R_RFinger[0][1] = 0.497900;
+	R_RFinger[0][2] = 8133.765263;
+	R_RFinger[0][3] = 532.851579;
+	R_RFinger[0][4] = -0.175140;
+	R_RFinger[0][5] = -788.814211;
+
+	R_RFinger[1][0] = 0.497900;
+	R_RFinger[1][1] = 303.854636;
+	R_RFinger[1][2] = -204.310947;
+	R_RFinger[1][3] = 194.939053;
+	R_RFinger[1][4] = 0.563388;
+	R_RFinger[1][5] = 344.682000;
+
+	R_RFinger[2][0] = 8133.765263;
+	R_RFinger[2][1] = -204.310947;
+	R_RFinger[2][2] = 8788.515789;
+	R_RFinger[2][3] = 525.594737;
+	R_RFinger[2][4] = -1.350547;
+	R_RFinger[2][5] = -1456.226316;
+
+	R_RFinger[3][0] = 532.851579;
+	R_RFinger[3][1] = 194.939053;
+	R_RFinger[3][2] = 525.594737;
+	R_RFinger[3][3] = 844.239474;
+	R_RFinger[3][4] = 0.872489;
+	R_RFinger[3][5] = -744.423684;
+
+	R_RFinger[4][0] = -0.175140;
+	R_RFinger[4][1] = 0.563388;
+	R_RFinger[4][2] = -1.350547;
+	R_RFinger[4][3] = 0.872489;
+	R_RFinger[4][4] = 0.004481;
+	R_RFinger[4][5] = 0.846130;
+
+	R_RFinger[5][0] = -788.814211;
+	R_RFinger[5][1] = 344.682000;
+	R_RFinger[5][2] = -1456.226316;
+	R_RFinger[5][3] = -744.423684;
+	R_RFinger[5][4] = 0.846130;
+	R_RFinger[5][5] = 2032.871053;
+
+
+	invR_RFinger[0][0] = 0.630912;
+	invR_RFinger[0][1] = -0.107137;
+	invR_RFinger[0][2] = -0.630910;
+	invR_RFinger[0][3] = 0.107016;
+	invR_RFinger[0][4] = -156.927437;
+	invR_RFinger[0][5] = -0.084462;
+
+	invR_RFinger[1][0] = -0.107137;
+	invR_RFinger[1][1] = 0.052635;
+	invR_RFinger[1][2] = 0.107410;
+	invR_RFinger[1][3] = -0.048107;
+	invR_RFinger[1][4] = 31.767143;
+	invR_RFinger[1][5] = -0.004394;
+
+	invR_RFinger[2][0] = -0.630910;
+	invR_RFinger[2][1] = 0.107410;
+	invR_RFinger[2][2] = 0.631045;
+	invR_RFinger[2][3] = -0.107372;
+	invR_RFinger[2][4] = 157.025706;
+	invR_RFinger[2][5] = 0.084342;
+
+	invR_RFinger[3][0] = 0.107016;
+	invR_RFinger[3][1] = -0.048107;
+	invR_RFinger[3][2] = -0.107372;
+	invR_RFinger[3][3] = 0.048565;
+	invR_RFinger[3][4] = -32.347568;
+	invR_RFinger[3][5] = 0.004015;
+
+	invR_RFinger[4][0] = -156.927437;
+	invR_RFinger[4][1] = 31.767143;
+	invR_RFinger[4][2] = 157.025706;
+	invR_RFinger[4][3] = -32.347568;
+	invR_RFinger[4][4] = 40412.922201;
+	invR_RFinger[4][5] = 17.538712;
+
+	invR_RFinger[5][0] = -0.084462;
+	invR_RFinger[5][1] = -0.004394;
+	invR_RFinger[5][2] = 0.084342;
+	invR_RFinger[5][3] = 0.004015;
+	invR_RFinger[5][4] = 17.538712;
+	invR_RFinger[5][5] = 0.023051;
+
 
 
 

@@ -427,6 +427,44 @@ private:
 	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
 	vector<double> diff_SFinger;
 
+	//*****************************************************************//
+	//*ZMIENNE PALEC SERDECZNY*****************************************//
+	//*****************************************************************//
+
+	// wektor obserwacji dłoni
+	vector<double> z_RFinger;
+
+	// wektor stanu dłoni
+	vector<double> s_RFinger;
+
+	// poczatkowa hipoteza środkowego palca
+	vector<double> s0_RFinger;
+
+	// wektor stanu dłoni obliczona na podstawie aktualnej obserwacji
+	vector<double> sTest6;
+
+	// wektor obserwacji palca
+	vector<double> h_z_RFinger;
+
+	//macierz H
+	double H_RFinger[5][6];
+
+	//macierz P
+	double P_RFinger[5][5];
+
+	//macierz R
+	double R_RFinger[6][6];
+
+	//macierz odwrotna kowariancji P
+	double invP_RFinger[5][5];
+
+	//macierz odwrotna kowariancji R
+	double invR_RFinger[6][6];
+
+	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
+	vector<double> diff_RFinger;
+
+
 
 };
 

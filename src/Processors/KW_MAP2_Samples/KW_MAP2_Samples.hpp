@@ -306,6 +306,25 @@ private:
 	//macierz przechowująca parametry stanu dla kilku obrazków
 	double meanStates_SFinger[5];
 
+
+	//*****************************************************************//
+	//*ZMIENNE PALCA SERDECZNEGO***************************************//
+	//*****************************************************************//
+
+	// wektor obserwacji dłoni
+	vector<double> z_RFinger;
+
+	// wektor stanu dłoni
+	vector<double> s_RFinger;
+
+	//macierz przechowująca parametry stanu środkowego palca dla kilku obrazków
+	double nStates_RFinger[5][20];
+
+	//macierz przechowująca parametry obserwacji środkowego palca dla kilku obrazków
+	double nObservation_RFinger[6][20];
+
+	//macierz przechowująca parametry stanu dla kilku obrazków
+	double meanStates_RFinger[5];
 };
 
 }//: namespace KW_MAP2_Samples
