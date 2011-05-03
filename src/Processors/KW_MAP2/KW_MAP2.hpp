@@ -318,6 +318,14 @@ private:
 	//*ZMIENNE PALCA WSKAZUJĄCEG0**************************************//
 	//*****************************************************************//
 	//forefinger
+	// wektor obserwacji dłoni
+	vector<double> z_FFinger;
+
+	// wektor stanu dłoni
+	vector<double> s_FFinger;
+
+	// poczatkowa hipoteza środkowego palca
+	vector<double> s0_FFinger;
 
 
 };

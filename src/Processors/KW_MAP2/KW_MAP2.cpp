@@ -64,13 +64,21 @@ bool KW_MAP2::onStep() {
 	try {
 
 		drawcont.clear();
+
+
+		//czubki palców
+		fingertips.clear();
+		idFingertips.clear();
+
+		//srodkowy palec
 		z_MFinger.clear();
 		h_z_MFinger.clear();
 		diff_MFinger.clear();
 		sTest2.clear();
-		fingertips.clear();
-		idFingertips.clear();
 	//	s_MFinger.clear();
+
+		//palec wskazujacy
+		z_FFinger.clear();
 
 		if(STOP == false)
 		{
@@ -84,7 +92,7 @@ bool KW_MAP2::onStep() {
 		//	projectionObservation(z, 255, 255, 255);
 			observationToState();
 			projectionState(sTest, 0, 255, 255);
-			projectionState(s, 255, 255, 255);
+		//	projectionState(s, 255, 255, 255);
 			stateToObservation();
 		//	projectionObservation(h_z, 255, 0, 255);
 			calculateDiff();
@@ -96,18 +104,23 @@ bool KW_MAP2::onStep() {
 			//projectionState(s, 0, 255, 255);
 		}
 
+		//palec środkowy
 		sTest.clear();
 		getMiddleFingerObservation();
 		projectionFingerObservation(z_MFinger, 200, 200, 200);
 		observationMiddleFingerToState();
 		projectionFingerState(sTest2, 0, 255, 255);
-		projectionFingerState(s_MFinger, 255, 255, 255);
+	//	projectionFingerState(s_MFinger, 255, 255, 255);
 	//	stateMiddleFingerToObservation(sTest2);
 		stateMiddleFingerToObservation(s_MFinger);
-		projectionFingerObservation(h_z_MFinger, 255, 0, 0);
+	//	projectionFingerObservation(h_z_MFinger, 255, 0, 0);
 		calculateMiddleFingerH();
 		calculateMiddleFingerDiff();
 		updateMiddleFingerState();
+
+		//palec wskazujacy
+		getForeFingerObservation();
+		projectionFingerObservation(z_FFinger, 200, 200, 200);
 
 
 
@@ -913,16 +926,6 @@ void KW_MAP2::stateMiddleFingerToObservation(vector <double> s_MFinger)
 	hz_topX = s_MFinger[0] + 1.0/2.0 * s_MFinger[3]*cos(s_MFinger[2]);
 	hz_topY = s_MFinger[1] - 1.0/2.0 * s_MFinger[3]*sin(s_MFinger[2]);
 
-	Types::Ellipse * el;
-
-	el = new Types::Ellipse(cv::Point(hz_downX, hz_downY ), Size2f(10, 10));
-	el->setCol(CV_RGB(255,255,0));
-	drawcont.add(el);
-
-	el = new Types::Ellipse(cv::Point(hz_topX, hz_topY ), Size2f(10, 10));
-	el->setCol(CV_RGB(255,255,0));
-	drawcont.add(el);
-
 	hz_angle = s_MFinger[2];
 	hz_width = 25/3.0 * s_MFinger[4];
 
@@ -1037,9 +1040,43 @@ void KW_MAP2::updateMiddleFingerState()
 //*****************************************************************//
 
 // Otrzymanie obserwacji środkowego palca
-void getForeFingerObservation()
+void KW_MAP2::getForeFingerObservation()
 {
 
+	double downX, downY, topX, topY, alfa, w;
+
+	downX = z[0] - 3.0/7.0 * (topPoint.x - z[0]);
+	downY = z[1] - 3.0/7.0 * (topPoint.y - z[1]);
+
+	Types::Ellipse * el;
+
+	el = new Types::Ellipse(cv::Point(downX, downY), Size2f(10, 10));
+	el->setCol(CV_RGB(255,0,255));
+	drawcont.add(el);
+
+	topX = fingertips[3].x;
+	topY = fingertips[3].y;
+
+	el = new Types::Ellipse(cv::Point(topX, topY), Size2f(10, 10));
+	el->setCol(CV_RGB(255,0,255));
+	drawcont.add(el);
+
+	//z jest w stopniach, a alfa ma byc w radianach
+
+	double dx, dy;
+	dx = topX - downX;
+	dy = topY - downY;
+
+	double angle = abs(atan2(dy, dx));
+	alfa = angle;  //kat w radianach
+	w = z[4];
+
+	z_FFinger.push_back(downX);
+	z_FFinger.push_back(downY);
+	z_FFinger.push_back(topX);
+	z_FFinger.push_back(topY);
+	z_FFinger.push_back(alfa);
+	z_FFinger.push_back(w);
 }
 
 //konstruktor

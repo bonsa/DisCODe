@@ -7,7 +7,7 @@
 		<Seq type="Sequence" thread="Exec1" group="s1">
 			<directory>/home/kasia/Filmy/zdjecia/MAP3/</directory> 
 			<loop>true</loop>
-			<triggered>false</triggered>	
+			<triggered>true</triggered>	
 			<pattern>.*\.jpg</pattern>
 		
 		</Seq>
