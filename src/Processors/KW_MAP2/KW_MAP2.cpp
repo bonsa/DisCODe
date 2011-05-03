@@ -109,28 +109,31 @@ bool KW_MAP2::onStep() {
 
 		//palec środkowy
 		sTest.clear();
-		//getMiddleFingerObservation();
 		z_MFinger = getFingerObservation(2);
 		projectionFingerObservation(z_MFinger, 200, 200, 200);
 		sTest2 = observationFingerToState(z_MFinger, 0.7, 0.6);
-		//	observationMiddleFingerToState();
 		projectionFingerState(sTest2, 0, 255, 255);
 		projectionFingerState(s_MFinger, 255, 255, 255);
-
 		h_z_MFinger = stateFingerToObservation(s_MFinger, 7.0/6.0);
 		projectionFingerObservation(h_z_MFinger, 255, 255, 0);
-		calculateMiddleFingerH();
-		calculateMiddleFingerDiff();
-		updateMiddleFingerState();
+
+		calculateFingerH(s_MFinger, H_MFinger, 7.0/6.0);
+
+		cout<<"H   "<<H_MFinger[2][2]<<"\n";
+		diff_MFinger = calculateFingerDiff(h_z_MFinger, z_MFinger, invR_MFinger, H_MFinger, P_MFinger);
+		//calculateMiddleFingerDiff();
+		s_MFinger = updateFingerState(diff_MFinger,s_MFinger, P_MFinger);
+		//updateMiddleFingerState();
 
 		//palec wskazujacy
 		z_FFinger = getFingerObservation(3);
 		projectionFingerObservation(z_FFinger, 200, 200, 200);
 		sTest3 = observationFingerToState(z_FFinger, 0.7, 0.56);
-		//	observationForeFingerToState();
 		projectionFingerState(sTest3, 0, 255, 255);
 		h_z_FFinger = stateFingerToObservation(sTest3, 9.0/7.0);
 	//	projectionFingerObservation(h_z_FFinger, 255, 255, 0);
+
+		//calculateFingerH(s_FFinger, H_FFinger, 9.0/7.0);
 
 
 
@@ -325,7 +328,6 @@ void KW_MAP2::getObservation(){
 					{
 						if (((contourPoints[i-1].x - contourPoints[idLastExtreme].x) * (contourPoints[i-1].x - contourPoints[idLastExtreme].x) + (contourPoints[i-1].y - contourPoints[idLastExtreme].y) * (contourPoints[i-1].y - contourPoints[idLastExtreme].y)) > 5000)
 						{
-							cout<<"!!!!!!!!!!!!"<<dist[i]<<"\n";
 							if((dist[i-1]>20000) && (idFingertips.size()<5))
 							{
 								idFingertips.push_back(i-1);
@@ -829,31 +831,7 @@ void KW_MAP2::projectionFingerObservation(vector<double> z, int R, int G, int B)
 		drawcont.add(elL);
 }
 
-void KW_MAP2:: observationMiddleFingerToState()
-{
 
-	float s_mx, s_my, s_angle, s_heigth, s_width;
-
-	s_mx = z_MFinger[0] + 0.7 * (z_MFinger[2] - z_MFinger[0]);
-	s_my = z_MFinger[1] + 0.7 * (z_MFinger[3] - z_MFinger[1]);
-
-	Types::Ellipse * el;
-
-	el = new Types::Ellipse(cv::Point(s_mx, s_my ), Size2f(10, 10));
-	el->setCol(CV_RGB(0,255,255));
-	drawcont.add(el);
-
-	s_angle = z_MFinger[4];
-	s_heigth = 0.6 * (sqrt((z_MFinger[0]-z_MFinger[2])*(z_MFinger[0]-z_MFinger[2])+(z_MFinger[1]-z_MFinger[3])*(z_MFinger[1]-z_MFinger[3])));
-	s_width = 0.12 * z_MFinger[5];
-
-	sTest2.push_back(s_mx);
-	sTest2.push_back(s_my);
-	sTest2.push_back(s_angle);
-	sTest2.push_back(s_heigth);
-	sTest2.push_back(s_width);
-
-}
 
 vector <double> KW_MAP2:: observationFingerToState(vector <double> z_Finger, float a, float b)
 {
@@ -958,34 +936,57 @@ void KW_MAP2::projectionFingerState(vector<double> s, int R, int G, int B)
 }
 
 
-void KW_MAP2::calculateMiddleFingerH()
+vector <double> KW_MAP2::calculateFingerDiff(vector <double> h_z_Finger, vector <double> z_Finger, double invR_Finger[6][6], double  H_Finger[5][6], double P_Finger[5][5])
 {
+	//różnicaiedzy wektorami h(s) i z
+	double D[6];
+	float error = 0;
+	vector <double> diff_Finger;
 
-	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 5; j++) {
-			H_MFinger[i][j] = 0;
+	for (unsigned int i = 0; i < 6; i ++)
+	{
+		//różnica miedzy punktami charakterystycznymi aktualnego obraz
+		D[i] =  h_z_Finger[i] - z_Finger[i];
+		cout<<"D"<<i<<" = "<<D[i]<<"\n";
+	}
+
+	double t1[6];
+	for (unsigned int i = 0; i < 6; i++) {
+		t1[i] = 0;
+		for (unsigned int j = 0; j < 6; j++) {
+			//t = iloraz odwrotnej macierzy R * roznica D
+			t1[i] += invR_Finger[i][j] * D[j];
 		}
 	}
 
-	H_MFinger[0][0] = 1;
-	H_MFinger[2][0] = 7.0/6.0 * s_MFinger[3] * sin(s_MFinger[2]);
-	H_MFinger[3][0] = - 7.0/6.0 * cos(s_MFinger[2]);
+	double t2[5];
+	for (unsigned int i = 0; i < 5; i++) {
+		t2[i] = 0;
+		for (unsigned int j = 0; j < 6; j++) {
+			//t1 = iloraz macierzy H * t1
+			t2[i] += H_Finger[i][j] * t1[j];
+		}
+	//	cout<<t1[i]<<"\n";
+	}
 
-	H_MFinger[1][1] = 1;
-	H_MFinger[2][1] = 7.0/6.0 * s_MFinger[3] * cos(s_MFinger[2]);
-	H_MFinger[3][1] = 7.0/6.0 * sin(s_MFinger[2]);
+	double t3[5];
+	for (unsigned int i = 0; i < 5; i++) {
+		t3[i] = 0;
+		for (unsigned int j = 0; j < 5; j++) {
+			//mnożenie macierzy P * t2
+			t3[i] +=  P_Finger[i][j] * t2[j];
 
-	H_MFinger[0][2] = 1;
-	H_MFinger[2][2] = - 1.0/2.0 * s_MFinger[3] * sin(s_MFinger[2]);
-	H_MFinger[3][2] = 1.0/2.0 * cos(s_MFinger[2]);
+		}
+		t3[i] *= 0.1;//*factor;
+		diff_Finger.push_back(t3[i]);
+		error += abs(t3[i]);
 
-	H_MFinger[1][3] = 1;
-	H_MFinger[2][3] = - 1.0/2.0 * s_MFinger[3] * cos(s_MFinger[2]);
-	H_MFinger[3][3] = - 1.0/2.0 * sin(s_MFinger[2]);
+	}
 
-	H_MFinger[2][4] = 1.0;
-	H_MFinger[4][5] = 25/3.0;
+	cout <<"\nERROR M Finger"<<error<<"\n";
+	return diff_Finger;
 }
+
 
 void  KW_MAP2::calculateMiddleFingerDiff()
 {
@@ -1036,6 +1037,27 @@ void  KW_MAP2::calculateMiddleFingerDiff()
 }
 
 // Funckja aktualizująca wektor stanu i macierz kowariancji P
+vector <double>KW_MAP2::updateFingerState(vector <double> diff_Finger, vector <double> s_Finger, double P_Finger[5][5])
+{
+	vector <double> s_NFinger;
+	for (unsigned int i = 0; i < 5; i++) {
+		cout << i << " diff_Finger\t" << diff_Finger[i] << "\n";
+	}
+
+	for (unsigned int i = 0; i < 5; i++) {
+		s_NFinger.push_back(s_Finger[i] - diff_Finger[i]);
+		cout << i << " states\t" << s_NFinger[i] << "\n";
+	}
+
+	for (unsigned int i = 0; i < 5; i++) {
+		for (unsigned int j = 0; j < 5; j++) {
+			P_Finger[i][j] *= (1 - factor);
+		}
+	}
+	return s_NFinger;
+}
+
+// Funckja aktualizująca wektor stanu i macierz kowariancji P
 void KW_MAP2::updateMiddleFingerState()
 {
 
@@ -1054,10 +1076,6 @@ void KW_MAP2::updateMiddleFingerState()
 		}
 	}
 }
-
-//*****************************************************************//
-//*FUNKCJE PALCA WSKAZUJĄCEGO**************************************//
-//*****************************************************************//
 
 // Otrzymanie obserwacji środkowego palca
 vector <double> KW_MAP2::getFingerObservation(int i)
@@ -1103,31 +1121,6 @@ vector <double> KW_MAP2::getFingerObservation(int i)
 	return z_Finger;
 }
 
-// Funkcja wyliczajaca wartosci parametrów stanu palca wskazujacego na podstawie wartosci obserwacji
-void KW_MAP2::observationForeFingerToState()
-{
-	float s_mx, s_my, s_angle, s_heigth, s_width;
-
-	s_mx = z_FFinger[0] + 0.72 * (z_FFinger[2] - z_FFinger[0]);
-	s_my = z_FFinger[1] + 0.72 * (z_FFinger[3] - z_FFinger[1]);
-
-	Types::Ellipse * el;
-
-	el = new Types::Ellipse(cv::Point(s_mx, s_my ), Size2f(10, 10));
-	el->setCol(CV_RGB(0,255,255));
-	drawcont.add(el);
-
-	s_angle = z_FFinger[4];
-	s_heigth = 0.56 * (sqrt((z_FFinger[0]-z_FFinger[2])*(z_FFinger[0]-z_FFinger[2])+(z_FFinger[1]-z_FFinger[3])*(z_FFinger[1]-z_FFinger[3])));
-	s_width = 0.12 * z_FFinger[5];
-
-	sTest3.push_back(s_mx);
-	sTest3.push_back(s_my);
-	sTest3.push_back(s_angle);
-	sTest3.push_back(s_heigth);
-	sTest3.push_back(s_width);
-
-}
 
 // Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
 vector <double> KW_MAP2::stateFingerToObservation(vector <double> s_Finger, float a)
@@ -1156,33 +1149,35 @@ vector <double> KW_MAP2::stateFingerToObservation(vector <double> s_Finger, floa
 }
 
 
-void KW_MAP2::calculateForeFingerH()
+void KW_MAP2::calculateFingerH(vector<double> s_Finger, double H_Finger[5][6], float a)
 {
 
 	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 5; j++) {
-			H_FFinger[i][j] = 0;
+		for (int j = 0; j < 6; j++) {
+			H_Finger[i][j] = 0;
 		}
 	}
 
-	H_FFinger[0][0] = 1;
-	H_FFinger[2][0] = 9.0/7.0 * s_FFinger[3] * sin(s_FFinger[2]);
-	H_FFinger[3][0] = - 9.0/7.0 * cos(s_FFinger[2]);
+	H_Finger[0][0] = 1;
+	H_Finger[2][0] = a * s_Finger[3] * sin(s_Finger[2]);
+	H_Finger[3][0] = - a * cos(s_Finger[2]);
 
-	H_MFinger[1][1] = 1;
-	H_MFinger[2][1] = 9.0/7.0 * s_FFinger[3] * cos(s_FFinger[2]);
-	H_MFinger[3][1] = 9.0/7.0 * sin(s_FFinger[2]);
+	H_Finger[1][1] = 1;
+	H_Finger[2][1] = a * s_Finger[3] * cos(s_Finger[2]);
+	H_Finger[3][1] = a * sin(s_Finger[2]);
 
-	H_MFinger[0][2] = 1;
-	H_MFinger[2][2] = - 1.0/2.0 * s_FFinger[3] * sin(s_FFinger[2]);
-	H_MFinger[3][2] = 1.0/2.0 * cos(s_FFinger[2]);
+	H_Finger[0][2] = 1;
+	H_Finger[2][2] = - 1.0/2.0 * s_Finger[3] * sin(s_Finger[2]);
+	H_Finger[3][2] = 1.0/2.0 * cos(s_Finger[2]);
 
-	H_MFinger[1][3] = 1;
-	H_MFinger[2][3] = - 1.0/2.0 * s_FFinger[3] * cos(s_FFinger[2]);
-	H_MFinger[3][3] = - 1.0/2.0 * sin(s_FFinger[2]);
+	H_Finger[1][3] = 1;
+	H_Finger[2][3] = - 1.0/2.0 * s_Finger[3] * cos(s_Finger[2]);
+	H_Finger[3][3] = - 1.0/2.0 * sin(s_Finger[2]);
 
-	H_MFinger[2][4] = 1.0;
-	H_MFinger[4][5] = 25/3.0;
+	H_Finger[2][4] = 1.0;
+	H_Finger[4][5] = 25/3.0;
+
+	cout<<"H   "<<H_Finger[2][2]<<"\n";
 }
 
 

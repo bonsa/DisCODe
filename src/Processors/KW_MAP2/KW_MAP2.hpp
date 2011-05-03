@@ -194,19 +194,14 @@ protected:
 	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
 	vector <double> stateFingerToObservation(vector <double> s_Finger, float a);
 
+	void calculateFingerH(vector<double> s_Finger, double H_Finger[5][6], float a);
 
+	vector <double> calculateFingerDiff(vector <double> h_z_Finger, vector <double> z_Finger, double invR_Finger[6][6], double H_Finger[5][6], double P_Finger[5][5]);
+
+	vector <double> updateFingerState(vector <double> diff_Finger, vector <double> s_Finger, double P_Finger[5][5]);
 	//*****************************************************************//
 	//*FUNKCJE SRODKOWEGO PALCA****************************************//
 	//*****************************************************************//
-
-	// Otrzymanie obserwacji środkowego palca
-	void getMiddleFingerObservation();
-
-	// Funkcja wyliczajaca wartosci parametrów stanu środkowego palca na podstawie wartosci obserwacji
-	void observationMiddleFingerToState();
-
-	// Funkcja obliczajaca macierz jakobianu H
-	void calculateMiddleFingerH();
 
 	// Funkcja obliczająca o jaki wektor nalezy zaktualizowac wektor stan
 	void calculateMiddleFingerDiff();
@@ -214,16 +209,7 @@ protected:
 	// Funckja aktualizująca wektor stanu i macierz kowariancji P
 	void updateMiddleFingerState();
 
-	//*****************************************************************//
-	//*FUNKCJE PALCA WSKAZUJĄCEGO**************************************//
-	//*****************************************************************//
 
-
-	// Funkcja wyliczajaca wartosci parametrów stanu palca wskazujacego na podstawie wartosci obserwacji
-	void observationForeFingerToState();
-
-	// Funkcja obliczajaca macierz jakobianu H
-	void calculateForeFingerH();
 
 private:
 
