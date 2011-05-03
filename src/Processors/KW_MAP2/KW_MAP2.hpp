@@ -211,6 +211,9 @@ protected:
 	// Otrzymanie obserwacji środkowego palca
 	void getForeFingerObservation();
 
+	// Funkcja wyliczajaca wartosci parametrów stanu palca wskazujacego na podstawie wartosci obserwacji
+	void observationForeFingerToState();
+
 private:
 
 	cv::Mat tsl_img;
@@ -326,6 +329,9 @@ private:
 
 	// poczatkowa hipoteza środkowego palca
 	vector<double> s0_FFinger;
+
+	// wektor stanu dłoni obliczona na podstawie aktualnej obserwacji
+	vector<double> sTest3;
 
 
 };

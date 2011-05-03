@@ -79,6 +79,7 @@ bool KW_MAP2::onStep() {
 
 		//palec wskazujacy
 		z_FFinger.clear();
+		sTest3.clear();
 
 		if(STOP == false)
 		{
@@ -121,6 +122,8 @@ bool KW_MAP2::onStep() {
 		//palec wskazujacy
 		getForeFingerObservation();
 		projectionFingerObservation(z_FFinger, 200, 200, 200);
+		observationForeFingerToState();
+		projectionFingerState(sTest3, 0, 255, 255);
 
 
 
@@ -1078,6 +1081,35 @@ void KW_MAP2::getForeFingerObservation()
 	z_FFinger.push_back(alfa);
 	z_FFinger.push_back(w);
 }
+
+// Funkcja wyliczajaca wartosci parametrów stanu palca wskazujacego na podstawie wartosci obserwacji
+void KW_MAP2::observationForeFingerToState()
+{
+	float s_mx, s_my, s_angle, s_heigth, s_width;
+
+	s_mx = z_FFinger[0] + 0.72 * (z_FFinger[2] - z_FFinger[0]);
+	s_my = z_FFinger[1] + 0.72 * (z_FFinger[3] - z_FFinger[1]);
+
+	Types::Ellipse * el;
+
+	el = new Types::Ellipse(cv::Point(s_mx, s_my ), Size2f(10, 10));
+	el->setCol(CV_RGB(0,255,255));
+	drawcont.add(el);
+
+	s_angle = z_FFinger[4];
+	s_heigth = 0.56 * (sqrt((z_FFinger[0]-z_FFinger[2])*(z_FFinger[0]-z_FFinger[2])+(z_FFinger[1]-z_FFinger[3])*(z_FFinger[1]-z_FFinger[3])));
+	s_width = 0.12 * z_FFinger[5];
+
+	sTest3.push_back(s_mx);
+	sTest3.push_back(s_my);
+	sTest3.push_back(s_angle);
+	sTest3.push_back(s_heigth);
+	sTest3.push_back(s_width);
+
+}
+
+
+/*************************************************************************/
 
 //konstruktor
 KW_MAP2::KW_MAP2(const std::string & name) :
