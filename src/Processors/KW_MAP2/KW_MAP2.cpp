@@ -79,6 +79,8 @@ bool KW_MAP2::onStep() {
 
 		//palec wskazujacy
 		z_FFinger.clear();
+	//	s_FFinger.clear();
+		h_z_FFinger.clear();
 		sTest3.clear();
 
 		if(STOP == false)
@@ -93,7 +95,7 @@ bool KW_MAP2::onStep() {
 		//	projectionObservation(z, 255, 255, 255);
 			observationToState();
 			projectionState(sTest, 0, 255, 255);
-		//	projectionState(s, 255, 255, 255);
+			projectionState(s, 255, 255, 255);
 			stateToObservation();
 		//	projectionObservation(h_z, 255, 0, 255);
 			calculateDiff();
@@ -111,10 +113,10 @@ bool KW_MAP2::onStep() {
 		projectionFingerObservation(z_MFinger, 200, 200, 200);
 		observationMiddleFingerToState();
 		projectionFingerState(sTest2, 0, 255, 255);
-	//	projectionFingerState(s_MFinger, 255, 255, 255);
-	//	stateMiddleFingerToObservation(sTest2);
-		stateMiddleFingerToObservation(s_MFinger);
-	//	projectionFingerObservation(h_z_MFinger, 255, 0, 0);
+		projectionFingerState(s_MFinger, 255, 255, 255);
+
+		h_z_MFinger = stateFingerToObservation(s_MFinger, 7.0/6.0);
+		projectionFingerObservation(h_z_MFinger, 255, 255, 0);
 		calculateMiddleFingerH();
 		calculateMiddleFingerDiff();
 		updateMiddleFingerState();
@@ -124,6 +126,9 @@ bool KW_MAP2::onStep() {
 		projectionFingerObservation(z_FFinger, 200, 200, 200);
 		observationForeFingerToState();
 		projectionFingerState(sTest3, 0, 255, 255);
+		h_z_FFinger = stateFingerToObservation(sTest3, 9.0/7.0);
+		projectionFingerObservation(h_z_FFinger, 255, 255, 0);
+
 
 
 
@@ -918,28 +923,7 @@ void KW_MAP2::projectionFingerState(vector<double> s, int R, int G, int B)
 
 
 }
-// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
-void KW_MAP2::stateMiddleFingerToObservation(vector <double> s_MFinger)
-{
-	float hz_downX, hz_downY, hz_topX, hz_topY, hz_angle, hz_width;
 
-	hz_downX = s_MFinger[0] - 7.0/6.0 * s_MFinger[3]*cos(s_MFinger[2]);
-	hz_downY = s_MFinger[1] + 7.0/6.0 * s_MFinger[3]*sin(s_MFinger[2]);
-
-	hz_topX = s_MFinger[0] + 1.0/2.0 * s_MFinger[3]*cos(s_MFinger[2]);
-	hz_topY = s_MFinger[1] - 1.0/2.0 * s_MFinger[3]*sin(s_MFinger[2]);
-
-	hz_angle = s_MFinger[2];
-	hz_width = 25/3.0 * s_MFinger[4];
-
-	h_z_MFinger.push_back(hz_downX);
-	h_z_MFinger.push_back(hz_downY);
-	h_z_MFinger.push_back(hz_topX);
-	h_z_MFinger.push_back(hz_topY);
-	h_z_MFinger.push_back(hz_angle);
-	h_z_MFinger.push_back(hz_width);
-
-}
 
 void KW_MAP2::calculateMiddleFingerH()
 {
@@ -1106,6 +1090,62 @@ void KW_MAP2::observationForeFingerToState()
 	sTest3.push_back(s_heigth);
 	sTest3.push_back(s_width);
 
+}
+
+// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
+vector <double> KW_MAP2::stateFingerToObservation(vector <double> s_Finger, float a)
+{
+	float hz_downX, hz_downY, hz_topX, hz_topY, hz_angle, hz_width;
+
+	hz_downX = s_Finger[0] - a * s_Finger[3]*cos(s_Finger[2]);
+	hz_downY = s_Finger[1] + a * s_Finger[3]*sin(s_Finger[2]);
+
+	hz_topX = s_Finger[0] + 1.0/2.0 * s_Finger[3]*cos(s_Finger[2]);
+	hz_topY = s_Finger[1] - 1.0/2.0 * s_Finger[3]*sin(s_Finger[2]);
+
+	hz_angle = s_Finger[2];
+	hz_width = 25/3.0 * s_Finger[4];
+
+	vector <double> h_z_Finger;
+
+	h_z_Finger.push_back(hz_downX);
+	h_z_Finger.push_back(hz_downY);
+	h_z_Finger.push_back(hz_topX);
+	h_z_Finger.push_back(hz_topY);
+	h_z_Finger.push_back(hz_angle);
+	h_z_Finger.push_back(hz_width);
+
+	return h_z_Finger;
+}
+
+
+void KW_MAP2::calculateForeFingerH()
+{
+
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			H_FFinger[i][j] = 0;
+		}
+	}
+
+	H_FFinger[0][0] = 1;
+	H_FFinger[2][0] = 9.0/7.0 * s_FFinger[3] * sin(s_FFinger[2]);
+	H_FFinger[3][0] = - 9.0/7.0 * cos(s_FFinger[2]);
+
+	H_MFinger[1][1] = 1;
+	H_MFinger[2][1] = 9.0/7.0 * s_FFinger[3] * cos(s_FFinger[2]);
+	H_MFinger[3][1] = 9.0/7.0 * sin(s_FFinger[2]);
+
+	H_MFinger[0][2] = 1;
+	H_MFinger[2][2] = - 1.0/2.0 * s_FFinger[3] * sin(s_FFinger[2]);
+	H_MFinger[3][2] = 1.0/2.0 * cos(s_FFinger[2]);
+
+	H_MFinger[1][3] = 1;
+	H_MFinger[2][3] = - 1.0/2.0 * s_FFinger[3] * cos(s_FFinger[2]);
+	H_MFinger[3][3] = - 1.0/2.0 * sin(s_FFinger[2]);
+
+	H_MFinger[2][4] = 1.0;
+	H_MFinger[4][5] = 25/3.0;
 }
 
 

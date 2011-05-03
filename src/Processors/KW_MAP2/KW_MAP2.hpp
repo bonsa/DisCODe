@@ -175,6 +175,18 @@ protected:
 
 	// Funkcja sprawdzająca czy warunek końcowy jest sprawdzony
 	void stopCondition();
+	//*****************************************************************//
+	//*FUNKCJE wspolne dla PALCÓW****************************************//
+	//*****************************************************************//
+
+	// Funckja odpowiedzialna za projekcie obserwacji palca
+	void projectionFingerObservation(vector<double> z, int R, int G, int B);
+
+	void projectionFingerState(vector<double> s, int R, int G, int B);
+
+	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
+	vector <double> stateFingerToObservation(vector <double> s_Finger, float a);
+
 
 	//*****************************************************************//
 	//*FUNKCJE SRODKOWEGO PALCA****************************************//
@@ -183,17 +195,8 @@ protected:
 	// Otrzymanie obserwacji środkowego palca
 	void getMiddleFingerObservation();
 
-	// Funckja odpowiedzialna za projekcie obserwacji palca
-	void projectionFingerObservation(vector<double> z, int R, int G, int B);
-
 	// Funkcja wyliczajaca wartosci parametrów stanu środkowego palca na podstawie wartosci obserwacji
 	void observationMiddleFingerToState();
-
-	void projectionFingerState(vector<double> s, int R, int G, int B);
-
-	// Funkcja wyliczajaca wartosci parametrów obserwacji na podstawie wartosci obserwacji
-	void stateMiddleFingerToObservation(vector <double> s_MFinger);
-
 
 	// Funkcja obliczajaca macierz jakobianu H
 	void calculateMiddleFingerH();
@@ -213,6 +216,9 @@ protected:
 
 	// Funkcja wyliczajaca wartosci parametrów stanu palca wskazujacego na podstawie wartosci obserwacji
 	void observationForeFingerToState();
+
+	// Funkcja obliczajaca macierz jakobianu H
+	void calculateForeFingerH();
 
 private:
 
@@ -332,6 +338,12 @@ private:
 
 	// wektor stanu dłoni obliczona na podstawie aktualnej obserwacji
 	vector<double> sTest3;
+
+	// wektor obserwacji palca
+	vector<double> h_z_FFinger;
+
+	//macierz H
+	double H_FFinger[5][6];
 
 
 };
