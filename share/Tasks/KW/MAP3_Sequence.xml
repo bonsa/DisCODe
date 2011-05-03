@@ -94,11 +94,7 @@
 		<Event source="Seq.newImage" destination="Window4.onNewImage"/>
 		<Event source="MorphClose1.newImage" destination="DecPalm.onNewImage"/>
 		<Event source="Blob.newBlobs"       destination="DecPalm.onNewBlobs"/>
-		<Event source="DecPalm.newImage"       destination="Window4.onNewImage"/>
-	
-
-		
-	
+		<Event source="DecPalm.newImage"       destination="Window4.onNewImage"/>	
 		
 	</Events>
 

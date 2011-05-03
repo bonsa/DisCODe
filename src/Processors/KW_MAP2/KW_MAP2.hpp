@@ -199,6 +199,8 @@ protected:
 	vector <double> calculateFingerDiff(vector <double> h_z_Finger, vector <double> z_Finger, double invR_Finger[6][6], double H_Finger[5][6], double P_Finger[5][5]);
 
 	vector <double> updateFingerState(vector <double> diff_Finger, vector <double> s_Finger, double P_Finger[5][5]);
+
+
 	//*****************************************************************//
 	//*FUNKCJE SRODKOWEGO PALCA****************************************//
 	//*****************************************************************//
@@ -351,6 +353,79 @@ private:
 	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
 	vector<double> diff_FFinger;
 
+	//*****************************************************************//
+	//*ZMIENNE KCIUKA**************************************************//
+	//*****************************************************************//
+	//forefinger
+	// wektor obserwacji dłoni
+	vector<double> z_TFinger;
+
+	// wektor stanu dłoni
+	vector<double> s_TFinger;
+
+	// poczatkowa hipoteza środkowego palca
+	vector<double> s0_TFinger;
+
+	// wektor stanu dłoni obliczona na podstawie aktualnej obserwacji
+	vector<double> sTest4;
+
+	// wektor obserwacji palca
+	vector<double> h_z_TFinger;
+
+	//macierz H
+	double H_TFinger[5][6];
+
+	//macierz P
+	double P_TFinger[5][5];
+
+	//macierz R
+	double R_TFinger[6][6];
+
+	//macierz odwrotna kowariancji P
+	double invP_TFinger[5][5];
+
+	//macierz odwrotna kowariancji R
+	double invR_TFinger[6][6];
+
+	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
+	vector<double> diff_TFinger;
+
+	//*****************************************************************//
+	//*ZMIENNE MAŁEGO PALCA********************************************//
+	//*****************************************************************//
+
+	// wektor obserwacji dłoni
+	vector<double> z_SFinger;
+
+	// wektor stanu dłoni
+	vector<double> s_SFinger;
+
+	// poczatkowa hipoteza środkowego palca
+	vector<double> s0_SFinger;
+
+	// wektor stanu dłoni obliczona na podstawie aktualnej obserwacji
+	vector<double> sTest5;
+
+	// wektor obserwacji palca
+	vector<double> h_z_SFinger;
+
+	//macierz H
+	double H_SFinger[5][6];
+
+	//macierz P
+	double P_SFinger[5][5];
+
+	//macierz R
+	double R_SFinger[6][6];
+
+	//macierz odwrotna kowariancji P
+	double invP_SFinger[5][5];
+
+	//macierz odwrotna kowariancji R
+	double invR_SFinger[6][6];
+
+	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
+	vector<double> diff_SFinger;
 
 
 };

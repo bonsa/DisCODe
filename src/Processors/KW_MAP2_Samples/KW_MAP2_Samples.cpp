@@ -122,6 +122,42 @@ bool KW_MAP2_Samples::onStep() {
 		nStates_FFinger[3][ileObrazkow -1] = s_FFinger[3];
 		nStates_FFinger[4][ileObrazkow -1] = s_FFinger[4];
 
+		//kciuk
+		z_TFinger = getFingerObservation(4);
+
+		nObservation_TFinger[0][ileObrazkow -1] = z_TFinger[0];
+		nObservation_TFinger[1][ileObrazkow -1] = z_TFinger[1];
+		nObservation_TFinger[2][ileObrazkow -1] = z_TFinger[2];
+		nObservation_TFinger[3][ileObrazkow -1] = z_TFinger[3];
+		nObservation_TFinger[4][ileObrazkow -1] = z_TFinger[4];
+		nObservation_TFinger[5][ileObrazkow -1] = z_TFinger[5];
+
+		s_TFinger = observationFingerToState(z_TFinger, 0.72, 0.56);
+
+		nStates_TFinger[0][ileObrazkow -1] = s_TFinger[0];
+		nStates_TFinger[1][ileObrazkow -1] = s_TFinger[1];
+		nStates_TFinger[2][ileObrazkow -1] = s_TFinger[2];
+		nStates_TFinger[3][ileObrazkow -1] = s_TFinger[3];
+		nStates_TFinger[4][ileObrazkow -1] = s_TFinger[4];
+
+		//mały palec
+		z_SFinger = getFingerObservation(0);
+
+		nObservation_SFinger[0][ileObrazkow -1] = z_SFinger[0];
+		nObservation_SFinger[1][ileObrazkow -1] = z_SFinger[1];
+		nObservation_SFinger[2][ileObrazkow -1] = z_SFinger[2];
+		nObservation_SFinger[3][ileObrazkow -1] = z_SFinger[3];
+		nObservation_SFinger[4][ileObrazkow -1] = z_SFinger[4];
+		nObservation_SFinger[5][ileObrazkow -1] = z_SFinger[5];
+
+		s_SFinger = observationFingerToState(z_SFinger, 0.82, 0.36);
+
+		nStates_SFinger[0][ileObrazkow -1] = s_SFinger[0];
+		nStates_SFinger[1][ileObrazkow -1] = s_SFinger[1];
+		nStates_SFinger[2][ileObrazkow -1] = s_SFinger[2];
+		nStates_SFinger[3][ileObrazkow -1] = s_SFinger[3];
+		nStates_SFinger[4][ileObrazkow -1] = s_SFinger[4];
+
 
 		out_draw.write(drawcont);
 		newImage->raise();
@@ -665,48 +701,134 @@ void KW_MAP2_Samples::calculate()
 			plik<<"meanStates_MFinger["<<i<<"] = "<<meanStates_MFinger[i]<<";\n";
 		}
 
-		//*****************************************************************//
-		//*ZMIENNE PALCA WSKAZUJACEGO**************************************//
-		//*****************************************************************//
+	//*****************************************************************//
+	//*ZMIENNE PALCA WSKAZUJACEGO**************************************//
+	//*****************************************************************//
 
 
-			plik<<"\n ";
-			plik<<"RSamples_FFinger\n ";
+		plik<<"\n ";
+		plik<<"RSamples_FFinger\n ";
 
-			plik<<"R_FFinger = [\n ";
-			for (int i = 0; i< 6; i++)
+		plik<<"R_FFinger = [\n ";
+		for (int i = 0; i< 6; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
 			{
-				for(int j = 0; j< ileObrazkow; j++)
-				{
-					plik<<setprecision(5)<<nObservation_FFinger[i][j]<<" \t";
-				}
-				plik<<";";
+				plik<<setprecision(5)<<nObservation_FFinger[i][j]<<" \t";
 			}
-			plik<<"]";
+			plik<<";";
+		}
+		plik<<"]";
 
-			plik<<"\n ";
-			plik<<"PSamples_FFinger\n ";
+		plik<<"\n ";
+		plik<<"PSamples_FFinger\n ";
 
-			plik<<"P_MFinger = [\n ";
-			for (int i = 0; i< 5; i++)
+		plik<<"P_FFinger = [\n ";
+		for (int i = 0; i< 5; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
 			{
-				for(int j = 0; j< ileObrazkow; j++)
-				{
-					plik<<setprecision(5)<<nStates_FFinger[i][j]<<" \t";
-				}
-				plik<<";";
+				plik<<setprecision(5)<<nStates_FFinger[i][j]<<" \t";
 			}
-			plik<<"]\n\n";
+			plik<<";";
+		}
+		plik<<"]\n\n";
 
-			for (unsigned int i = 0 ; i < 5; i++)
+		for (unsigned int i = 0 ; i < 5; i++)
+		{
+			for (int j = 0; j < ileObrazkow; j++)
 			{
-				for (int j = 0; j < ileObrazkow; j++)
-				{
-					meanStates_FFinger[i] += nStates_FFinger[i][j];
-				}
-				meanStates_FFinger[i] /= ileObrazkow;
-				plik<<"meanStates_FFinger["<<i<<"] = "<<meanStates_FFinger[i]<<";\n";
+				meanStates_FFinger[i] += nStates_FFinger[i][j];
 			}
+			meanStates_FFinger[i] /= ileObrazkow;
+			plik<<"meanStates_FFinger["<<i<<"] = "<<meanStates_FFinger[i]<<";\n";
+		}
+
+	//*****************************************************************//
+	//*ZMIENNE KCIUKA**************************************************//
+	//*****************************************************************//
+
+
+		plik<<"\n ";
+		plik<<"RSamples_TFinger\n ";
+
+		plik<<"R_TFinger = [\n ";
+		for (int i = 0; i< 6; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
+			{
+				plik<<setprecision(5)<<nObservation_TFinger[i][j]<<" \t";
+			}
+			plik<<";";
+		}
+		plik<<"]";
+
+		plik<<"\n ";
+		plik<<"PSamples_TFinger\n ";
+
+		plik<<"P_TFinger = [\n ";
+		for (int i = 0; i< 5; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
+			{
+				plik<<setprecision(5)<<nStates_FFinger[i][j]<<" \t";
+			}
+			plik<<";";
+		}
+		plik<<"]\n\n";
+
+		for (unsigned int i = 0 ; i < 5; i++)
+		{
+			for (int j = 0; j < ileObrazkow; j++)
+			{
+				meanStates_TFinger[i] += nStates_TFinger[i][j];
+			}
+			meanStates_TFinger[i] /= ileObrazkow;
+			plik<<"meanStates_TFinger["<<i<<"] = "<<meanStates_TFinger[i]<<";\n";
+		}
+
+	//*****************************************************************//
+	//*ZMIENNE MAŁEGO PALCA*********************************************//
+	//*****************************************************************//
+
+
+		plik<<"\n ";
+		plik<<"RSamples_SFinger\n ";
+
+		plik<<"R_SFinger = [\n ";
+		for (int i = 0; i< 6; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
+			{
+				plik<<setprecision(5)<<nObservation_SFinger[i][j]<<" \t";
+			}
+			plik<<";";
+		}
+		plik<<"]";
+
+		plik<<"\n ";
+		plik<<"PSamples_SFinger\n ";
+
+		plik<<"P_SFinger = [\n ";
+		for (int i = 0; i< 5; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
+			{
+				plik<<setprecision(5)<<nStates_SFinger[i][j]<<" \t";
+			}
+			plik<<";";
+		}
+		plik<<"]\n\n";
+
+		for (unsigned int i = 0 ; i < 5; i++)
+		{
+			for (int j = 0; j < ileObrazkow; j++)
+			{
+				meanStates_SFinger[i] += nStates_SFinger[i][j];
+			}
+			meanStates_SFinger[i] /= ileObrazkow;
+			plik<<"meanStates_SFinger["<<i<<"] = "<<meanStates_SFinger[i]<<";\n";
+		}
 
 
 	plik.close();

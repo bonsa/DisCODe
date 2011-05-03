@@ -268,6 +268,44 @@ private:
 	//macierz przechowująca parametry stanu dla kilku obrazków
 	double meanStates_FFinger[5];
 
+	//*****************************************************************//
+	//*ZMIENNE KCIUKA**************************************************//
+	//*****************************************************************//
+
+	// wektor obserwacji dłoni
+	vector<double> z_TFinger;
+
+	// wektor stanu dłoni
+	vector<double> s_TFinger;
+
+	//macierz przechowująca parametry stanu środkowego palca dla kilku obrazków
+	double nStates_TFinger[5][20];
+
+	//macierz przechowująca parametry obserwacji środkowego palca dla kilku obrazków
+	double nObservation_TFinger[6][20];
+
+	//macierz przechowująca parametry stanu dla kilku obrazków
+	double meanStates_TFinger[5];
+
+	//*****************************************************************//
+	//*ZMIENNE MAŁEGO PALCA********************************************//
+	//*****************************************************************//
+
+	// wektor obserwacji dłoni
+	vector<double> z_SFinger;
+
+	// wektor stanu dłoni
+	vector<double> s_SFinger;
+
+	//macierz przechowująca parametry stanu środkowego palca dla kilku obrazków
+	double nStates_SFinger[5][20];
+
+	//macierz przechowująca parametry obserwacji środkowego palca dla kilku obrazków
+	double nObservation_SFinger[6][20];
+
+	//macierz przechowująca parametry stanu dla kilku obrazków
+	double meanStates_SFinger[5];
+
 };
 
 }//: namespace KW_MAP2_Samples
