@@ -348,6 +348,10 @@ private:
 	//macierz odwrotna kowariancji R
 	double invR_FFinger[6][6];
 
+	// różnica punktów charakterystycznych estymacji i punktów aktualnego obrazka
+	vector<double> diff_FFinger;
+
+
 
 };
 

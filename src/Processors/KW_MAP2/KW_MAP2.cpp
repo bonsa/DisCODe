@@ -81,6 +81,7 @@ bool KW_MAP2::onStep() {
 		z_FFinger.clear();
 	//	s_FFinger.clear();
 		h_z_FFinger.clear();
+		diff_FFinger.clear();
 		sTest3.clear();
 
 		if(STOP == false)
@@ -130,10 +131,15 @@ bool KW_MAP2::onStep() {
 		projectionFingerObservation(z_FFinger, 200, 200, 200);
 		sTest3 = observationFingerToState(z_FFinger, 0.72, 0.56);
 		projectionFingerState(sTest3, 0, 255, 255);
-		h_z_FFinger = stateFingerToObservation(sTest3, 9.0/7.0);
-	//	projectionFingerObservation(h_z_FFinger, 255, 255, 0);
+		projectionFingerState(s_FFinger, 255, 255, 255);
+		h_z_FFinger = stateFingerToObservation(s_FFinger, 9.0/7.0);
+		projectionFingerObservation(h_z_FFinger, 255, 255, 0);
+
 
 		calculateFingerH(s_FFinger, H_FFinger, 9.0/7.0);
+
+		diff_FFinger = calculateFingerDiff(h_z_FFinger, z_FFinger, invR_FFinger, H_FFinger, P_FFinger);
+		s_FFinger = updateFingerState(diff_FFinger,s_FFinger, P_FFinger);
 
 
 
