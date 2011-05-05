@@ -51,6 +51,7 @@
 
 		<DecPalm type="KW_MAP2" thread="Exec1" group="s1"> 
 		</DecPalm>
+		
 
 	
 	</Components>
@@ -70,10 +71,13 @@
 			<keys>t</keys> 
 		</Exec3>
 		
+		
 		<Exec2 type="periodic">
 			<main_component>Window4</main_component>
 			<interval>0.2</interval>
 		</Exec2>
+		
+
 		
 
 
@@ -89,14 +93,11 @@
 		<Event source="ConColor.newImage" destination="SkinDec.onNewImage"/>
 		<Event source="SkinDec.newImage" destination="BW.onNewImage"/>	
 		<Event source="BW.newImage" destination="MorphClose1.onNewImage"/>
-		<Event source="MorphClose1.newImage" destination="Blob.onNewImage"/>
-		
+		<Event source="MorphClose1.newImage" destination="Blob.onNewImage"/>		
 		<Event source="Seq.newImage" destination="Window4.onNewImage"/>
 		<Event source="MorphClose1.newImage" destination="DecPalm.onNewImage"/>
 		<Event source="Blob.newBlobs"       destination="DecPalm.onNewBlobs"/>
 		<Event source="DecPalm.newImage"       destination="Window4.onNewImage"/>
-	
-
 		
 	
 		

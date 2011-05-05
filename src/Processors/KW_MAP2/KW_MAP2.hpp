@@ -35,11 +35,13 @@ using namespace std;
  */
 struct Props: public Base::Props
 {
+	bool triggered;
 	/*!
 	 * \copydoc Base::Props::load
 	 */
 	void load(const ptree & pt)
 	{
+		triggered = pt.get("triggered", false);
 	}
 
 	/*!
@@ -47,6 +49,7 @@ struct Props: public Base::Props
 	 */
 	void save(ptree & pt)
 	{
+		pt.put("triggered", triggered);
 	}
 };
 
@@ -133,6 +136,14 @@ protected:
 	/// New image is waiting
 	Base::EventHandler <KW_MAP2> h_map;
 
+	/*!
+	 * Event handler function.
+	 */
+	void onTrigger();
+
+	/// Event handler.
+	Base::EventHandler<KW_MAP2> h_onTrigger;
+
 
 	/// Input blobs
 	Base::DataStreamIn <Types::Blobs::BlobResult> in_blobs;
@@ -147,10 +158,6 @@ protected:
 	Base::DataStreamOut < Types::Blobs::BlobResult > out_signs;
 
 	Base::DataStreamOut < Types::DrawableContainer > out_draw;
-
-	/// Properties
-	Props props;
-
 
 
 	/*!
@@ -212,21 +219,17 @@ protected:
 
 	bool stopCondition(vector <double> s, vector <double> s0, double invP[5][5], vector <double> diff, float limit);
 
-	//*****************************************************************//
-	//*FUNKCJE SRODKOWEGO PALCA****************************************//
-	//*****************************************************************//
-
-	// Funkcja obliczająca o jaki wektor nalezy zaktualizowac wektor stan
-	void calculateMiddleFingerDiff();
-
-	// Funckja aktualizująca wektor stanu i macierz kowariancji P
-	void updateMiddleFingerState();
-
 
 
 private:
 
 	bool MAP;
+
+	/// MAP properties
+	Props props;
+
+	double error;
+
 
 	cv::Mat tsl_img;
 	cv::Mat segments;
@@ -288,6 +291,9 @@ private:
 
 	//wspołczynnik zapominania
 	double factor;
+
+	//wspołczynnik skalujacy wielkosc zmiany parametrów stanu
+	double factor2;
 
 	// funkcja warunek stopu, jesli STOP = true estymacja MAP jest zakończona
 	bool STOP;

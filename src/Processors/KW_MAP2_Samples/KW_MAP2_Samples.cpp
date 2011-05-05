@@ -652,6 +652,20 @@ void KW_MAP2_Samples::calculate()
 	}
 	plik<<"]";
 
+
+	//dla Kasprzaka
+
+	plik<<"\n\nR = \n";
+	for (int i = 0; i< 5; i++)
+	{
+		for(int j = 0; j< ileObrazkow; j++)
+		{
+			plik<<setprecision(4)<<nObservation[i][j]<<" \t";
+		}
+		plik<<"\n";
+	}
+	plik<<"\n";
+
 	plik<<"\n ";
 	plik<<"PSamples\n ";
 
@@ -665,6 +679,18 @@ void KW_MAP2_Samples::calculate()
 		plik<<";";
 	}
 	plik<<"]\n\n";
+
+	// dla KAsprzaka
+	plik<<"P = \n";
+	for (int i = 0; i< 5; i++)
+	{
+		for(int j = 0; j< ileObrazkow; j++)
+		{
+			plik<<setprecision(4)<<nStates[i][j]<<" \t";
+		}
+		plik<<"\n";
+	}
+	plik<<"\n\n";
 
 	for (unsigned int i = 0 ; i < 5; i++)
 	{
@@ -866,11 +892,23 @@ void KW_MAP2_Samples::calculate()
 			plik<<";";
 		}
 		plik<<"]";
+		// dla prof. Kasprzaka
+		plik<<"RSamples_RFinger\n ";
+		plik<<"R_RFinger = \n";
+		for (int i = 0; i< 6; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
+			{
+				plik<<setprecision(4)<<nObservation_RFinger[i][j]<<" \t";
+			}
+			plik<<"\n";
+		}
+		plik<<"]";
 
 		plik<<"\n ";
 		plik<<"PSamples_RFinger\n ";
 
-		plik<<"P_RFinger = [\n ";
+		plik<<"P_RFinger = \n ";
 		for (int i = 0; i< 5; i++)
 		{
 			for(int j = 0; j< ileObrazkow; j++)
@@ -878,6 +916,18 @@ void KW_MAP2_Samples::calculate()
 				plik<<setprecision(5)<<nStates_RFinger[i][j]<<" \t";
 			}
 			plik<<";";
+		}
+		plik<<"]\n\n";
+
+		// dla prof. Kasprzaka
+		plik<<"P_RFinger = \n";
+		for (int i = 0; i< 5; i++)
+		{
+			for(int j = 0; j< ileObrazkow; j++)
+			{
+				plik<<setprecision(4)<<nStates_RFinger[i][j]<<" \t";
+			}
+			plik<<"\n";
 		}
 		plik<<"]\n\n";
 

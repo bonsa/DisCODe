@@ -18,7 +18,7 @@ namespace KW_MAP3_Filter {
 #define H(x) (x>>1)
 
 KW_MAP3_InitialFilter::KW_MAP3_InitialFilter(const std::string & name) : Base::Component(name),
-
+/* dla filmiku działa, tylko wszystko jest zakomentowane oprócz 2 pierwszych linijek
 		blue_B("grupa1|  down_blue_B", 255, "range"),
 		blue_R("grupa1|  up_blue_R", 150, "range"),
 		blue_G("grupa1|  up_blue_G", 0, "range"),
@@ -40,7 +40,28 @@ KW_MAP3_InitialFilter::KW_MAP3_InitialFilter(const std::string & name) : Base::C
 		blue_in_contast("grupa6|  down_blue_in_contast", 40, "range"),
 		green_in_contast("grupa6|  down_green_in_contast", 45, "range")
 
+*/
 
+		blue_B("grupa1|  down_blue_B", 255, "range"),
+		blue_R("grupa1|  up_blue_R", 10, "range"),
+		blue_G("grupa1|  up_blue_G", 230, "range"),
+
+		green_G("grupa2|  down_green_G", 0, "range"),
+		green_R("grupa2|  up_green_R", 0, "range"),
+		green_B("grupa2|  up_green_B", 0, "range"),
+
+		dark_R("grupa3|  up_dark_R", 99, "range"),
+		dark_G("grupa3|  up_dark_G", 82, "range"),
+		dark_B("grupa3|  up_dark_B", 61, "range"),
+
+		green("grupa4|  down_green", 196, "range"),
+		red_green("grupa4|  down_red_green", 54, "range"),
+
+		yellow_G("grupa5|  down_yellow_G", 140, "range"),
+		yellow_B("grupa5|  up_yellow_B", 100, "range"),
+
+		blue_in_contast("grupa6|  down_blue_in_contast", 40, "range"),
+		green_in_contast("grupa6|  down_green_in_contast", 54, "range")
 
 {
 	LOG(LTRACE) << "Hello KW_MAP3_InitialFilter\n";
@@ -199,14 +220,16 @@ void KW_MAP3_InitialFilter::onNewImage()
 				G = RGB_p[j + 1];
 				R = RGB_p[j + 2];
 
+				//wszystko było zakomentowane oprócz dwóch pierwszych linijek
+
 				if((B > blue_B && R < blue_R && G < blue_G)  // too much blue
 					||(G > green_G && R < green_R && B < green_B) // too much green
-				//	||(B < dark_B && R < dark_R && G < dark_G)  // too dark
-				//	||(G > green) //Green
-				//	||(R+G > red_green)  // too much red and green (yellow like color)
-				//	||(G > yellow_G && B < yellow_B) // too Yellow like also
-				//	||(1.0*B/(R+G+B) > 0.01 * blue_in_contast) // too much blue in contrast to others
-				//	||(1.0*G/(R+G+B) > 0.01 * green_in_contast)// // too much green in contrast to others
+					||(B < dark_B && R < dark_R && G < dark_G)  // too dark
+					||(G > green) //Green
+					//||(R+G > red_green)  // too much red and green (yellow like color)
+					//||(G > yellow_G && B < yellow_B) // too Yellow like also
+					||(1.0*B/(R+G+B) > 0.01 * blue_in_contast) // too much blue in contrast to others
+					||(1.0*G/(R+G+B) > 0.01 * green_in_contast)// // too much green in contrast to others
 				//	(R < 102 && G > 100 && B > 110 && G < 140 && B <160)
 					)
 					{

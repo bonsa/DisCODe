@@ -2,13 +2,22 @@
 <Task>
 	<!-- List of components, data: 01.03.10 -->
 	<Components>
-
+	
 		<Movie type="Movie" thread="Exec1" group="s1">
 		<filename>/home/kasia/Filmy/10.04.avi</filename>
 		<loop>true</loop>
+	
 		</Movie>
-
 		
+		<Kbd1 type="Keyboard" thread="Exec3" group="s1">
+            <keys>t</keys> 
+        </Kbd1>
+
+<!--
+		<Movie type="CameraOpenCV"  thread="Exec1" group="s1">
+			<device>1</device>
+		</Movie>
+-->
 		<Window4 type="CvWindow" thread="Exec2" group="s1">
 
 		</Window4>
@@ -39,6 +48,7 @@
 		</Blob>
 
 		<DecPalm type="KW_MAP2" thread="Exec1" group="s1"> 
+		<triggered>true</triggered>	
 		</DecPalm>
 		
 		<Sink type="CvVideoWriter" thread="Exec1" group="s1">
@@ -73,6 +83,11 @@
 		<Exec2 type="continuous">
 			<main_component>Window4</main_component>
 		</Exec2>
+		
+		<Exec3 type="continuous">
+			<main_component>Kbd1</main_component>
+			<keys>t</keys> 
+		</Exec3>
 
 
 	</Executors>
@@ -91,6 +106,7 @@
 		<Event source="MorphClose1.newImage" destination="DecPalm.onNewImage"/>
 		<Event source="Blob.newBlobs"       destination="DecPalm.onNewBlobs"/>
 		<Event source="DecPalm.newImage"       destination="Window4.onNewImage"/>
+		<Event source="Kbd1.t_Pressed" destination="DecPalm.onTrigger"/>
 	
 	</Events>
 
