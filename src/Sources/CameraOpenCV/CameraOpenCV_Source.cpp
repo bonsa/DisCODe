@@ -14,7 +14,7 @@ namespace Sources {
 namespace CameraOpenCV {
 
 CameraOpenCV_Source::CameraOpenCV_Source(const std::string & name) : Base::Component(name),
-		m_device("device", boost::bind(&CameraOpenCV_Source::onDeviceCahnged, this, _1, _2), 1),
+		m_device("device", boost::bind(&CameraOpenCV_Source::onDeviceCahnged, this, _1, _2), 0),
 		m_width("width", 640, "combo"),
 		m_height("width", 480, "combo")
 {
